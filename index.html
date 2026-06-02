@@ -37,6 +37,7 @@ input{
   border:none;
   border-radius:8px;
   font-size:16px;
+  box-sizing: border-box; /* Fixes input overflow */
 }
 
 button{
@@ -105,7 +106,7 @@ button{
 
 <div class="inputWrap">
 <span class="currency">£</span>
-<input id="budget" type="number" placeholder="Monthly budget"/>
+<input id="budget" type="number" placeholder="Monthly budget" oninput="saveBudget()"/>
 </div>
 
 <div class="inputWrap">
@@ -166,28 +167,40 @@ function save(d){
   localStorage.setItem(key(),JSON.stringify(d));
 }
 
+// Added function to save budget changes
+function saveBudget(){
+  const val = parseFloat(document.getElementById("budget").value) || 0;
+  const d = getData();
+  d.budget = val;
+  save(d);
+  render();
+}
+
 /* ---------------- CORE ENGINE ---------------- */
 
-function calc(day){
-
+function calc(targetDay) {
   const d = getData();
   const days = daysInMonth();
+  const totalBudget = d.budget || 0;
 
-  let remaining = d.budget || 0;
-
-  for(let i=1;i<=day;i++){
-    const spent = (d.history || [])
-      .filter(h=>h.day===i)
-      .reduce((s,h)=>s+(h.amount||0),0);
-
-    remaining -= spent;
+  // 1. Calculate TOTAL spent up to the target day
+  let totalSpentUpToTarget = 0;
+  for (let i = 1; i <= targetDay; i++) {
+    totalSpentUpToTarget += (d.history || [])
+      .filter(h => h.day === i)
+      .reduce((s, h) => s + (h.amount || 0), 0);
   }
 
-  const daysLeft = Math.max(1, days - day + 1);
+  // 2. What is left out of the total budget on that target day
+  let remaining = totalBudget - totalSpentUpToTarget;
+
+  // 3. Daily safe spend calculation
+  const daysLeft = Math.max(1, days - targetDay + 1);
+  let daily = remaining / daysLeft;
 
   return {
     remaining,
-    daily: remaining / daysLeft
+    daily
   };
 }
 
@@ -207,7 +220,6 @@ function setView(v){
 /* ---------------- ADD SPEND ---------------- */
 
 function addSpend(){
-
   const val = parseFloat(document.getElementById("spend").value);
   if(isNaN(val)) return;
 
@@ -236,34 +248,40 @@ function resetMonth(){
 /* ---------------- TARGET LOGIC ---------------- */
 
 function getTargetDay(){
-
   const days = daysInMonth();
 
   if(view === "day"){
     return selectedDay;
   }
-
   if(view === "week"){
     return Math.min(selectedDay + 6, days);
   }
-
-  return days;
+  return days; // Month view looks at the end of the month
 }
 
 /* ---------------- RENDER ---------------- */
 
 function render(){
-
   const days = daysInMonth();
   const today = now().getDate();
+  const d = getData();
+
+  // Keep the budget input field showing what's saved
+  if(document.activeElement !== document.getElementById("budget")) {
+    document.getElementById("budget").value = d.budget || "";
+  }
 
   const target = getTargetDay();
   const state = calc(target);
-
   const remaining = state.remaining;
 
-  document.body.style.background =
-    remaining >= 0 ? "#1f8f4a" : "#c0392b";
+  // Update background color based on the dynamic view selection
+  document.body.style.background = remaining >= 0 ? "#1f8f4a" : "#c0392b";
+
+  // Dynamic text depending on Day/Week/Month view selection
+  let viewText = "Day";
+  if(view === "week") viewText = "Week (Next 7 Days)";
+  if(view === "month") viewText = "Month End";
 
   document.getElementById("mainValue").innerText =
     remaining >= 0
@@ -271,7 +289,7 @@ function render(){
       : `-£${Math.abs(remaining).toFixed(2)} Over`;
 
   document.getElementById("subValue").innerText =
-    `View: ${view}`;
+    `Target: ${viewText} (Day ${target})`;
 
   const sel = calc(selectedDay);
 
@@ -284,9 +302,7 @@ function render(){
   cal.innerHTML = "";
 
   for(let i=1;i<=days;i++){
-
     const r = calc(i);
-
     let cls = "day";
 
     if(i > today) cls += " future";
@@ -295,7 +311,6 @@ function render(){
     if(i === selectedDay) cls += " selected";
 
     const div = document.createElement("div");
-
     div.className = cls;
     div.innerText = i + "\n£" + r.daily.toFixed(0);
 
@@ -308,6 +323,7 @@ function render(){
   }
 }
 
+// Initial pull on load
 render();
 
 </script>
