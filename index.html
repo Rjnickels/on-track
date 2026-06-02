@@ -12,16 +12,15 @@
     transition: background 0.3s ease;
     color: white;
     display: flex;
-    align-items: flex-start;
     justify-content: center;
-    min-height: 100vh;
     padding: 20px;
+    min-height: 100vh;
   }
 
   .container {
-    text-align: center;
     width: 100%;
     max-width: 520px;
+    text-align: center;
   }
 
   input, button {
@@ -40,14 +39,22 @@
     cursor: pointer;
   }
 
-  .big {
-    font-size: 42px;
-    margin: 10px 0;
+  .panel {
+    margin: 12px 0;
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.12);
   }
 
-  .money {
-    font-size: 18px;
-    margin: 10px 0;
+  .safe {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .sub {
+    font-size: 14px;
+    opacity: 0.9;
   }
 
   .calendar {
@@ -61,17 +68,21 @@
     padding: 10px 0;
     border-radius: 8px;
     font-size: 12px;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.2);
+    color: black;
+    cursor: pointer;
   }
 
-  .green { background: #1f8f4a; }
-  .red { background: #c0392b; }
-  .future { background: rgba(255,255,255,0.1); }
+  .green { background: #1f8f4a; color: white; }
+  .red { background: #c0392b; color: white; }
+  .future { background: rgba(255,255,255,0.35); color: black; }
 
-  .small {
-    font-size: 13px;
-    opacity: 0.9;
-    margin-top: 10px;
+  .selectedBox {
+    margin-top: 12px;
+    font-size: 14px;
+    background: rgba(255,255,255,0.12);
+    padding: 10px;
+    border-radius: 8px;
   }
 </style>
 </head>
@@ -83,29 +94,35 @@
 
   <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
 
-  <input id="customSpend" type="number" placeholder="Enter spend (£)" />
+  <input id="spend" type="number" placeholder="Enter spend (£)" />
   <button onclick="addSpend()">Add Spend</button>
-  <button onclick="undoLast()">Undo Last Spend</button>
+  <button onclick="undoLast()">Undo Last</button>
   <button onclick="resetApp()">Reset Month</button>
 
-  <div class="big" id="status">—</div>
-  <div class="money" id="remaining">—</div>
+  <!-- 🔥 RESTORED MAIN PANEL -->
+  <div class="panel" id="panel">
+    <div class="safe" id="safeText">—</div>
+    <div class="sub" id="periodText">—</div>
+    <div class="sub" id="breakdownText">—</div>
+  </div>
 
-  <div class="small">Monthly Calendar</div>
   <div class="calendar" id="calendar"></div>
+
+  <div class="selectedBox" id="selectedDay">
+    Click a day to see details
+  </div>
 </div>
 
 <script>
 
-function monthKey(date = new Date()) {
-  return `${date.getFullYear()}-${date.getMonth()}`;
+function monthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
 function getData() {
-  const key = monthKey();
-  return JSON.parse(localStorage.getItem(key)) || {
+  return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
-    spent: 0,
     history: []
   };
 }
@@ -114,7 +131,7 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// --- BUDGET ---
+// budget
 document.getElementById("budget").addEventListener("change", (e) => {
   const data = getData();
   data.budget = parseFloat(e.target.value);
@@ -122,106 +139,116 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-// --- SPEND ---
+// spend
 function addSpend() {
-  const val = parseFloat(document.getElementById("customSpend").value);
+  const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
 
   const data = getData();
+  const today = new Date().getDate();
 
-  const now = new Date();
-  const day = now.getDate();
-
-  data.spent += val;
-
-  // store by day
-  if (!data.history) data.history = [];
-
-  data.history.push({
-    amount: val,
-    day: day
-  });
+  data.history.push({ amount: val, day: today });
 
   saveData(data);
-
-  document.getElementById("customSpend").value = "";
+  document.getElementById("spend").value = "";
   updateUI();
 }
 
-// --- UNDO ---
+// undo
 function undoLast() {
   const data = getData();
-  const last = data.history.pop();
-
-  if (!last) return;
-
-  data.spent -= last.amount;
-  if (data.spent < 0) data.spent = 0;
-
+  data.history.pop();
   saveData(data);
   updateUI();
 }
 
-// --- RESET ---
+// reset
 function resetApp() {
   localStorage.removeItem(monthKey());
   location.reload();
 }
 
-// --- CALENDAR ---
+// helpers
+function getDaySpend(data, day) {
+  return data.history
+    .filter(h => h.day === day)
+    .reduce((s, h) => s + h.amount, 0);
+}
+
+// calendar
 function renderCalendar(data) {
-  const container = document.getElementById("calendar");
-  container.innerHTML = "";
+  const el = document.getElementById("calendar");
+  el.innerHTML = "";
 
   const now = new Date();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
   const today = now.getDate();
 
-  for (let i = 1; i <= daysInMonth; i++) {
+  const dailyBudget = data.budget / daysInMonth;
 
-    const daySpend = data.history
-      .filter(h => h.day === i)
-      .reduce((sum, h) => sum + h.amount, 0);
+  for (let d = 1; d <= daysInMonth; d++) {
 
-    const expected = data.budget / daysInMonth;
+    const spend = getDaySpend(data, d);
 
     let cls = "day";
 
-    if (i > today) cls += " future";
-    else if (daySpend <= expected) cls += " green";
+    if (d > today) cls += " future";
+    else if (spend <= dailyBudget) cls += " green";
     else cls += " red";
 
-    const el = document.createElement("div");
-    el.className = cls;
-    el.innerText = i;
+    const div = document.createElement("div");
+    div.className = cls;
+    div.innerText = d;
 
-    container.appendChild(el);
+    div.onclick = () => {
+      document.getElementById("selectedDay").innerHTML = `
+        <b>Day ${d}</b><br>
+        Spent: £${spend.toFixed(2)}<br>
+        Budget: £${dailyBudget.toFixed(2)}
+      `;
+    };
+
+    el.appendChild(div);
   }
 }
 
-// --- UI ---
-function updateUI() {
-  const data = getData();
+// 🔥 RESTORED SUMMARY PANEL LOGIC
+function updatePanel(data) {
   const now = new Date();
 
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const expected = data.budget;
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const todaySpend = getDaySpend(data, now.getDate());
 
-  const remaining = expected - data.spent;
+  const allowedDaily = data.budget / daysInMonth;
+  const remaining = data.budget - data.history.reduce((s,h)=>s+h.amount,0);
 
-  const status = document.getElementById("status");
-  const remainingEl = document.getElementById("remaining");
+  document.getElementById("safeText").innerHTML =
+    `Safe to spend £${remaining.toFixed(2)}`;
 
-  if (remaining >= 0) {
+  document.getElementById("periodText").innerHTML =
+    `This Month`;
+
+  document.getElementById("breakdownText").innerHTML =
+    `Budget: £${data.budget || 0}<br>
+     Spent: £${data.history.reduce((s,h)=>s+h.amount,0).toFixed(2)}<br>
+     Allowed: £${data.budget || 0}`;
+}
+
+// main
+function updateUI() {
+  const data = getData();
+
+  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
+  const nowSpentToday = getDaySpend(data, new Date().getDate());
+  const dailyBudget = data.budget / new Date().getDate();
+
+  if (nowSpentToday <= dailyBudget) {
     document.body.style.background = "#1f8f4a";
-    status.innerHTML = "🟢 GREEN";
-    remainingEl.innerHTML = `Safe to spend £${remaining.toFixed(2)}`;
   } else {
     document.body.style.background = "#c0392b";
-    status.innerHTML = "🔴 RED";
-    remainingEl.innerHTML = `Over by £${Math.abs(remaining).toFixed(2)}`;
   }
 
+  updatePanel(data);
   renderCalendar(data);
 }
 
