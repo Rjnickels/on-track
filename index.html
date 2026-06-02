@@ -12,15 +12,16 @@
     transition: background 0.3s ease;
     color: white;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 20px;
   }
 
   .container {
     text-align: center;
-    width: 90%;
-    max-width: 420px;
+    width: 100%;
+    max-width: 520px;
   }
 
   input, button {
@@ -39,25 +40,8 @@
     cursor: pointer;
   }
 
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-  }
-
-  .tabs button {
-    flex: 1;
-    background: rgba(255,255,255,0.2);
-    color: white;
-  }
-
-  .tabs button.active {
-    background: white;
-    color: black;
-  }
-
   .big {
-    font-size: 46px;
+    font-size: 42px;
     margin: 10px 0;
   }
 
@@ -66,9 +50,28 @@
     margin: 10px 0;
   }
 
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 15px;
+  }
+
+  .day {
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .green { background: #1f8f4a; }
+  .red { background: #c0392b; }
+  .future { background: rgba(255,255,255,0.1); }
+
   .small {
-    font-size: 14px;
+    font-size: 13px;
     opacity: 0.9;
+    margin-top: 10px;
   }
 </style>
 </head>
@@ -81,41 +84,23 @@
   <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
 
   <input id="customSpend" type="number" placeholder="Enter spend (£)" />
-
   <button onclick="addSpend()">Add Spend</button>
   <button onclick="undoLast()">Undo Last Spend</button>
   <button onclick="resetApp()">Reset Month</button>
 
-  <div class="tabs">
-    <button onclick="setView('day')" id="tab-day" class="active">Day</button>
-    <button onclick="setView('week')" id="tab-week">Week</button>
-    <button onclick="setView('month')" id="tab-month">Month</button>
-  </div>
-
   <div class="big" id="status">—</div>
   <div class="money" id="remaining">—</div>
-  <div class="small" id="details"></div>
+
+  <div class="small">Monthly Calendar</div>
+  <div class="calendar" id="calendar"></div>
 </div>
 
 <script>
-let view = "day";
 
-// --- DATE HELPERS (FIXED PROPERLY) ---
 function monthKey(date = new Date()) {
   return `${date.getFullYear()}-${date.getMonth()}`;
 }
 
-function dayKey(date = new Date()) {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-}
-
-function weekKey(date = new Date()) {
-  const start = new Date(date);
-  start.setDate(date.getDate() - date.getDay());
-  return `${start.getFullYear()}-${start.getMonth()}-W${start.getDate()}`;
-}
-
-// --- STORAGE ---
 function getData() {
   const key = monthKey();
   return JSON.parse(localStorage.getItem(key)) || {
@@ -137,24 +122,33 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-// --- SPENDING ---
+// --- SPEND ---
 function addSpend() {
   const val = parseFloat(document.getElementById("customSpend").value);
   if (isNaN(val)) return;
 
   const data = getData();
+
+  const now = new Date();
+  const day = now.getDate();
+
   data.spent += val;
+
+  // store by day
+  if (!data.history) data.history = [];
+
   data.history.push({
     amount: val,
-    time: new Date().toISOString()
+    day: day
   });
 
   saveData(data);
+
   document.getElementById("customSpend").value = "";
   updateUI();
 }
 
-// --- UNDO LAST SPEND ---
+// --- UNDO ---
 function undoLast() {
   const data = getData();
   const last = data.history.pop();
@@ -174,47 +168,49 @@ function resetApp() {
   location.reload();
 }
 
-// --- VIEW SWITCH ---
-function setView(v) {
-  view = v;
+// --- CALENDAR ---
+function renderCalendar(data) {
+  const container = document.getElementById("calendar");
+  container.innerHTML = "";
 
-  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
-  document.getElementById("tab-" + v).classList.add("active");
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const today = now.getDate();
 
-  updateUI();
+  for (let i = 1; i <= daysInMonth; i++) {
+
+    const daySpend = data.history
+      .filter(h => h.day === i)
+      .reduce((sum, h) => sum + h.amount, 0);
+
+    const expected = data.budget / daysInMonth;
+
+    let cls = "day";
+
+    if (i > today) cls += " future";
+    else if (daySpend <= expected) cls += " green";
+    else cls += " red";
+
+    const el = document.createElement("div");
+    el.className = cls;
+    el.innerText = i;
+
+    container.appendChild(el);
+  }
 }
 
-// --- CORE LOGIC (FIXED CALENDAR AWARE) ---
+// --- UI ---
 function updateUI() {
   const data = getData();
   const now = new Date();
 
-  const day = now.getDate();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
-  let expected = 0;
-  let label = "";
-
-  if (view === "day") {
-    expected = data.budget / daysInMonth;
-    label = "Today";
-  }
-
-  if (view === "week") {
-    expected = (data.budget / daysInMonth) * 7;
-    label = "This Week";
-  }
-
-  if (view === "month") {
-    expected = data.budget;
-    label = "This Month";
-  }
+  const expected = data.budget;
 
   const remaining = expected - data.spent;
 
   const status = document.getElementById("status");
   const remainingEl = document.getElementById("remaining");
-  const details = document.getElementById("details");
 
   if (remaining >= 0) {
     document.body.style.background = "#1f8f4a";
@@ -226,15 +222,11 @@ function updateUI() {
     remainingEl.innerHTML = `Over by £${Math.abs(remaining).toFixed(2)}`;
   }
 
-  details.innerHTML = `
-    <b>${label}</b><br><br>
-    Budget: £${data.budget || 0}<br>
-    Spent: £${data.spent.toFixed(2)}<br>
-    Allowed: £${expected.toFixed(2)}
-  `;
+  renderCalendar(data);
 }
 
 updateUI();
+
 </script>
 
 </body>
