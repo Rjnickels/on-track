@@ -1,35 +1,315 @@
-function build(){
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stay Green</title>
+
+<style>
+  body {
+    margin:0;
+    font-family:Arial;
+    transition:0.3s;
+    color:white;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+    min-height:100vh;
+  }
+
+  .container {width:100%;max-width:560px;text-align:center;}
+
+  .inputWrap {position:relative;margin:6px 0;}
+
+  .currency {
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:0.6;
+    color:black;
+    font-weight:bold;
+  }
+
+  input {
+    width:100%;
+    padding:12px 12px 12px 28px;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+  }
+
+  button {
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    background:white;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+  }
+
+  .btnRow {display:flex;gap:8px;}
+  .btnRow button {width:50%;font-size:13px;padding:10px;}
+
+  .tabs {display:flex;gap:6px;margin:10px 0;}
+  .tabs button {flex:1;background:rgba(255,255,255,0.2);color:white;}
+  .tabs button.active {background:white;color:black;}
+
+  .panel {
+    background:rgba(255,255,255,0.12);
+    padding:14px;
+    border-radius:10px;
+    margin:10px 0;
+  }
+
+  .big {font-size:22px;font-weight:bold;}
+  .sub {font-size:14px;opacity:0.9;}
+
+  .selectedBox {
+    margin:10px 0;
+    padding:10px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.12);
+  }
+
+  .calendar {
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    margin-top:10px;
+  }
+
+  .day {
+    padding:10px 0;
+    border-radius:8px;
+    font-size:10px;
+    cursor:pointer;
+    white-space:pre-line;
+  }
+
+  .green {background:#1f8f4a;}
+  .red {background:#c0392b;}
+  .future {background:rgba(255,255,255,0.35); color:black;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Stay Green</h1>
+
+  <div class="inputWrap">
+    <span class="currency">£</span>
+    <input id="budget" type="number" placeholder="Monthly budget"/>
+  </div>
+
+  <div class="inputWrap">
+    <span class="currency">£</span>
+    <input id="spend" type="number" placeholder="Spend"/>
+  </div>
+
+  <button onclick="addSpend()">Add Spend</button>
+
+  <div class="btnRow">
+    <button onclick="resetDay()">Reset Day</button>
+    <button onclick="resetMonth()">Reset Month</button>
+  </div>
+
+  <div class="tabs">
+    <button onclick="setView('day')" id="dayBtn" class="active">Day</button>
+    <button onclick="setView('week')" id="weekBtn">Week</button>
+    <button onclick="setView('month')" id="monthBtn">Month</button>
+  </div>
+
+  <div class="panel">
+    <div class="big" id="mainValue">—</div>
+    <div class="sub" id="subValue">Live remaining</div>
+  </div>
+
+  <div class="selectedBox" id="selectedBox">Click a day</div>
+
+  <div class="calendar" id="calendar"></div>
+</div>
+
+<script>
+
+let view="day";
+let selectedDay=null;
+
+function now(){return new Date();}
+
+function key(){
+  const d=now();
+  return `${d.getFullYear()}-${d.getMonth()}`;
+}
+
+function getData(){
+  return JSON.parse(localStorage.getItem(key())) || {budget:0,history:[]};
+}
+
+function save(d){
+  localStorage.setItem(key(),JSON.stringify(d));
+}
+
+// ---------------- INPUT ----------------
+document.getElementById("budget").addEventListener("input",(e)=>{
+  const d=getData();
+  d.budget=parseFloat(e.target.value)||0;
+  save(d);
+  render();
+});
+
+// ---------------- VIEW ----------------
+function setView(v){
+  view=v;
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById(v+"Btn").classList.add("active");
+  render();
+}
+
+// ---------------- ADD ----------------
+function addSpend(){
+
+  const val=parseFloat(document.getElementById("spend").value);
+  if(isNaN(val)) return;
+
+  if(!selectedDay){
+    alert("Select a day first");
+    return;
+  }
 
   const d=getData();
-  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
+  d.history.push({amount:val,day:selectedDay});
+  save(d);
 
-  // Pre-calc total spent per day
-  const spentByDay = {};
-  for(let i=1;i<=days;i++){
-    spentByDay[i] = d.history
-      .filter(h=>h.day===i)
-      .reduce((s,h)=>s+h.amount,0);
-  }
+  document.getElementById("spend").value="";
+  render();
+}
+
+// ---------------- RESET DAY ----------------
+function resetDay(){
+  if(!selectedDay) return;
+  const d=getData();
+  d.history = d.history.filter(h=>h.day!==selectedDay);
+  save(d);
+  render();
+}
+
+// ---------------- RESET MONTH ----------------
+function resetMonth(){
+  localStorage.removeItem(key());
+  location.reload();
+}
+
+// ---------------- ENGINE (SAFE) ----------------
+function build(){
+
+  const data=getData();
+
+  const daysInMonth = new Date(
+    now().getFullYear(),
+    now().getMonth()+1,
+    0
+  ).getDate();
 
   const map={};
 
-  for(let i=1;i<=days;i++){
+  for(let i=1;i<=daysInMonth;i++){
 
-    // remaining budget AFTER all past spending up to THIS day
-    let remaining = d.budget;
+    let spentSoFar=0;
 
     for(let j=1;j<=i;j++){
-      remaining -= (spentByDay[j] || 0);
+      spentSoFar += data.history
+        .filter(h=>h.day===j)
+        .reduce((s,h)=>s+h.amount,0);
     }
 
-    const daysLeft = days - i + 1;
+    const remaining = data.budget - spentSoFar;
+    const daysLeft = daysInMonth - i + 1;
 
-    // THIS is the key change:
-    // evenly distribute remaining from this point onward
-    const dailySafe = remaining / daysLeft;
-
-    map[i] = {
-      remaining,
-      dailySafe
+    map[i]={
+      remaining: remaining || 0,
+      dailySafe: daysLeft > 0 ? (remaining / daysLeft) : 0
     };
   }
+
+  return map;
+}
+
+// ---------------- VIEW LOGIC (SAFE) ----------------
+function viewValue(val){
+
+  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
+  const daysLeft=days-now().getDate()+1;
+
+  if(view==="day") return val/(daysLeft||1);
+  if(view==="week") return val/Math.max(1,Math.ceil(daysLeft/7));
+  return val;
+}
+
+// ---------------- RENDER ----------------
+function render(){
+
+  const map=build();
+  const today=now().getDate();
+
+  const state=map[today] || {remaining:0,dailySafe:0};
+
+  document.body.style.background=
+    state.remaining>=0 ? "#1f8f4a" : "#c0392b";
+
+  document.getElementById("mainValue").innerText=
+    `£${viewValue(state.remaining).toFixed(2)} (${view})`;
+
+  document.getElementById("subValue").innerText=
+    `Remaining: £${state.remaining.toFixed(2)}`;
+
+  if(selectedDay){
+    const s=map[selectedDay] || {remaining:0,dailySafe:0};
+
+    document.getElementById("selectedBox").innerHTML=
+      `<b>Day ${selectedDay}</b><br>
+       Remaining: £${s.remaining.toFixed(2)}<br>
+       Safe/day: £${s.dailySafe.toFixed(2)}`;
+  }
+
+  const cal=document.getElementById("calendar");
+  cal.innerHTML="";
+
+  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
+
+  for(let i=1;i<=days;i++){
+
+    const s=map[i] || {remaining:0,dailySafe:0};
+
+    let cls="day";
+    if(i>today) cls+=" future";
+    else cls+=(s.remaining>=0?" green":" red");
+
+    const div=document.createElement("div");
+    div.className=cls;
+
+    div.innerText=
+      i+
+      "\n£"+s.remaining.toFixed(0)+
+      "\n/day £"+s.dailySafe.toFixed(0);
+
+    div.onclick=()=>{
+      selectedDay=i;
+      render();
+    };
+
+    cal.appendChild(div);
+  }
+}
+
+render();
+
+</script>
+
+</body>
+</html>
