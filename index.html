@@ -67,7 +67,13 @@
 
   .big {
     font-size: 48px;
-    margin: 15px 0;
+    margin: 10px 0;
+  }
+
+  .money {
+    font-size: 20px;
+    margin: 10px 0;
+    opacity: 0.95;
   }
 
   .small {
@@ -103,6 +109,7 @@
   </div>
 
   <div class="big" id="status">—</div>
+  <div class="money" id="remaining">—</div>
   <div class="small" id="details"></div>
 </div>
 
@@ -187,22 +194,27 @@ function updateUI() {
     label = "This Month";
   }
 
+  const remaining = expected - data.spent;
+
   const status = document.getElementById("status");
+  const remainingEl = document.getElementById("remaining");
   const details = document.getElementById("details");
 
-  if (data.spent <= expected) {
+  if (remaining >= 0) {
     document.body.style.background = "#1f8f4a";
     status.innerHTML = "🟢 GREEN";
+    remainingEl.innerHTML = `You can safely spend £${remaining.toFixed(2)}`;
   } else {
     document.body.style.background = "#c0392b";
     status.innerHTML = "🔴 RED";
+    remainingEl.innerHTML = `Over by £${Math.abs(remaining).toFixed(2)}`;
   }
 
   details.innerHTML = `
     <b>${label}</b><br><br>
     Budget: £${data.budget || 0}<br>
     Spent: £${data.spent.toFixed(2)}<br>
-    Expected: £${expected.toFixed(2)}
+    Allowed: £${expected.toFixed(2)}
   `;
 }
 
