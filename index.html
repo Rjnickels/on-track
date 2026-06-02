@@ -33,8 +33,8 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: black;
     opacity: 0.6;
+    color: black;
     font-weight: bold;
   }
 
@@ -89,21 +89,6 @@
   .error {
     color: #ff4d4d;
     font-size: 14px;
-    margin-top: 5px;
-  }
-
-  .calendarHeader {
-    margin-top: 10px;
-    font-size: 14px;
-    opacity: 0.9;
-  }
-
-  .selectedBox {
-    margin: 10px 0;
-    font-size: 14px;
-    background: rgba(255,255,255,0.12);
-    padding: 10px;
-    border-radius: 8px;
   }
 
   .calendar {
@@ -117,15 +102,13 @@
     padding: 10px 0;
     border-radius: 8px;
     font-size: 11px;
-    background: rgba(255,255,255,0.2);
-    color: black;
-    cursor: pointer;
     white-space: pre-line;
+    cursor: pointer;
   }
 
-  .green { background: #1f8f4a; color: white; }
-  .red { background: #c0392b; color: white; }
-  .future { background: rgba(255,255,255,0.35); color: black; }
+  .green { background:#1f8f4a; }
+  .red { background:#c0392b; }
+  .future { background:rgba(255,255,255,0.35); color:black; }
 </style>
 </head>
 
@@ -134,213 +117,141 @@
 <div class="container">
   <h1>Stay Green</h1>
 
-  <!-- £ BUDGET -->
   <div class="inputWrap">
     <span class="currency">£</span>
-    <input id="budget" type="number" placeholder="Monthly disposable income" />
+    <input id="budget" type="number" placeholder="Monthly budget"/>
   </div>
 
-  <!-- £ SPEND -->
   <div class="inputWrap">
     <span class="currency">£</span>
-    <input id="spend" type="number" placeholder="Enter spend" />
+    <input id="spend" type="number" placeholder="Spend"/>
   </div>
 
-  <div id="error" class="error"></div>
+  <div id="error"></div>
 
   <button onclick="addSpend()">Add Spend</button>
-  <button onclick="resetSelectedDay()">Reset Selected Day</button>
-  <button onclick="resetMonth()">Reset Month</button>
+
+  <div class="tabs">
+    <button onclick="setView('day')" id="dayBtn" class="active">Day</button>
+    <button onclick="setView('week')" id="weekBtn">Week</button>
+    <button onclick="setView('month')" id="monthBtn">Month</button>
+  </div>
 
   <div class="panel">
-    <div class="big" id="safeText">—</div>
-    <div class="sub" id="periodText">Running Balance</div>
-    <div class="sub" id="breakdownText">—</div>
+    <div class="big" id="mainValue">—</div>
+    <div class="sub" id="subValue">—</div>
   </div>
 
-  <div class="selectedBox" id="selectedDayBox">
-    Click a day to inspect balance
-  </div>
-
-  <div class="calendarHeader" id="calendarHeader"></div>
   <div class="calendar" id="calendar"></div>
 </div>
 
 <script>
 
+let view = "day";
 let selectedDay = null;
 
-function now() {
-  return new Date();
-}
+function now(){ return new Date(); }
 
-function monthKey() {
+function key(){
   const d = now();
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
-function getData() {
-  return JSON.parse(localStorage.getItem(monthKey())) || {
-    budget: 0,
-    history: []
-  };
+function getData(){
+  return JSON.parse(localStorage.getItem(key())) || {budget:0,history:[]};
 }
 
-function saveData(data) {
-  localStorage.setItem(monthKey(), JSON.stringify(data));
+function save(d){
+  localStorage.setItem(key(), JSON.stringify(d));
 }
 
-// ---------------- BUDGET INPUT ----------------
-document.getElementById("budget").addEventListener("input", (e) => {
-  const data = getData();
-  const v = parseFloat(e.target.value);
-  data.budget = isNaN(v) ? 0 : v;
-  saveData(data);
-  updateUI();
+// ---------------- INPUT ----------------
+document.getElementById("budget").addEventListener("input",(e)=>{
+  const d=getData();
+  d.budget=parseFloat(e.target.value)||0;
+  save(d);
+  render();
 });
 
-// ---------------- ADD SPEND ----------------
-function addSpend() {
-
-  const err = document.getElementById("error");
-  err.innerText = "";
-
-  const val = parseFloat(document.getElementById("spend").value);
-
-  if (isNaN(val)) return;
-
-  if (!selectedDay) {
-    err.innerText = "Select a day first";
-    return;
-  }
-
-  const data = getData();
-
-  data.history.push({
-    amount: val,
-    day: selectedDay
-  });
-
-  saveData(data);
-
-  document.getElementById("spend").value = "";
-  updateUI();
-}
-
-// ---------------- RESET ----------------
-function resetSelectedDay() {
-  if (!selectedDay) return;
-
-  const data = getData();
-  data.history = data.history.filter(h => h.day !== selectedDay);
-  saveData(data);
-  updateUI();
-}
-
-function resetMonth() {
-  localStorage.removeItem(monthKey());
-  location.reload();
+// ---------------- VIEW ----------------
+function setView(v){
+  view=v;
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById(v+"Btn").classList.add("active");
+  render();
 }
 
 // ---------------- ENGINE ----------------
-function buildRunningBalance(data) {
+function build(){
+  const d=getData();
+  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
 
-  const daysInMonth = new Date(
-    now().getFullYear(),
-    now().getMonth()+1,
-    0
-  ).getDate();
+  let bal=d.budget;
+  const map={};
 
-  let balance = data.budget;
-  const map = {};
-
-  for (let d = 1; d <= daysInMonth; d++) {
-
-    const spent = data.history
-      .filter(h => h.day === d)
-      .reduce((s,h)=>s+h.amount,0);
-
-    balance -= spent;
-
-    map[d] = balance;
+  for(let i=1;i<=days;i++){
+    const spent=d.history.filter(h=>h.day===i).reduce((s,h)=>s+h.amount,0);
+    bal-=spent;
+    map[i]=bal;
   }
 
   return map;
 }
 
-// ---------------- PANEL ----------------
-function updatePanel(data, map) {
+// ---------------- VIEW LOGIC (FIXED PROPERLY) ----------------
+function viewValue(balance){
 
-  const today = now().getDate();
-  const balance = map[today] ?? data.budget;
+  const d=getData();
+  const daysLeft=new Date(now().getFullYear(),now().getMonth()+1,0).getDate()-now().getDate()+1;
 
-  document.body.style.background =
-    balance >= 0 ? "#1f8f4a" : "#c0392b";
-
-  document.getElementById("safeText").innerHTML =
-    balance >= 0
-      ? `£${balance.toFixed(2)} remaining`
-      : `£${Math.abs(balance).toFixed(2)} over`;
-
-  document.getElementById("breakdownText").innerHTML =
-    `Budget: £${data.budget || 0}`;
-}
-
-// ---------------- CALENDAR ----------------
-function renderCalendar(data, map) {
-
-  const el = document.getElementById("calendar");
-  el.innerHTML = "";
-
-  const d = now();
-  const today = d.getDate();
-
-  const monthName = d.toLocaleString('default', { month: 'long' });
-  const year = d.getFullYear();
-
-  document.getElementById("calendarHeader").innerText =
-    `${monthName} ${year}`;
-
-  const daysInMonth = new Date(year, d.getMonth()+1, 0).getDate();
-
-  for (let i = 1; i <= daysInMonth; i++) {
-
-    let cls = "day";
-
-    const bal = map[i];
-
-    if (i > today) cls += " future";
-    else cls += bal >= 0 ? " green" : " red";
-
-    const div = document.createElement("div");
-    div.className = cls;
-
-    div.innerText = `${i}\n£${(bal ?? 0).toFixed(0)}`;
-
-    div.onclick = () => {
-      selectedDay = i;
-
-      document.getElementById("selectedDayBox").innerHTML =
-        `<b>Day ${i}</b><br>Balance: £${(bal ?? 0).toFixed(2)}`;
-
-      updateUI();
-    };
-
-    el.appendChild(div);
-  }
+  if(view==="day") return balance/daysLeft;
+  if(view==="week") return balance/Math.max(1,Math.ceil(daysLeft/7));
+  return balance;
 }
 
 // ---------------- MAIN ----------------
-function updateUI() {
+function render(){
 
-  const data = getData();
-  const map = buildRunningBalance(data);
+  const d=getData();
+  const map=build();
+  const today=now().getDate();
 
-  updatePanel(data, map);
-  renderCalendar(data, map);
+  const balance=map[today];
+
+  document.body.style.background=balance>=0?"#1f8f4a":"#c0392b";
+
+  const display=viewValue(balance);
+
+  document.getElementById("mainValue").innerText=
+    (display>=0?`£${display.toFixed(2)}`:`-£${Math.abs(display).toFixed(2)}`)+" ("+view+")";
+
+  document.getElementById("subValue").innerText=
+    "Remaining: £"+balance.toFixed(2);
+
+  const cal=document.getElementById("calendar");
+  cal.innerHTML="";
+
+  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
+
+  for(let i=1;i<=days;i++){
+
+    const b=map[i];
+
+    const div=document.createElement("div");
+
+    let cls="day";
+    if(i>today) cls+=" future";
+    else cls+=(b>=0?" green":" red");
+
+    div.className=cls;
+
+    div.innerText=i+"\n£"+b.toFixed(0);
+
+    cal.appendChild(div);
+  }
 }
 
-updateUI();
+render();
 
 </script>
 
