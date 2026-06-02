@@ -92,6 +92,7 @@
     font-size: 12px;
     background: rgba(255,255,255,0.2);
     color: black;
+    cursor: pointer;
   }
 
   .green { background: #1f8f4a; color: white; }
@@ -134,20 +135,20 @@
     <div class="sub" id="breakdownText">—</div>
   </div>
 
-  <!-- CALENDAR -->
   <div class="calendarHeader" id="calendarHeader"></div>
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDay">
-    Click a day to view details
+    Click a day to set where spending goes (defaults to today)
   </div>
 </div>
 
 <script>
 
 let view = "day";
+let selectedDay = null;
 
-// ---------------- STORAGE ----------------
+// ---------------- DATE ----------------
 function now() {
   return new Date();
 }
@@ -157,6 +158,7 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
+// ---------------- STORAGE ----------------
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -176,23 +178,28 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-// ---------------- ALWAYS TODAY ----------------
+// ---------------- ACTIVE DAY ----------------
+function getActiveDay() {
+  return selectedDay ?? now().getDate();
+}
+
+// ---------------- ADD SPEND (FIXED) ----------------
 function addSpend() {
   const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
 
   const data = getData();
 
-  // 💥 ALWAYS TODAY — NO EXCEPTIONS
-  const today = now().getDate();
+  const day = getActiveDay();
 
   data.history.push({
     amount: val,
-    day: today
+    day: day
   });
 
   saveData(data);
   document.getElementById("spend").value = "";
+
   updateUI();
 }
 
@@ -217,7 +224,7 @@ function getDaySpend(data, day) {
     .reduce((s, h) => s + h.amount, 0);
 }
 
-// ---------------- VIEW TOTALS ----------------
+// ---------------- PANEL ----------------
 function getRemaining(data) {
   const total = data.history.reduce((s,h)=>s+h.amount,0);
 
@@ -232,7 +239,6 @@ function getRemaining(data) {
   return allowed - total;
 }
 
-// ---------------- PANEL ----------------
 function updatePanel(data) {
   const remaining = getRemaining(data);
 
@@ -285,11 +291,14 @@ function renderCalendar(data) {
     div.className = cls;
     div.innerText = i;
 
+    // CLICK = SET TARGET DAY FOR SPENDING
     div.onclick = () => {
+      selectedDay = i;
+
       document.getElementById("selectedDay").innerHTML = `
         <b>${monthName} ${i}</b><br>
-        Spent: £${spend.toFixed(2)}<br>
-        Daily budget: £${dailyBudget.toFixed(2)}
+        Spending will be added to this day<br>
+        Current spent: £${spend.toFixed(2)}
       `;
     };
 
@@ -297,7 +306,7 @@ function renderCalendar(data) {
   }
 }
 
-// ---------------- TABS ----------------
+// ---------------- VIEW SWITCH ----------------
 function setView(v) {
   view = v;
 
