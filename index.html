@@ -243,13 +243,24 @@ function resetMonth(){
 function viewState(){
 
   const today = now().getDate();
+  const days = daysInMonth();
 
-  if(view==="day" && selectedDay){
-    return getRemainingAt(selectedDay);
+  // DAY VIEW → exact selected day
+  if(view === "day"){
+    const d = selectedDay || today;
+    return getRemainingAt(d);
   }
 
-  if(view==="week"){
-    return getRemainingAt(Math.min((selectedDay||today)+6, daysInMonth()));
+  // WEEK VIEW → 7-day window from selected/today
+  if(view === "week"){
+    const start = selectedDay || today;
+    const end = Math.min(start + 6, days);
+    return getRemainingAt(end);
+  }
+
+  // MONTH VIEW → full month projection
+  if(view === "month"){
+    return getRemainingAt(days);
   }
 
   return getRemainingAt(today);
