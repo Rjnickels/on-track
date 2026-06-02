@@ -48,16 +48,6 @@
     flex: 1;
   }
 
-  .big {
-    font-size: 48px;
-    margin: 15px 0;
-  }
-
-  .small {
-    font-size: 14px;
-    opacity: 0.9;
-  }
-
   .tabs {
     display: flex;
     gap: 6px;
@@ -73,6 +63,16 @@
   .tabs button.active {
     background: white;
     color: black;
+  }
+
+  .big {
+    font-size: 48px;
+    margin: 15px 0;
+  }
+
+  .small {
+    font-size: 14px;
+    opacity: 0.9;
   }
 </style>
 </head>
@@ -109,10 +109,10 @@
 <script>
 let view = "day";
 
-const monthKey = () => {
+function monthKey() {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth()}`;
-};
+}
 
 function getData() {
   const key = monthKey();
@@ -135,6 +135,7 @@ document.getElementById("budget").addEventListener("change", (e) => {
 
 function addSpend(amount) {
   if (isNaN(amount)) return;
+
   const data = getData();
   data.spent += amount;
   saveData(data);
@@ -155,8 +156,11 @@ function resetApp() {
 function setView(v) {
   view = v;
 
-  document.querySelectorAll(".tabs button").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
   document.getElementById("tab-" + v).classList.add("active");
+
+  updateUI();
+}
 
 function updateUI() {
   const data = getData();
@@ -201,6 +205,9 @@ function updateUI() {
     Expected: £${expected.toFixed(2)}
   `;
 }
+
+updateUI();
+</script>
 
 </body>
 </html>
