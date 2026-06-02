@@ -140,8 +140,8 @@ button{
 
 /* ---------------- STATE ---------------- */
 
-let selectedDay = new Date().getDate();
 let view = "day";
+let selectedDay = new Date().getDate();
 
 /* ---------------- DATE ---------------- */
 
@@ -191,16 +191,7 @@ function calc(day){
   };
 }
 
-/* ---------------- INPUT ---------------- */
-
-document.getElementById("budget").addEventListener("input",(e)=>{
-  const d=getData();
-  d.budget=parseFloat(e.target.value)||0;
-  save(d);
-  render();
-});
-
-/* ---------------- VIEW ---------------- */
+/* ---------------- VIEW CONTROL ---------------- */
 
 function setView(v){
   view = v;
@@ -242,11 +233,10 @@ function resetMonth(){
   location.reload();
 }
 
-/* ---------------- VIEW TARGET ---------------- */
+/* ---------------- TARGET LOGIC ---------------- */
 
 function getTargetDay(){
 
-  const today = now().getDate();
   const days = daysInMonth();
 
   if(view === "day"){
@@ -257,11 +247,7 @@ function getTargetDay(){
     return Math.min(selectedDay + 6, days);
   }
 
-  if(view === "month"){
-    return days;
-  }
-
-  return today;
+  return days;
 }
 
 /* ---------------- RENDER ---------------- */
@@ -291,8 +277,8 @@ function render(){
 
   document.getElementById("selectedBox").innerHTML =
     `<b>Day ${selectedDay}</b><br>
-    Remaining: £${sel.remaining.toFixed(2)}<br>
-    Safe/day: £${sel.daily.toFixed(2)}`;
+     Remaining: £${sel.remaining.toFixed(2)}<br>
+     Safe/day: £${sel.daily.toFixed(2)}`;
 
   const cal = document.getElementById("calendar");
   cal.innerHTML = "";
