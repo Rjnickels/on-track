@@ -39,17 +39,35 @@
     cursor: pointer;
   }
 
-  .panel {
-    margin: 12px 0;
-    padding: 14px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.12);
+  /* tabs */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0;
   }
 
-  .safe {
+  .tabs button {
+    flex: 1;
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .tabs button.active {
+    background: white;
+    color: black;
+  }
+
+  /* panel */
+  .panel {
+    background: rgba(255,255,255,0.12);
+    padding: 14px;
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+
+  .big {
     font-size: 22px;
     font-weight: bold;
-    margin-bottom: 6px;
   }
 
   .sub {
@@ -57,6 +75,7 @@
     opacity: 0.9;
   }
 
+  /* calendar */
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -99,13 +118,21 @@
   <button onclick="undoLast()">Undo Last</button>
   <button onclick="resetApp()">Reset Month</button>
 
-  <!-- 🔥 RESTORED MAIN PANEL -->
-  <div class="panel" id="panel">
-    <div class="safe" id="safeText">—</div>
+  <!-- 🔘 TABS -->
+  <div class="tabs">
+    <button onclick="setView('day')" id="tab-day" class="active">Day</button>
+    <button onclick="setView('week')" id="tab-week">Week</button>
+    <button onclick="setView('month')" id="tab-month">Month</button>
+  </div>
+
+  <!-- 💰 PANEL -->
+  <div class="panel">
+    <div class="big" id="safeText">—</div>
     <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
+  <!-- 📅 CALENDAR -->
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDay">
@@ -114,6 +141,8 @@
 </div>
 
 <script>
+
+let view = "day";
 
 function monthKey() {
   const d = new Date();
@@ -168,11 +197,62 @@ function resetApp() {
   location.reload();
 }
 
+// toggle view
+function setView(v) {
+  view = v;
+
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + v).classList.add("active");
+
+  updateUI();
+}
+
 // helpers
 function getDaySpend(data, day) {
   return data.history
     .filter(h => h.day === day)
     .reduce((s, h) => s + h.amount, 0);
+}
+
+// panel logic
+function updatePanel(data) {
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+
+  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
+
+  let allowed = 0;
+  let label = "";
+
+  if (view === "day") {
+    allowed = data.budget / daysInMonth;
+    label = "Today";
+  }
+
+  if (view === "week") {
+    allowed = (data.budget / daysInMonth) * 7;
+    label = "This Week";
+  }
+
+  if (view === "month") {
+    allowed = data.budget;
+    label = "This Month";
+  }
+
+  const remaining = allowed - totalSpent;
+
+  document.getElementById("safeText").innerHTML =
+    remaining >= 0
+      ? `Safe to spend £${remaining.toFixed(2)}`
+      : `Over by £${Math.abs(remaining).toFixed(2)}`;
+
+  document.getElementById("periodText").innerHTML = label;
+
+  document.getElementById("breakdownText").innerHTML = `
+    Budget: £${data.budget || 0}<br>
+    Spent: £${totalSpent.toFixed(2)}<br>
+    Allowed: £${allowed.toFixed(2)}
+  `;
 }
 
 // calendar
@@ -212,41 +292,16 @@ function renderCalendar(data) {
   }
 }
 
-// 🔥 RESTORED SUMMARY PANEL LOGIC
-function updatePanel(data) {
-  const now = new Date();
-
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  const todaySpend = getDaySpend(data, now.getDate());
-
-  const allowedDaily = data.budget / daysInMonth;
-  const remaining = data.budget - data.history.reduce((s,h)=>s+h.amount,0);
-
-  document.getElementById("safeText").innerHTML =
-    `Safe to spend £${remaining.toFixed(2)}`;
-
-  document.getElementById("periodText").innerHTML =
-    `This Month`;
-
-  document.getElementById("breakdownText").innerHTML =
-    `Budget: £${data.budget || 0}<br>
-     Spent: £${data.history.reduce((s,h)=>s+h.amount,0).toFixed(2)}<br>
-     Allowed: £${data.budget || 0}`;
-}
-
 // main
 function updateUI() {
   const data = getData();
 
-  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
-  const nowSpentToday = getDaySpend(data, new Date().getDate());
-  const dailyBudget = data.budget / new Date().getDate();
+  const now = new Date();
+  const todaySpend = getDaySpend(data, now.getDate());
+  const dailyBudget = data.budget / new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
 
-  if (nowSpentToday <= dailyBudget) {
-    document.body.style.background = "#1f8f4a";
-  } else {
-    document.body.style.background = "#c0392b";
-  }
+  document.body.style.background =
+    todaySpend <= dailyBudget ? "#1f8f4a" : "#c0392b";
 
   updatePanel(data);
   renderCalendar(data);
