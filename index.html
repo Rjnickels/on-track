@@ -59,21 +59,15 @@
     cursor:pointer;
   }
 
-  .tabs {
+  .btnRow {
     display:flex;
-    gap:6px;
-    margin:10px 0;
+    gap:8px;
   }
 
-  .tabs button {
-    flex:1;
-    background:rgba(255,255,255,0.2);
-    color:white;
-  }
-
-  .tabs button.active {
-    background:white;
-    color:black;
+  .btnRow button {
+    width:50%;
+    font-size:13px;
+    padding:10px;
   }
 
   .panel {
@@ -130,6 +124,12 @@
   </div>
 
   <button onclick="addSpend()">Add Spend</button>
+
+  <!-- 🔥 SIDE BY SIDE RESET BUTTONS -->
+  <div class="btnRow">
+    <button onclick="resetDay()">Reset Day</button>
+    <button onclick="resetMonth()">Reset Month</button>
+  </div>
 
   <div class="panel">
     <div class="big" id="mainValue">—</div>
@@ -189,29 +189,49 @@ function addSpend(){
   render();
 }
 
-// ---------------- CORE ENGINE ----------------
-function buildRunning(data){
+// ---------------- RESET DAY ----------------
+function resetDay(){
 
+  if(!selectedDay){
+    alert("No day selected");
+    return;
+  }
+
+  const d=getData();
+  d.history = d.history.filter(h => h.day !== selectedDay);
+  save(d);
+
+  render();
+}
+
+// ---------------- RESET MONTH ----------------
+function resetMonth(){
+  localStorage.removeItem(key());
+  location.reload();
+}
+
+// ---------------- ENGINE ----------------
+function build(){
+
+  const d=getData();
   const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
 
-  let balance=data.budget;
+  let bal=d.budget;
   const map={};
 
   for(let i=1;i<=days;i++){
 
-    const spent=data.history
+    const spent=d.history
       .filter(h=>h.day===i)
       .reduce((s,h)=>s+h.amount,0);
 
-    balance-=spent;
+    bal-=spent;
 
     const daysLeft=days-i+1;
 
-    const dailyAllowance = balance / daysLeft;
-
     map[i]={
-      balance,
-      dailyAllowance
+      balance:bal,
+      daily:bal/daysLeft
     };
   }
 
@@ -222,7 +242,7 @@ function buildRunning(data){
 function render(){
 
   const d=getData();
-  const map=buildRunning(d);
+  const map=build();
   const today=now().getDate();
 
   const state=map[today];
@@ -253,7 +273,7 @@ function render(){
     div.innerText=
       i+
       "\n£"+s.balance.toFixed(0)+
-      "\n/day £"+s.dailyAllowance.toFixed(0);
+      "\n/day £"+s.daily.toFixed(0);
 
     div.onclick=()=>{
       selectedDay=i;
@@ -261,7 +281,7 @@ function render(){
       document.getElementById("selectedBox").innerHTML=
         `<b>Day ${i}</b><br>
          Remaining: £${s.balance.toFixed(2)}<br>
-         Safe/day: £${s.dailyAllowance.toFixed(2)}`;
+         Safe/day: £${s.daily.toFixed(2)}`;
 
       render();
     };
