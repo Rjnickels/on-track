@@ -22,3 +22,331 @@
     max-width: 560px;
     text-align: center;
   }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  button {
+    background: white;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0;
+  }
+
+  .tabs button {
+    flex: 1;
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .tabs button.active {
+    background: white;
+    color: black;
+  }
+
+  .panel {
+    background: rgba(255,255,255,0.12);
+    padding: 14px;
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+
+  .big {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .sub {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .calendarHeader {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .day {
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.2);
+    color: black;
+    cursor: pointer;
+  }
+
+  .green { background: #1f8f4a; color: white; }
+  .red { background: #c0392b; color: white; }
+  .future { background: rgba(255,255,255,0.35); color: black; }
+
+  .selectedBox {
+    margin-top: 12px;
+    font-size: 14px;
+    background: rgba(255,255,255,0.12);
+    padding: 10px;
+    border-radius: 8px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Stay Green</h1>
+
+  <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
+  <input id="spend" type="number" placeholder="Enter spend (£)" />
+
+  <button onclick="addSpend()">Add Spend</button>
+  <button onclick="resetSelectedDay()">Reset Selected Day</button>
+  <button onclick="resetMonth()">Reset Month</button>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button onclick="setView('day')" id="tab-day" class="active">Day</button>
+    <button onclick="setView('week')" id="tab-week">Week</button>
+    <button onclick="setView('month')" id="tab-month">Month</button>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+    <div class="big" id="safeText">—</div>
+    <div class="sub" id="periodText">—</div>
+    <div class="sub" id="breakdownText">—</div>
+  </div>
+
+  <div class="calendarHeader" id="calendarHeader"></div>
+  <div class="calendar" id="calendar"></div>
+
+  <div class="selectedBox" id="selectedDayBox">
+    Click a day to select it (defaults to today)
+  </div>
+</div>
+
+<script>
+
+let view = "day";
+let selectedDay = null;
+
+// ---------------- DATE ----------------
+function now() {
+  return new Date();
+}
+
+function monthKey() {
+  const d = now();
+  return `${d.getFullYear()}-${d.getMonth()}`;
+}
+
+// ---------------- STORAGE ----------------
+function getData() {
+  return JSON.parse(localStorage.getItem(monthKey())) || {
+    budget: 0,
+    history: []
+  };
+}
+
+function saveData(data) {
+  localStorage.setItem(monthKey(), JSON.stringify(data));
+}
+
+// ---------------- BUDGET ----------------
+document.getElementById("budget").addEventListener("change", (e) => {
+  const data = getData();
+  data.budget = parseFloat(e.target.value);
+  saveData(data);
+  updateUI();
+});
+
+// ---------------- ACTIVE DAY ----------------
+function getActiveDay() {
+  return selectedDay ?? now().getDate();
+}
+
+// ---------------- ADD SPEND ----------------
+function addSpend() {
+  const val = parseFloat(document.getElementById("spend").value);
+  if (isNaN(val)) return;
+
+  const data = getData();
+  const day = getActiveDay();
+
+  data.history.push({ amount: val, day: day });
+
+  saveData(data);
+  document.getElementById("spend").value = "";
+
+  updateUI();
+}
+
+// ---------------- RESET SELECTED DAY ----------------
+function resetSelectedDay() {
+  const data = getData();
+  const day = getActiveDay();
+
+  data.history = data.history.filter(h => h.day !== day);
+
+  saveData(data);
+  updateUI();
+}
+
+// ---------------- RESET MONTH ----------------
+function resetMonth() {
+  localStorage.removeItem(monthKey());
+  location.reload();
+}
+
+// ---------------- HELPERS ----------------
+function getDaySpend(data, day) {
+  return data.history
+    .filter(h => h.day === day)
+    .reduce((s, h) => s + h.amount, 0);
+}
+
+// ---------------- REMAINING ----------------
+function getRemaining(data) {
+  const total = data.history.reduce((s,h)=>s+h.amount,0);
+
+  const daysInMonth = new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
+
+  let allowed = 0;
+
+  if (view === "day") allowed = data.budget / daysInMonth;
+  if (view === "week") allowed = (data.budget / daysInMonth) * 7;
+  if (view === "month") allowed = data.budget;
+
+  return allowed - total;
+}
+
+// ---------------- LABEL ----------------
+function formatLabel() {
+  const d = now();
+  const monthName = d.toLocaleString('default', { month: 'short' });
+
+  const today = d.getDate();
+  const active = getActiveDay();
+
+  return view === "day"
+    ? `${monthName} ${active}${active === today ? " (Today)" : ""}`
+    : view === "week"
+      ? "This Week"
+      : "This Month";
+}
+
+// ---------------- PANEL ----------------
+function updatePanel(data) {
+  const remaining = getRemaining(data);
+
+  document.getElementById("safeText").innerHTML =
+    remaining >= 0
+      ? `Remaining £${remaining.toFixed(2)}`
+      : `Over by £${Math.abs(remaining).toFixed(2)}`;
+
+  document.getElementById("periodText").innerHTML = formatLabel();
+
+  const active = getActiveDay();
+
+  const activeTotal = data.history
+    .filter(h => h.day === active)
+    .reduce((s,h)=>s+h.amount,0);
+
+  document.getElementById("breakdownText").innerHTML = `
+    Budget: £${data.budget || 0}<br>
+    Spent (selected day): £${activeTotal.toFixed(2)}
+  `;
+}
+
+// ---------------- CALENDAR ----------------
+function renderCalendar(data) {
+  const el = document.getElementById("calendar");
+  el.innerHTML = "";
+
+  const d = now();
+  const year = d.getFullYear();
+  const month = d.getMonth();
+
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const today = d.getDate();
+
+  const monthName = d.toLocaleString('default', { month: 'long' });
+  document.getElementById("calendarHeader").innerText =
+    `${monthName} ${year}`;
+
+  const dailyBudget = data.budget / daysInMonth;
+
+  for (let i = 1; i <= daysInMonth; i++) {
+
+    const spend = getDaySpend(data, i);
+
+    let cls = "day";
+
+    if (i > today) cls += " future";
+    else if (spend <= dailyBudget) cls += " green";
+    else cls += " red";
+
+    const div = document.createElement("div");
+    div.className = cls;
+    div.innerText = i;
+
+    div.onclick = () => {
+      selectedDay = i;
+
+      document.getElementById("selectedDayBox").innerHTML = `
+        <b>${monthName} ${i}</b><br>
+        Selected day active
+      `;
+    };
+
+    el.appendChild(div);
+  }
+}
+
+// ---------------- VIEW SWITCH ----------------
+function setView(v) {
+  view = v;
+
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + v).classList.add("active");
+
+  updateUI();
+}
+
+// ---------------- MAIN ----------------
+function updateUI() {
+  const data = getData();
+
+  const remaining = getRemaining(data);
+
+  document.body.style.background =
+    remaining >= 0 ? "#1f8f4a" : "#c0392b";
+
+  updatePanel(data);
+  renderCalendar(data);
+}
+
+updateUI();
+
+</script>
+
+</body>
+</html>
