@@ -92,7 +92,6 @@
     font-size: 12px;
     background: rgba(255,255,255,0.2);
     color: black;
-    cursor: pointer;
   }
 
   .green { background: #1f8f4a; color: white; }
@@ -121,32 +120,34 @@
   <button onclick="undoLast()">Undo Last</button>
   <button onclick="resetApp()">Reset Month</button>
 
+  <!-- TABS -->
   <div class="tabs">
     <button onclick="setView('day')" id="tab-day" class="active">Day</button>
     <button onclick="setView('week')" id="tab-week">Week</button>
     <button onclick="setView('month')" id="tab-month">Month</button>
   </div>
 
+  <!-- PANEL -->
   <div class="panel">
     <div class="big" id="safeText">—</div>
     <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
+  <!-- CALENDAR -->
   <div class="calendarHeader" id="calendarHeader"></div>
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDay">
-    Click a day to select it (defaults to today)
+    Click a day to view details
   </div>
 </div>
 
 <script>
 
 let view = "day";
-let selectedDay = null;
 
-// --- DATE HELPERS ---
+// ---------------- STORAGE ----------------
 function now() {
   return new Date();
 }
@@ -156,7 +157,6 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
-// --- STORAGE ---
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -168,7 +168,7 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// --- BUDGET ---
+// ---------------- BUDGET ----------------
 document.getElementById("budget").addEventListener("change", (e) => {
   const data = getData();
   data.budget = parseFloat(e.target.value);
@@ -176,23 +176,19 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-// --- ACTIVE DAY ---
-function getActiveDay() {
-  return selectedDay ?? now().getDate();
-}
-
-// --- ADD SPEND (NOW DAY-AWARE) ---
+// ---------------- ALWAYS TODAY ----------------
 function addSpend() {
   const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
 
   const data = getData();
 
-  const day = getActiveDay();
+  // 💥 ALWAYS TODAY — NO EXCEPTIONS
+  const today = now().getDate();
 
   data.history.push({
     amount: val,
-    day: day
+    day: today
   });
 
   saveData(data);
@@ -200,7 +196,7 @@ function addSpend() {
   updateUI();
 }
 
-// --- UNDO ---
+// ---------------- UNDO ----------------
 function undoLast() {
   const data = getData();
   data.history.pop();
@@ -208,23 +204,23 @@ function undoLast() {
   updateUI();
 }
 
-// --- RESET ---
+// ---------------- RESET ----------------
 function resetApp() {
   localStorage.removeItem(monthKey());
   location.reload();
 }
 
-// --- HELPERS ---
+// ---------------- HELPERS ----------------
 function getDaySpend(data, day) {
   return data.history
     .filter(h => h.day === day)
     .reduce((s, h) => s + h.amount, 0);
 }
 
-// --- PANEL ---
-function updatePanel(data) {
+// ---------------- VIEW TOTALS ----------------
+function getRemaining(data) {
+  const total = data.history.reduce((s,h)=>s+h.amount,0);
 
-  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
   const daysInMonth = new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
 
   let allowed = 0;
@@ -233,25 +229,31 @@ function updatePanel(data) {
   if (view === "week") allowed = (data.budget / daysInMonth) * 7;
   if (view === "month") allowed = data.budget;
 
-  const remaining = allowed - totalSpent;
+  return allowed - total;
+}
+
+// ---------------- PANEL ----------------
+function updatePanel(data) {
+  const remaining = getRemaining(data);
 
   document.getElementById("safeText").innerHTML =
     remaining >= 0
-      ? `Safe to spend £${remaining.toFixed(2)}`
+      ? `Remaining £${remaining.toFixed(2)}`
       : `Over by £${Math.abs(remaining).toFixed(2)}`;
 
   document.getElementById("periodText").innerHTML =
     view === "day" ? "Today" :
     view === "week" ? "This Week" : "This Month";
 
+  const total = data.history.reduce((s,h)=>s+h.amount,0);
+
   document.getElementById("breakdownText").innerHTML = `
     Budget: £${data.budget || 0}<br>
-    Spent: £${totalSpent.toFixed(2)}<br>
-    Allowed: £${allowed.toFixed(2)}
+    Spent: £${total.toFixed(2)}
   `;
 }
 
-// --- CALENDAR (REAL DATES NOW) ---
+// ---------------- CALENDAR ----------------
 function renderCalendar(data) {
   const el = document.getElementById("calendar");
   el.innerHTML = "";
@@ -260,7 +262,7 @@ function renderCalendar(data) {
   const year = d.getFullYear();
   const month = d.getMonth();
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
   const today = d.getDate();
 
   const monthName = d.toLocaleString('default', { month: 'long' });
@@ -281,16 +283,13 @@ function renderCalendar(data) {
 
     const div = document.createElement("div");
     div.className = cls;
-
-    div.innerText = `${i}`;
+    div.innerText = i;
 
     div.onclick = () => {
-      selectedDay = i;
-
       document.getElementById("selectedDay").innerHTML = `
         <b>${monthName} ${i}</b><br>
         Spent: £${spend.toFixed(2)}<br>
-        Budget: £${dailyBudget.toFixed(2)}
+        Daily budget: £${dailyBudget.toFixed(2)}
       `;
     };
 
@@ -298,7 +297,7 @@ function renderCalendar(data) {
   }
 }
 
-// --- VIEW SWITCH ---
+// ---------------- TABS ----------------
 function setView(v) {
   view = v;
 
@@ -308,20 +307,11 @@ function setView(v) {
   updateUI();
 }
 
-// --- MAIN ---
+// ---------------- MAIN ----------------
 function updateUI() {
   const data = getData();
 
-  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
-  const daysInMonth = new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
-
-  let allowed = 0;
-
-  if (view === "day") allowed = data.budget / daysInMonth;
-  if (view === "week") allowed = (data.budget / daysInMonth) * 7;
-  if (view === "month") allowed = data.budget;
-
-  const remaining = allowed - totalSpent;
+  const remaining = getRemaining(data);
 
   document.body.style.background =
     remaining >= 0 ? "#1f8f4a" : "#c0392b";
