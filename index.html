@@ -129,7 +129,7 @@
   <button onclick="resetSelectedDay()">Reset Selected Day</button>
   <button onclick="resetMonth()">Reset Month</button>
 
-  <!-- 🔥 RESTORED TABS -->
+  <!-- VIEW SWITCH -->
   <div class="tabs">
     <button onclick="setView('day')" id="tab-day" class="active">Day</button>
     <button onclick="setView('week')" id="tab-week">Week</button>
@@ -138,12 +138,12 @@
 
   <div class="panel">
     <div class="big" id="safeText">—</div>
-    <div class="sub" id="periodText">Forecast View</div>
+    <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
   <div class="selectedBox" id="selectedDayBox">
-    Click a day to see forecast impact
+    Click a day to select it
   </div>
 
   <div class="calendarHeader" id="calendarHeader"></div>
@@ -155,7 +155,7 @@
 let view = "day";
 let selectedDay = null;
 
-// ---------------- DATA ----------------
+// ---------------- DATE ----------------
 function now() {
   return new Date();
 }
@@ -165,6 +165,7 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
+// ---------------- STORAGE ----------------
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -176,7 +177,7 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// ---------------- INPUTS ----------------
+// ---------------- LIVE BUDGET ----------------
 document.getElementById("budget").addEventListener("input", (e) => {
   const data = getData();
   const v = parseFloat(e.target.value);
@@ -197,7 +198,7 @@ function setView(v) {
   updateUI();
 }
 
-// ---------------- FORECAST CORE ----------------
+// ---------------- FORECAST ENGINE ----------------
 function buildForecast(data) {
 
   const daysInMonth = new Date(
@@ -265,25 +266,46 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- PANEL ----------------
+// ---------------- PANEL (VIEW LOGIC FIXED) ----------------
 function updatePanel(data, forecast) {
 
   const today = now().getDate();
-  const balance = forecast[today] ?? data.budget;
+  const monthlyRemaining = forecast[today] ?? data.budget;
+
+  const daysLeft = new Date(
+    now().getFullYear(),
+    now().getMonth()+1,
+    0
+  ).getDate() - today + 1;
+
+  let display = monthlyRemaining;
+
+  if (view === "day") {
+    display = monthlyRemaining / daysLeft;
+  }
+
+  if (view === "week") {
+    const weeksLeft = Math.max(1, Math.ceil(daysLeft / 7));
+    display = monthlyRemaining / weeksLeft;
+  }
+
+  if (view === "month") {
+    display = monthlyRemaining;
+  }
 
   document.body.style.background =
-    balance >= 0 ? "#1f8f4a" : "#c0392b";
+    monthlyRemaining >= 0 ? "#1f8f4a" : "#c0392b";
 
   document.getElementById("safeText").innerHTML =
-    balance >= 0
-      ? `£${balance.toFixed(2)} remaining`
-      : `£${Math.abs(balance).toFixed(2)} over`;
+    monthlyRemaining >= 0
+      ? `£${display.toFixed(2)} (${view})`
+      : `£${Math.abs(display).toFixed(2)} over (${view})`;
 
   document.getElementById("periodText").innerText =
     view.toUpperCase() + " VIEW";
 
   document.getElementById("breakdownText").innerHTML =
-    `Monthly budget: £${data.budget || 0}`;
+    `Monthly remaining: £${monthlyRemaining.toFixed(2)}`;
 }
 
 // ---------------- CALENDAR ----------------
@@ -293,9 +315,9 @@ function renderCalendar(data, forecast) {
   el.innerHTML = "";
 
   const d = now();
+  const today = d.getDate();
   const monthName = d.toLocaleString('default', { month: 'long' });
   const year = d.getFullYear();
-  const today = d.getDate();
 
   document.getElementById("calendarHeader").innerText =
     `${monthName} ${year}`;
@@ -308,8 +330,11 @@ function renderCalendar(data, forecast) {
 
     const bal = forecast[i];
 
-    if (i > today) cls += " future";
-    else cls += bal >= 0 ? " green" : " red";
+    if (i > today) {
+      cls += " future";
+    } else {
+      cls += bal >= 0 ? " green" : " red";
+    }
 
     const div = document.createElement("div");
     div.className = cls;
@@ -317,6 +342,10 @@ function renderCalendar(data, forecast) {
 
     div.onclick = () => {
       selectedDay = i;
+
+      document.getElementById("selectedDayBox").innerHTML =
+        `<b>${monthName} ${i}</b><br>Selected`;
+
       updateUI();
     };
 
