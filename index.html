@@ -249,9 +249,19 @@ function getTargetDay(){
   const today = now().getDate();
   const days = daysInMonth();
 
-  if(view === "day") return selectedDay;
-  if(view === "week") return Math.min(selectedDay + 6, days);
-  return days;
+  if(view === "day"){
+    return selectedDay;
+  }
+
+  if(view === "week"){
+    return Math.min(selectedDay + 6, days);
+  }
+
+  if(view === "month"){
+    return days;
+  }
+
+  return today;
 }
 
 /* ---------------- RENDER ---------------- */
