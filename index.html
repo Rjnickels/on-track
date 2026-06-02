@@ -118,21 +118,21 @@
   <button onclick="undoLast()">Undo Last</button>
   <button onclick="resetApp()">Reset Month</button>
 
-  <!-- 🔘 TABS -->
+  <!-- TABS -->
   <div class="tabs">
     <button onclick="setView('day')" id="tab-day" class="active">Day</button>
     <button onclick="setView('week')" id="tab-week">Week</button>
     <button onclick="setView('month')" id="tab-month">Month</button>
   </div>
 
-  <!-- 💰 PANEL -->
+  <!-- PANEL -->
   <div class="panel">
     <div class="big" id="safeText">—</div>
     <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
-  <!-- 📅 CALENDAR -->
+  <!-- CALENDAR -->
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDay">
@@ -144,6 +144,7 @@
 
 let view = "day";
 
+// --- STORAGE ---
 function monthKey() {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth()}`;
@@ -160,7 +161,7 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// budget
+// --- BUDGET ---
 document.getElementById("budget").addEventListener("change", (e) => {
   const data = getData();
   data.budget = parseFloat(e.target.value);
@@ -168,7 +169,7 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-// spend
+// --- SPEND ---
 function addSpend() {
   const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
@@ -183,7 +184,7 @@ function addSpend() {
   updateUI();
 }
 
-// undo
+// --- UNDO ---
 function undoLast() {
   const data = getData();
   data.history.pop();
@@ -191,13 +192,13 @@ function undoLast() {
   updateUI();
 }
 
-// reset
+// --- RESET ---
 function resetApp() {
   localStorage.removeItem(monthKey());
   location.reload();
 }
 
-// toggle view
+// --- VIEW SWITCH ---
 function setView(v) {
   view = v;
 
@@ -207,14 +208,14 @@ function setView(v) {
   updateUI();
 }
 
-// helpers
+// --- HELPERS ---
 function getDaySpend(data, day) {
   return data.history
     .filter(h => h.day === day)
     .reduce((s, h) => s + h.amount, 0);
 }
 
-// panel logic
+// --- PANEL LOGIC (FIXED) ---
 function updatePanel(data) {
   const now = new Date();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
@@ -255,7 +256,7 @@ function updatePanel(data) {
   `;
 }
 
-// calendar
+// --- CALENDAR ---
 function renderCalendar(data) {
   const el = document.getElementById("calendar");
   el.innerHTML = "";
@@ -292,7 +293,7 @@ function renderCalendar(data) {
   }
 }
 
-// main
+// --- MAIN ---
 function updateUI() {
   const data = getData();
 
