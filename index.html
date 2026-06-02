@@ -39,23 +39,40 @@
     cursor: pointer;
   }
 
-  .big {
-    font-size: 48px;
-    margin: 20px 0;
-  }
-
-  .small {
-    opacity: 0.9;
-    font-size: 14px;
-  }
-
   .row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
   }
 
   .row button {
     flex: 1;
+  }
+
+  .big {
+    font-size: 48px;
+    margin: 15px 0;
+  }
+
+  .small {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .tabs button {
+    flex: 1;
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .tabs button.active {
+    background: white;
+    color: black;
   }
 </style>
 </head>
@@ -75,15 +92,23 @@
   </div>
 
   <input id="customSpend" type="number" placeholder="Custom spend (£)" />
-  <button onclick="addSpend(parseFloat(document.getElementById('customSpend').value))">
-    Add Spend
-  </button>
+  <button onclick="addCustomSpend()">Add Spend</button>
+
+  <button onclick="resetApp()">Reset Month</button>
+
+  <div class="tabs">
+    <button onclick="setView('day')" id="tab-day" class="active">Day</button>
+    <button onclick="setView('week')" id="tab-week">Week</button>
+    <button onclick="setView('month')" id="tab-month">Month</button>
+  </div>
 
   <div class="big" id="status">—</div>
   <div class="small" id="details"></div>
 </div>
 
 <script>
+let view = "day";
+
 const monthKey = () => {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth()}`;
@@ -110,26 +135,68 @@ document.getElementById("budget").addEventListener("change", (e) => {
 
 function addSpend(amount) {
   if (isNaN(amount)) return;
-
   const data = getData();
   data.spent += amount;
   saveData(data);
   updateUI();
 }
 
+function addCustomSpend() {
+  const val = parseFloat(document.getElementById("customSpend").value);
+  if (!isNaN(val)) addSpend(val);
+  document.getElementById("customSpend").value = "";
+}
+
+function resetApp() {
+  localStorage.removeItem(monthKey());
+  location.reload();
+}
+
+function setView(v) {
+  view = v;
+
+  document.querySelectorAll(".tabs button").forEach(btn => btn.classList.remove("active"));
+  document.getElementById("tab-" + v).classList.add("active");
+
+  updateUI();
+}
+
+function getExpected(budget, day) {
+  const daysInMonth = new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+  return budget * (day / daysInMonth);
+}
+
 function updateUI() {
   const data = getData();
-
   const now = new Date();
+
+  let spent = data.spent;
+  let expected = 0;
+  let label = "";
+
   const day = now.getDate();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const weekProgress = day / 7;
 
-  const expected = data.budget * (day / daysInMonth);
+  if (view === "day") {
+    expected = data.budget / daysInMonth;
+    label = "Today";
+  }
+
+  if (view === "week") {
+    expected = (data.budget / daysInMonth) * 7;
+    label = "This Week";
+  }
+
+  if (view === "month") {
+    expected = data.budget;
+    label = "This Month";
+  }
 
   const status = document.getElementById("status");
   const details = document.getElementById("details");
 
-  if (data.spent <= expected) {
+  if (spent <= expected) {
     document.body.style.background = "#1f8f4a";
     status.innerHTML = "🟢 GREEN";
   } else {
@@ -138,8 +205,9 @@ function updateUI() {
   }
 
   details.innerHTML = `
+    <b>${label}</b><br><br>
     Budget: £${data.budget || 0}<br>
-    Spent: £${data.spent.toFixed(2)}<br>
+    Spent: £${spent.toFixed(2)}<br>
     Expected: £${expected.toFixed(2)}
   `;
 }
