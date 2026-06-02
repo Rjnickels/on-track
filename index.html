@@ -8,13 +8,14 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   transition:0.3s;
   color:white;
   display:flex;
   justify-content:center;
   padding:20px;
   min-height:100vh;
+  background:#1f8f4a; /* Fallback color so it's never white */
 }
 
 .container{width:100%;max-width:560px;text-align:center;}
@@ -122,4 +123,255 @@ button{
 </div>
 
 <div class="tabs">
-<button onclick="setView('day')" id="dayBtn" class="active">
+<button onclick="setView('day')" id="dayBtn" class="active">Day</button>
+<button onclick="setView('week')" id="weekBtn">Week</button>
+<button onclick="setView('month')" id="monthBtn">Month</button>
+</div>
+
+<div class="panel">
+<div class="big" id="mainValue">—</div>
+<div class="sub" id="subValue">—</div>
+</div>
+
+<div class="selectedBox" id="selectedBox">Click a day</div>
+
+<div class="calendar" id="calendar"></div>
+</div>
+
+<script>
+
+/* ---------------- STATE ---------------- */
+
+let view = "day";
+let selectedDay = new Date().getDate();
+
+/* ---------------- DATE ---------------- */
+
+function now(){ return new Date(); }
+
+function daysInMonth(){
+  return new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
+}
+
+/* ---------------- STORAGE ---------------- */
+
+function key(){
+  const d = now();
+  return `${d.getFullYear()}-${d.getMonth()}`;
+}
+
+function getData(){
+  try {
+    return JSON.parse(localStorage.getItem(key())) || {budget:0,history:[]};
+  } catch(e) {
+    return {budget:0,history:[]};
+  }
+}
+
+function save(d){
+  localStorage.setItem(key(),JSON.stringify(d));
+}
+
+function saveBudget(){
+  const val = parseFloat(document.getElementById("budget").value) || 0;
+  const d = getData();
+  d.budget = val;
+  save(d);
+  render();
+}
+
+/* ---------------- CORE ENGINE ---------------- */
+
+function calcUpToDay(targetDay) {
+  const d = getData();
+  const totalBudget = d.budget || 0;
+
+  let totalSpent = 0;
+  const historyList = d.history || [];
+  
+  for (let i = 1; i <= targetDay; i++) {
+    totalSpent += historyList
+      .filter(h => h && h.day === i)
+      .reduce((s, h) => s + (h.amount || 0), 0);
+  }
+
+  return {
+    remaining: totalBudget - totalSpent,
+    spentOnThisDay: historyList.filter(h => h && h.day === targetDay).reduce((s, h) => s + (h.amount || 0), 0)
+  };
+}
+
+/* ---------------- VIEW CONTROL ---------------- */
+
+function setView(v){
+  view = v;
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  const btn = document.getElementById(v+"Btn");
+  if(btn) btn.classList.add("active");
+  render();
+}
+
+/* ---------------- ADD SPEND ---------------- */
+
+function addSpend(){
+  const val = parseFloat(document.getElementById("spend").value);
+  if(isNaN(val)) return;
+
+  const d = getData();
+  if(!d.history) d.history = [];
+  d.history.push({day:selectedDay, amount:val});
+  save(d);
+
+  document.getElementById("spend").value = "";
+  render();
+}
+
+/* ---------------- RESET ---------------- */
+
+function resetDay(){
+  const d = getData();
+  if(d.history) {
+    d.history = d.history.filter(h => h && h.day !== selectedDay);
+  }
+  save(d);
+  render();
+}
+
+function resetMonth(){
+  localStorage.removeItem(key());
+  location.reload();
+}
+
+/* ---------------- RENDER ---------------- */
+
+function render(){
+  const days = daysInMonth();
+  const today = now().getDate();
+  const d = getData();
+
+  const budgetInput = document.getElementById("budget");
+  if(budgetInput && document.activeElement !== budgetInput) {
+    budgetInput.value = d.budget || "";
+  }
+
+  // --- PERSPECTIVE MATH FOR THE MAIN PANEL ---
+  let mainDisplayAmount = 0;
+  let subValueText = "";
+
+  const yesterdayState = calcUpToDay(selectedDay - 1);
+  const daysLeftFromSelected = Math.max(1, days - selectedDay + 1);
+  const dailyAllowanceForSelectedDay = daysLeftFromSelected > 0 ? (yesterdayState.remaining / daysLeftFromSelected) : 0;
+  
+  const historyList = d.history || [];
+  const selectedDayActualSpend = historyList
+    .filter(h => h && h.day === selectedDay)
+    .reduce((s, h) => s + (h.amount || 0), 0);
+
+  if (view === "day") {
+    mainDisplayAmount = dailyAllowanceForSelectedDay - selectedDayActualSpend;
+    subValueText = `Remaining allowance for Day ${selectedDay}`;
+  } 
+  else if (view === "week") {
+    const daysInWeekView = Math.min(7, daysLeftFromSelected);
+    const targetEndDay = Math.min(selectedDay + daysInWeekView - 1, days);
+    
+    let spentInWeekBlock = 0;
+    for(let i = selectedDay; i <= targetEndDay; i++) {
+      spentInWeekBlock += historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+    }
+
+    const totalWeekBudget = dailyAllowanceForSelectedDay * daysInWeekView;
+    mainDisplayAmount = totalWeekBudget - spentInWeekBlock;
+    subValueText = `Budget for Days ${selectedDay} to ${targetEndDay}`;
+  } 
+  else if (view === "month") {
+    const totalMonthState = calcUpToDay(days);
+    mainDisplayAmount = totalMonthState.remaining;
+    subValueText = `Total remaining for the whole month`;
+  }
+
+  // Update Background & Main text
+  document.body.style.background = mainDisplayAmount >= 0 ? "#1f8f4a" : "#c0392b";
+  
+  const mainValEl = document.getElementById("mainValue");
+  if (mainValEl) {
+    mainValEl.innerText = mainDisplayAmount >= 0
+      ? `£${mainDisplayAmount.toFixed(2)} Remaining`
+      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Over`;
+  }
+
+  const subValEl = document.getElementById("subValue");
+  if (subValEl) subValEl.innerText = subValueText;
+
+  // Update Selected Day Box
+  const currentDayState = calcUpToDay(selectedDay);
+  const selectedBoxEl = document.getElementById("selectedBox");
+  if (selectedBoxEl) {
+    selectedBoxEl.innerHTML =
+      `<b>Day ${selectedDay}</b><br>
+       Month Rolling Bal: £${currentDayState.remaining.toFixed(2)}<br>
+       Ideal Daily Limit: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
+  }
+
+  // --- LIVE PROJECTING CALENDAR GENERATOR ---
+  const cal = document.getElementById("calendar");
+  if (cal) {
+    cal.innerHTML = "";
+
+    const todayState = calcUpToDay(today);
+    const futureDaysCount = Math.max(1, days - today); 
+    const futureDailyAllowance = futureDaysCount > 0 ? (todayState.remaining / futureDaysCount) : 0;
+
+    for(let i = 1; i <= days; i++){
+      let cls = "day";
+      let displayAllowance = 0;
+
+      if (i < today) {
+        const historicalYesterday = calcUpToDay(i - 1);
+        const historicalDaysLeft = Math.max(1, days - i + 1);
+        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
+
+        const daySpend = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+        cls += (daySpend <= displayAllowance ? " green" : " red");
+      } 
+      else if (i === today) {
+        const historicalYesterday = calcUpToDay(i - 1);
+        const historicalDaysLeft = Math.max(1, days - i + 1);
+        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
+
+        const daySpend = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+        cls += (daySpend <= displayAllowance ? " green" : " red");
+      } 
+      else {
+        displayAllowance = futureDailyAllowance;
+        cls += " future";
+      }
+
+      if(i === selectedDay) cls += " selected";
+
+      const div = document.createElement("div");
+      div.className = cls;
+      
+      const displayValue = Math.max(0, displayAllowance);
+      div.innerText = i + "\n£" + displayValue.toFixed(1); 
+
+      div.onclick = ()=>{
+        selectedDay = i;
+        render();
+      };
+
+      cal.appendChild(div);
+    }
+  }
+}
+
+// Fire initial build safely
+try {
+  render();
+} catch(e) {
+  console.error("Initial render failed: ", e);
+}
+</script>
+
+</body>
+</html>
