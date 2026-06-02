@@ -39,7 +39,6 @@
     cursor: pointer;
   }
 
-  /* tabs */
   .tabs {
     display: flex;
     gap: 6px;
@@ -57,7 +56,6 @@
     color: black;
   }
 
-  /* panel */
   .panel {
     background: rgba(255,255,255,0.12);
     padding: 14px;
@@ -75,7 +73,6 @@
     opacity: 0.9;
   }
 
-  /* calendar */
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -215,7 +212,7 @@ function getDaySpend(data, day) {
     .reduce((s, h) => s + h.amount, 0);
 }
 
-// --- PANEL LOGIC (FIXED) ---
+// --- PANEL ---
 function updatePanel(data) {
   const now = new Date();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
@@ -293,16 +290,34 @@ function renderCalendar(data) {
   }
 }
 
-// --- MAIN ---
+// --- MAIN (FIXED PAGE COLOUR LOGIC) ---
 function updateUI() {
   const data = getData();
 
   const now = new Date();
-  const todaySpend = getDaySpend(data, now.getDate());
-  const dailyBudget = data.budget / new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
 
+  const totalSpent = data.history.reduce((s,h)=>s+h.amount,0);
+
+  let allowed = 0;
+
+  if (view === "day") {
+    allowed = data.budget / daysInMonth;
+  }
+
+  if (view === "week") {
+    allowed = (data.budget / daysInMonth) * 7;
+  }
+
+  if (view === "month") {
+    allowed = data.budget;
+  }
+
+  const remaining = allowed - totalSpent;
+
+  // 🟢 THIS FIXES YOUR ISSUE
   document.body.style.background =
-    todaySpend <= dailyBudget ? "#1f8f4a" : "#c0392b";
+    remaining >= 0 ? "#1f8f4a" : "#c0392b";
 
   updatePanel(data);
   renderCalendar(data);
