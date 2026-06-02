@@ -182,25 +182,24 @@ function setView(v){
 
 function getProjection(day){
 
-  const d=getData();
+  const d = getData();
   const days = daysInMonth();
 
   let remaining = d.budget || 0;
 
-  for(let i=1;i<=day;i++){
+  for(let i = 1; i <= day; i++){
     const spent = (d.history || [])
-      .filter(h=>h.day===i)
-      .reduce((s,h)=>s+(h.amount||0),0);
+      .filter(h => h.day === i)
+      .reduce((s,h) => s + (h.amount || 0), 0);
 
     remaining -= spent;
   }
 
   const daysLeft = Math.max(1, days - day + 1);
-  const dailySafe = remaining / daysLeft;
 
   return {
-    remaining: remaining || 0,
-    dailySafe: dailySafe || 0
+    remaining: remaining,
+    dailySafe: remaining / daysLeft
   };
 }
 
