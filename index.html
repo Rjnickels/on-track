@@ -3,22 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Stay Green</title>
+<title>GreenTrack | Stay in the Green Zone</title>
 
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   transition:0.3s;
   color:white;
   display:flex;
   justify-content:center;
   padding:20px;
   min-height:100vh;
-  background:#1f8f4a; /* Fallback color so it's never white */
+  background:#1f8f4a; /* Dynamic fallback */
 }
 
 .container{width:100%;max-width:560px;text-align:center;}
+
+.brand-subtitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: -10px;
+  margin-bottom: 25px;
+  opacity: 0.8;
+  color: #e8f5e9;
+}
 
 .inputWrap{position:relative;margin:6px 0;}
 
@@ -62,18 +72,32 @@ button{
 .tabs button.active{background:white;color:black;}
 
 .panel{
-  background:rgba(255,255,255,0.12);
-  padding:14px;
+  background:rgba(255,255,255,0.15);
+  padding:18px;
   border-radius:10px;
   margin:10px 0;
+  backdrop-filter: blur(5px);
 }
 
-.big{font-size:22px;font-weight:bold;}
-.sub{font-size:14px;opacity:0.9;}
+.big{font-size:24px;font-weight:bold;letter-spacing: 0.5px;}
+
+.status-indicator{
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  background: rgba(0,0,0,0.2);
+}
+
+.sub{font-size:13px;opacity:0.9;margin-top:8px;}
 
 .selectedBox{
   margin:10px 0;
-  padding:10px;
+  padding:12px;
   border-radius:8px;
   background:rgba(255,255,255,0.12);
 }
@@ -86,54 +110,58 @@ button{
 }
 
 .day{
-  padding:10px 0;
+  padding:8px 2px;
   border-radius:8px;
-  font-size:10px;
+  font-size:9px;
+  line-height:1.3;
   cursor:pointer;
   white-space:pre-line;
 }
 
-.green{background:#1f8f4a;}
-.red{background:#c0392b;}
-.future{background:rgba(255,255,255,0.35);color:black;}
-.selected{outline:2px solid white;}
+/* GreenTrack Color Signals */
+.green{background:#2e7d32;} /* Optimal Trajectory */
+.red{background:#c62828;}   /* Deficit Trajectory */
+.future{background:rgba(255,255,255,0.35);color:#1b5e20;}
+.selected{outline:3px solid white;}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h1>Stay Green</h1>
+<h1>GreenTrack</h1>
+<div class="brand-subtitle">Pacing & Balance Engine</div>
 
 <div class="inputWrap">
 <span class="currency">£</span>
-<input id="budget" type="number" placeholder="Monthly budget" oninput="saveBudget()"/>
+<input id="budget" type="number" placeholder="Enter target limit for this month" oninput="saveBudget()"/>
 </div>
 
 <div class="inputWrap">
 <span class="currency">£</span>
-<input id="spend" type="number" placeholder="Spend"/>
+<input id="spend" type="number" placeholder="Log expense amount" />
 </div>
 
-<button onclick="addSpend()">Add Spend</button>
+<button onclick="addSpend()">Log Transaction</button>
 
 <div class="btnRow">
-<button onclick="resetDay()">Reset Day</button>
-<button onclick="resetMonth()">Reset Month</button>
+<button onclick="resetDay()">Clear Selected Day</button>
+<button onclick="resetMonth()">Reset Track Cycle</button>
 </div>
 
 <div class="tabs">
-<button onclick="setView('day')" id="dayBtn" class="active">Day</button>
-<button onclick="setView('week')" id="weekBtn">Week</button>
-<button onclick="setView('month')" id="monthBtn">Month</button>
+<button onclick="setView('day')" id="dayBtn" class="active">Daily Track</button>
+<button onclick="setView('week')" id="weekBtn">Weekly Pacing</button>
+<button onclick="setView('month')" id="monthBtn">Cycle Summary</button>
 </div>
 
 <div class="panel">
 <div class="big" id="mainValue">—</div>
+<div id="statusIndicator" class="status-indicator">—</div>
 <div class="sub" id="subValue">—</div>
 </div>
 
-<div class="selectedBox" id="selectedBox">Click a day</div>
+<div class="selectedBox" id="selectedBox">Select calendar day below</div>
 
 <div class="calendar" id="calendar"></div>
 </div>
@@ -269,7 +297,7 @@ function render(){
 
   if (view === "day") {
     mainDisplayAmount = dailyAllowanceForSelectedDay - selectedDayActualSpend;
-    subValueText = `Remaining allowance for Day ${selectedDay}`;
+    subValueText = `Safe margin allocation for Day ${selectedDay}`;
   } 
   else if (view === "week") {
     const daysInWeekView = Math.min(7, daysLeftFromSelected);
@@ -282,22 +310,30 @@ function render(){
 
     const totalWeekBudget = dailyAllowanceForSelectedDay * daysInWeekView;
     mainDisplayAmount = totalWeekBudget - spentInWeekBlock;
-    subValueText = `Budget for Days ${selectedDay} to ${targetEndDay}`;
+    subValueText = `Combined baseline for Days ${selectedDay} to ${targetEndDay}`;
   } 
   else if (view === "month") {
     const totalMonthState = calcUpToDay(days);
     mainDisplayAmount = totalMonthState.remaining;
-    subValueText = `Total remaining for the whole month`;
+    subValueText = `Total remaining cycle runway`;
   }
 
   // Update Background & Main text
-  document.body.style.background = mainDisplayAmount >= 0 ? "#1f8f4a" : "#c0392b";
+  const isOnTrack = mainDisplayAmount >= 0;
+  document.body.style.background = isOnTrack ? "#2e7d32" : "#c62828";
   
   const mainValEl = document.getElementById("mainValue");
   if (mainValEl) {
-    mainValEl.innerText = mainDisplayAmount >= 0
-      ? `£${mainDisplayAmount.toFixed(2)} Remaining`
-      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Over`;
+    mainValEl.innerText = isOnTrack
+      ? `£${mainDisplayAmount.toFixed(2)} Ahead`
+      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Behind`;
+  }
+
+  // Track Status Signals
+  const statusEl = document.getElementById("statusIndicator");
+  if (statusEl) {
+    statusEl.innerText = isOnTrack ? "✓ ON TRACK" : "⚠ OFF TRACK";
+    statusEl.style.color = isOnTrack ? "#a5d6a7" : "#ef9a9a";
   }
 
   const subValEl = document.getElementById("subValue");
@@ -308,9 +344,9 @@ function render(){
   const selectedBoxEl = document.getElementById("selectedBox");
   if (selectedBoxEl) {
     selectedBoxEl.innerHTML =
-      `<b>Day ${selectedDay}</b><br>
-       Month Rolling Bal: £${currentDayState.remaining.toFixed(2)}<br>
-       Ideal Daily Limit: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
+      `<b>Day ${selectedDay} Pacing Profile</b><br>
+       Rolling Reserve Remaining: £${currentDayState.remaining.toFixed(2)}<br>
+       Target Daily Limit: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
   }
 
   // --- LIVE PROJECTING CALENDAR GENERATOR ---
@@ -325,26 +361,27 @@ function render(){
     for(let i = 1; i <= days; i++){
       let cls = "day";
       let displayAllowance = 0;
+      let actualSpendOnDay = 0;
+      let isFuture = false;
 
       if (i < today) {
         const historicalYesterday = calcUpToDay(i - 1);
         const historicalDaysLeft = Math.max(1, days - i + 1);
         displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-
-        const daySpend = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (daySpend <= displayAllowance ? " green" : " red");
+        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
       } 
       else if (i === today) {
         const historicalYesterday = calcUpToDay(i - 1);
         const historicalDaysLeft = Math.max(1, days - i + 1);
         displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-
-        const daySpend = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (daySpend <= displayAllowance ? " green" : " red");
+        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
       } 
       else {
         displayAllowance = futureDailyAllowance;
         cls += " future";
+        isFuture = true;
       }
 
       if(i === selectedDay) cls += " selected";
@@ -352,8 +389,16 @@ function render(){
       const div = document.createElement("div");
       div.className = cls;
       
-      const displayValue = Math.max(0, displayAllowance);
-      div.innerText = i + "\n£" + displayValue.toFixed(1); 
+      // Calculate day's remaining margin (Allowance - Actual Spent)
+      const dayRemainingMargin = displayAllowance - actualSpendOnDay;
+      
+      // Show Day #, Allowed Limit, and the accurate Day Remaining Balance
+      if (!isFuture) {
+        const sign = dayRemainingMargin >= 0 ? "£" : "-£";
+        div.innerText = `${i}\nLmt:£${displayAllowance.toFixed(0)}\nRem:${sign}${Math.abs(dayRemainingMargin).toFixed(0)}`;
+      } else {
+        div.innerText = `${i}\nProj\n£${displayAllowance.toFixed(0)}`;
+      }
 
       div.onclick = ()=>{
         selectedDay = i;
@@ -365,7 +410,6 @@ function render(){
   }
 }
 
-// Fire initial build safely
 try {
   render();
 } catch(e) {
