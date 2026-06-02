@@ -3,428 +3,608 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GreenTrack | Simple Daily Budget</title>
+<title>GreenTrack | Monthly Budget Tool</title>
 
 <style>
-body{
-  margin:0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  transition:0.3s;
-  color:white;
-  display:flex;
-  justify-content:center;
-  padding:20px;
-  min-height:100vh;
-  background:#1f8f4a; /* Dynamic fallback */
+:root {
+  --safe: #1b5e20;
+  --safe-bg: #2e7d32;
+  --safe-light: #a5d6a7;
+  --over: #b71c1c;
+  --over-bg: #c62828;
+  --over-light: #ef9a9a;
+  --future-bg: rgba(255,255,255,0.82);
+  --future-color: #1a1a1a;
+  --white: #ffffff;
+  --glass: rgba(255,255,255,0.14);
+  --glass-border: rgba(255,255,255,0.2);
 }
 
-.container{width:100%;max-width:560px;text-align:center;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 48px;
+  min-height: 100vh;
+  background: var(--safe-bg);
+  transition: background 0.5s ease;
+}
+
+.container { width: 100%; max-width: 580px; }
+
+/* ---- HEADER ---- */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.brand {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.month-nav button {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: white;
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.month-nav button:hover { background: rgba(255,255,255,0.28); }
 
 .brand-subtitle {
-  font-size: 13px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-top: -10px;
-  margin-bottom: 25px;
-  opacity: 0.8;
-  color: #e8f5e9;
+  letter-spacing: 3px;
+  opacity: 0.65;
+  margin-bottom: 22px;
 }
 
-.inputWrap{position:relative;margin:6px 0;}
-
-.currency{
-  position:absolute;
-  left:12px;
-  top:50%;
-  transform:translateY(-50%);
-  opacity:0.6;
-  color:black;
-  font-weight:bold;
+/* ---- INPUTS ---- */
+.input-group { position: relative; margin: 5px 0; }
+.currency-symbol {
+  position: absolute; left: 13px; top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700; opacity: 0.5; color: #111;
+  pointer-events: none;
+  font-size: 15px;
 }
-
-input{
-  width:100%;
-  padding:12px 12px 12px 28px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  box-sizing: border-box;
+input[type="number"] {
+  width: 100%;
+  padding: 13px 13px 13px 30px;
+  border: none;
+  border-radius: 9px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: white;
+  color: #111;
+  outline: none;
+  transition: box-shadow 0.2s;
 }
-
-button{
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  background:white;
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
+input[type="number"]:focus {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
 }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-.btnRow{display:flex;gap:8px;}
-.btnRow button{width:50%;font-size:13px;padding:10px;}
-
-.tabs{display:flex;gap:6px;margin:10px 0;}
-.tabs button{flex:1;background:rgba(255,255,255,0.2);color:white;}
-.tabs button.active{background:white;color:black;}
-
-.panel{
-  background:rgba(255,255,255,0.15);
-  padding:18px;
-  border-radius:10px;
-  margin:10px 0;
-  backdrop-filter: blur(5px);
+/* ---- BUTTONS ---- */
+.btn-primary {
+  width: 100%; padding: 13px; margin: 6px 0;
+  border: none; border-radius: 9px;
+  font-size: 16px; font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: white; color: #111;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
+.btn-primary:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+.btn-primary:active { transform: scale(0.98); }
 
-.big{font-size:24px;font-weight:bold;letter-spacing: 0.5px;}
+.btn-row { display: flex; gap: 8px; margin: 4px 0; }
+.btn-row button {
+  flex: 1; padding: 10px;
+  border: 1px solid var(--glass-border);
+  border-radius: 9px;
+  font-size: 13px; font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--glass); color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-row button:hover { background: rgba(255,255,255,0.28); }
 
-.status-indicator{
-  font-size: 14px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
+/* ---- TABS ---- */
+.tabs { display: flex; gap: 6px; margin: 14px 0 8px; }
+.tabs button {
+  flex: 1; padding: 10px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--glass); color: white;
+  cursor: pointer; transition: background 0.2s, color 0.2s;
+}
+.tabs button.active { background: white; color: #111; border-color: white; }
+
+/* ---- PANEL ---- */
+.panel {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  padding: 20px;
+  border-radius: 12px;
+  margin: 8px 0;
+  backdrop-filter: blur(6px);
+  text-align: center;
+}
+.big {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 28px; font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.status-pill {
   display: inline-block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 2px;
+  padding: 4px 10px; border-radius: 20px;
+  margin-top: 8px;
   background: rgba(0,0,0,0.2);
 }
+.sub { font-size: 13px; opacity: 0.8; margin-top: 6px; }
 
-.sub{font-size:13px;opacity:0.9;margin-top:8px;}
-
-.selectedBox{
-  margin:10px 0;
-  padding:12px;
-  border-radius:8px;
-  background:rgba(255,255,255,0.12);
-}
-
-/* Calendar Card Board Fixes */
-.calendar-container {
-  background: rgba(0, 0, 0, 0.12);
-  padding: 14px;
+/* ---- SELECTED BOX ---- */
+.selected-box {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
   border-radius: 10px;
-  margin-top: 12px;
+  padding: 14px 16px;
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.7;
 }
+.selected-box strong { font-family: 'Courier New', Courier, monospace; font-size: 12px; }
 
-.calendar{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:6px;
+/* ---- SPEND LOG ---- */
+.log-section {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 8px 0;
+  max-height: 160px;
+  overflow-y: auto;
 }
-
-.day{
-  padding:10px 2px;
-  border-radius:6px;
-  font-size:10px;
-  font-weight:bold;
-  line-height:1.3;
-  cursor:pointer;
-  white-space:pre-line;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+.log-section h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  margin-bottom: 8px;
 }
+.log-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.log-entry:last-child { border-bottom: none; }
+.log-entry .log-amount { font-family: 'Courier New', Courier, monospace; font-size: 12px; }
+.log-delete {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  cursor: pointer; font-size: 16px; padding: 0 4px;
+  transition: color 0.2s;
+}
+.log-delete:hover { color: #ef9a9a; }
+.log-empty { font-size: 12px; opacity: 0.5; text-align: center; padding: 6px 0; }
 
-/* Clear Visual Identity Colors */
-.green{background:#1b5e20; color:#e8f5e9;}   /* Distinct deep safe green */
-.red{background:#b71c1c; color:#ffebee;}     /* Distinct deep alert red */
-.future{background:rgba(255,255,255,0.85); color:#222222;} /* Clean neutral unwritten day */
-.selected{outline:3px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.6);}
+/* ---- CALENDAR ---- */
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.cal-day-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.5;
+  text-align: center;
+  padding: 2px 0;
+}
+.calendar-wrap {
+  background: rgba(0,0,0,0.12);
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-empty { }
+.day {
+  padding: 8px 2px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  white-space: pre-line;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: transform 0.1s, box-shadow 0.15s;
+  user-select: none;
+}
+.day:hover { transform: scale(1.06); box-shadow: 0 3px 10px rgba(0,0,0,0.25); }
+.day:active { transform: scale(0.97); }
+.day.green  { background: #1b5e20; color: #c8e6c9; }
+.day.red    { background: #b71c1c; color: #ffcdd2; }
+.day.future { background: rgba(255,255,255,0.82); color: #222; }
+.day.today-ring { outline: 3px solid rgba(255,255,255,0.6); outline-offset: 1px; }
+.day.selected { outline: 3px solid white; box-shadow: 0 0 12px rgba(255,255,255,0.55); }
+
+/* ---- SCROLLBAR ---- */
+.log-section::-webkit-scrollbar { width: 4px; }
+.log-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
 </style>
 </head>
 
 <body>
-
 <div class="container">
-<h1>GreenTrack</h1>
-<div class="brand-subtitle">Monthly Budget Tool</div>
 
-<div class="inputWrap">
-<span class="currency">£</span>
-<input id="budget" type="number" placeholder="Enter monthly disposable income" oninput="saveBudget()"/>
-</div>
+  <div class="header">
+    <div>
+      <div class="brand">GreenTrack</div>
+    </div>
+    <div class="month-nav">
+      <button onclick="prevMonth()" title="Previous month">&#8249;</button>
+      <span id="monthLabel">—</span>
+      <button onclick="nextMonth()" title="Next month">&#8250;</button>
+    </div>
+  </div>
+  <div class="brand-subtitle">Monthly Budget Tool</div>
 
-<div class="inputWrap">
-<span class="currency">£</span>
-<input id="spend" type="number" placeholder="Amount spent" />
-</div>
+  <div class="input-group">
+    <span class="currency-symbol">£</span>
+    <input id="budget" type="number" min="0" placeholder="Monthly disposable income" oninput="saveBudget()"/>
+  </div>
 
-<button onclick="addSpend()">Enter spending</button>
+  <div class="input-group">
+    <span class="currency-symbol">£</span>
+    <input id="spend" type="number" min="0" placeholder="Amount spent (positive only)"/>
+  </div>
 
-<div class="btnRow">
-<button onclick="resetDay()">Clear Today</button>
-<button onclick="resetMonth()">Reset Month</button>
-</div>
+  <button class="btn-primary" onclick="addSpend()">Enter Spending</button>
 
-<div class="tabs">
-<button onclick="setView('day')" id="dayBtn" class="active">Day</button>
-<button onclick="setView('week')" id="weekBtn">Week</button>
-<button onclick="setView('month')" id="monthBtn">Month</button>
-</div>
+  <div class="btn-row">
+    <button onclick="resetDay()">Clear Today's Entries</button>
+    <button onclick="resetMonth()">Reset Whole Month</button>
+  </div>
 
-<div class="panel">
-<div class="big" id="mainValue">—</div>
-<div id="statusIndicator" class="status-indicator">—</div>
-<div class="sub" id="subValue">—</div>
-</div>
+  <div class="tabs">
+    <button onclick="setView('day')"   id="dayBtn"   class="active">Day</button>
+    <button onclick="setView('week')"  id="weekBtn">Week</button>
+    <button onclick="setView('month')" id="monthBtn">Month</button>
+  </div>
 
-<div class="selectedBox" id="selectedBox">Tap a day below to view info</div>
+  <div class="panel">
+    <div class="big" id="mainValue">—</div>
+    <div class="status-pill" id="statusIndicator">—</div>
+    <div class="sub" id="subValue">—</div>
+  </div>
 
-<!-- Protected Calendar Workspace -->
-<div class="calendar-container">
-  <div class="calendar" id="calendar"></div>
-</div>
+  <div class="selected-box" id="selectedBox">Tap a day below to view details</div>
+
+  <div class="log-section" id="logSection">
+    <h4>Day <span id="logDayLabel">—</span> Entries</h4>
+    <div id="logList"><div class="log-empty">No entries yet</div></div>
+  </div>
+
+  <div class="calendar-wrap">
+    <div class="calendar-header">
+      <div class="cal-day-label">Mo</div>
+      <div class="cal-day-label">Tu</div>
+      <div class="cal-day-label">We</div>
+      <div class="cal-day-label">Th</div>
+      <div class="cal-day-label">Fr</div>
+      <div class="cal-day-label">Sa</div>
+      <div class="cal-day-label">Su</div>
+    </div>
+    <div class="calendar" id="calendar"></div>
+  </div>
+
 </div>
 
 <script>
-
-/* ---------------- STATE ---------------- */
-
-let view = "day";
+let view = 'day';
+let viewYear  = new Date().getFullYear();
+let viewMonth = new Date().getMonth();
 let selectedDay = new Date().getDate();
 
-/* ---------------- DATE ---------------- */
-
-function now(){ return new Date(); }
-
-function daysInMonth(){
-  return new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
+function todayObj() { return new Date(); }
+function isCurrentMonth() {
+  const t = todayObj();
+  return viewYear === t.getFullYear() && viewMonth === t.getMonth();
+}
+function daysInViewMonth() {
+  return new Date(viewYear, viewMonth + 1, 0).getDate();
+}
+function monthStartOffset() {
+  const d = new Date(viewYear, viewMonth, 1).getDay();
+  return (d + 6) % 7;
+}
+function formatMonth(y, m) {
+  return new Date(y, m, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 }
 
-/* ---------------- STORAGE ---------------- */
-
-function key(){
-  const d = now();
-  return `${d.getFullYear()}-${d.getMonth()}`;
+function key(y, m) {
+  return `gt_${y}-${String(m + 1).padStart(2, '0')}`;
 }
-
-function getData(){
+function getData(y, m) {
   try {
-    return JSON.parse(localStorage.getItem(key())) || {budget:0,history:[]};
+    return JSON.parse(localStorage.getItem(key(y, m))) || { budget: 0, history: [] };
   } catch(e) {
-    return {budget:0,history:[]};
+    return { budget: 0, history: [] };
   }
 }
-
-function save(d){
-  localStorage.setItem(key(),JSON.stringify(d));
+function save(d, y, m) {
+  try {
+    localStorage.setItem(key(y, m), JSON.stringify(d));
+  } catch(e) {
+    alert('Could not save: storage may be full.');
+  }
 }
-
-function saveBudget(){
-  const val = parseFloat(document.getElementById("budget").value);
-  const d = getData();
-  d.budget = isNaN(val) ? 0 : val;
-  save(d);
+function saveBudget() {
+  const val = parseFloat(document.getElementById('budget').value);
+  const d = getData(viewYear, viewMonth);
+  d.budget = isNaN(val) || val < 0 ? 0 : val;
+  save(d, viewYear, viewMonth);
   render();
 }
 
-/* ---------------- CORE ENGINE ---------------- */
+function prevMonth() {
+  if (viewMonth === 0) { viewMonth = 11; viewYear--; }
+  else viewMonth--;
+  selectedDay = 1;
+  render();
+}
+function nextMonth() {
+  if (viewMonth === 11) { viewMonth = 0; viewYear++; }
+  else viewMonth++;
+  selectedDay = 1;
+  render();
+}
 
-function calcUpToDay(targetDay) {
-  const d = getData();
+function calcUpToDay(targetDay, y, m) {
+  const d = getData(y, m);
   const totalBudget = d.budget || 0;
-
-  let totalSpent = 0;
   const historyList = d.history || [];
-  
+  let totalSpent = 0;
   for (let i = 1; i <= targetDay; i++) {
     totalSpent += historyList
       .filter(h => h && h.day === i)
       .reduce((s, h) => s + (h.amount || 0), 0);
   }
-
-  return {
-    remaining: totalBudget - totalSpent,
-    spentOnThisDay: historyList.filter(h => h && h.day === targetDay).reduce((s, h) => s + (h.amount || 0), 0)
-  };
+  return { remaining: totalBudget - totalSpent };
+}
+function dailyAllowanceForDay(dayNum, totalDays, y, m) {
+  const prev = calcUpToDay(dayNum - 1, y, m);
+  const daysLeft = Math.max(1, totalDays - dayNum + 1);
+  return prev.remaining / daysLeft;
+}
+function spentOnDay(dayNum, historyList) {
+  return historyList
+    .filter(h => h && h.day === dayNum)
+    .reduce((s, h) => s + (h.amount || 0), 0);
 }
 
-/* ---------------- VIEW CONTROL ---------------- */
-
-function setView(v){
+function setView(v) {
   view = v;
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  const btn = document.getElementById(v+"Btn");
-  if(btn) btn.classList.add("active");
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(v + 'Btn');
+  if (btn) btn.classList.add('active');
   render();
 }
 
-/* ---------------- ADD SPEND ---------------- */
-
-function addSpend(){
-  const val = parseFloat(document.getElementById("spend").value);
-  if(isNaN(val)) return;
-
-  const d = getData();
-  if(!d.history) d.history = [];
-  d.history.push({day:selectedDay, amount:val});
-  save(d);
-
-  document.getElementById("spend").value = "";
-  render();
-}
-
-/* ---------------- RESET ---------------- */
-
-function resetDay(){
-  const d = getData();
-  if(d.history) {
-    d.history = d.history.filter(h => h && h.day !== selectedDay);
+function addSpend() {
+  const raw = parseFloat(document.getElementById('spend').value);
+  if (isNaN(raw) || raw < 0) {
+    alert('Please enter a valid positive amount.');
+    return;
   }
-  save(d);
+  const d = getData(viewYear, viewMonth);
+  if (!d.history) d.history = [];
+  d.history.push({ day: selectedDay, amount: raw, id: Date.now() });
+  save(d, viewYear, viewMonth);
+  document.getElementById('spend').value = '';
   render();
 }
 
-function resetMonth(){
-  localStorage.removeItem(key());
+function deleteEntry(id) {
+  const d = getData(viewYear, viewMonth);
+  d.history = (d.history || []).filter(h => h.id !== id);
+  save(d, viewYear, viewMonth);
+  render();
+}
+
+function resetDay() {
+  if (!confirm(`Clear all entries for Day ${selectedDay}?`)) return;
+  const d = getData(viewYear, viewMonth);
+  d.history = (d.history || []).filter(h => h && h.day !== selectedDay);
+  save(d, viewYear, viewMonth);
+  render();
+}
+function resetMonth() {
+  if (!confirm('Reset the entire month? This cannot be undone.')) return;
+  localStorage.removeItem(key(viewYear, viewMonth));
   location.reload();
 }
 
-/* ---------------- RENDER ---------------- */
-
-function render(){
-  const days = daysInMonth();
-  const today = now().getDate();
-  const d = getData();
-
-  const budgetInput = document.getElementById("budget");
-  if(budgetInput && document.activeElement !== budgetInput) {
-    budgetInput.value = d.budget || "";
-  }
-
-  // --- PERSPECTIVE CALCULATIONS ---
-  let mainDisplayAmount = 0;
-  let subValueText = "";
-
-  const yesterdayState = calcUpToDay(selectedDay - 1);
-  const daysLeftFromSelected = Math.max(1, days - selectedDay + 1);
-  const dailyAllowanceForSelectedDay = daysLeftFromSelected > 0 ? (yesterdayState.remaining / daysLeftFromSelected) : 0;
-  
+function render() {
+  const days = daysInViewMonth();
+  const today = isCurrentMonth() ? todayObj().getDate() : null;
+  const d = getData(viewYear, viewMonth);
   const historyList = d.history || [];
-  const selectedDayActualSpend = historyList
-    .filter(h => h && h.day === selectedDay)
-    .reduce((s, h) => s + (h.amount || 0), 0);
 
-  if (view === "day") {
-    mainDisplayAmount = dailyAllowanceForSelectedDay - selectedDayActualSpend;
-    subValueText = `Left to spend for Day ${selectedDay}`;
-  } 
-  else if (view === "week") {
-    const daysInWeekView = Math.min(7, daysLeftFromSelected);
-    const targetEndDay = Math.min(selectedDay + daysInWeekView - 1, days);
-    
-    let spentInWeekBlock = 0;
-    for(let i = selectedDay; i <= targetEndDay; i++) {
-      spentInWeekBlock += historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+  if (selectedDay > days) selectedDay = days;
+
+  const ml = document.getElementById('monthLabel');
+  if (ml) ml.textContent = formatMonth(viewYear, viewMonth);
+
+  const budgetEl = document.getElementById('budget');
+  if (budgetEl && document.activeElement !== budgetEl) {
+    budgetEl.value = d.budget || '';
+  }
+
+  const totalDays = days;
+  const allowanceForSelected = dailyAllowanceForDay(selectedDay, totalDays, viewYear, viewMonth);
+  const selectedSpend = spentOnDay(selectedDay, historyList);
+
+  let mainAmount = 0;
+  let subText = '';
+
+  if (view === 'day') {
+    mainAmount = allowanceForSelected - selectedSpend;
+    subText = `Left to spend on Day ${selectedDay}`;
+  } else if (view === 'week') {
+    const endDay = Math.min(selectedDay + 6, days);
+    let weekBudget = 0;
+    let weekSpent = 0;
+    for (let i = selectedDay; i <= endDay; i++) {
+      weekBudget += dailyAllowanceForDay(i, totalDays, viewYear, viewMonth);
+      weekSpent  += spentOnDay(i, historyList);
     }
-
-    const totalWeekBudget = dailyAllowanceForSelectedDay * daysInWeekView;
-    mainDisplayAmount = totalWeekBudget - spentInWeekBlock;
-    subValueText = `Total left for Days ${selectedDay} to ${targetEndDay}`;
-  } 
-  else if (view === "month") {
-    const totalMonthState = calcUpToDay(days);
-    mainDisplayAmount = totalMonthState.remaining;
-    subValueText = `Total money left for the month`;
+    mainAmount = weekBudget - weekSpent;
+    subText = `Left for Days ${selectedDay}–${endDay}`;
+  } else {
+    mainAmount = calcUpToDay(days, viewYear, viewMonth).remaining;
+    subText = 'Total remaining for the month';
   }
 
-  // Update System Theme
-  const isOnTrack = mainDisplayAmount >= 0;
-  document.body.style.background = isOnTrack ? "#2e7d32" : "#c62828";
-  
-  const mainValEl = document.getElementById("mainValue");
-  if (mainValEl) {
-    mainValEl.innerText = isOnTrack
-      ? `£${mainDisplayAmount.toFixed(2)} Left`
-      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Over`;
-  }
+  const onTrack = mainAmount >= 0;
+  document.body.style.background = onTrack ? '#2e7d32' : '#c62828';
 
-  const statusEl = document.getElementById("statusIndicator");
+  const mainEl = document.getElementById('mainValue');
+  if (mainEl) {
+    mainEl.textContent = onTrack
+      ? `£${mainAmount.toFixed(2)} left`
+      : `-£${Math.abs(mainAmount).toFixed(2)} over`;
+  }
+  const statusEl = document.getElementById('statusIndicator');
   if (statusEl) {
-    statusEl.innerText = isOnTrack ? "✓ On Track" : "⚠ Over Budget";
-    statusEl.style.color = isOnTrack ? "#a5d6a7" : "#ef9a9a";
+    statusEl.textContent = onTrack ? '✓ On Track' : '⚠ Over Budget';
+    statusEl.style.color = onTrack ? '#a5d6a7' : '#ef9a9a';
   }
+  const subEl = document.getElementById('subValue');
+  if (subEl) subEl.textContent = subText;
 
-  const subValEl = document.getElementById("subValue");
-  if (subValEl) subValEl.innerText = subValueText;
-
-  // Selected Information Card
-  const currentDayState = calcUpToDay(selectedDay);
-  const selectedBoxEl = document.getElementById("selectedBox");
+  const currentState = calcUpToDay(selectedDay, viewYear, viewMonth);
+  const safeToday = Math.max(0, allowanceForSelected);
+  const selectedBoxEl = document.getElementById('selectedBox');
   if (selectedBoxEl) {
     selectedBoxEl.innerHTML =
-      `<b>Day ${selectedDay} Details</b><br>
-       Total money left: £${currentDayState.remaining.toFixed(2)}<br>
-       Safe to spend today: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
+      `<strong>Day ${selectedDay}</strong> &nbsp;·&nbsp; ` +
+      `Total remaining after today: <strong>£${currentState.remaining.toFixed(2)}</strong><br>` +
+      `Safe to spend today: <strong>£${safeToday.toFixed(2)}</strong> &nbsp;·&nbsp; ` +
+      `Spent today: <strong>£${selectedSpend.toFixed(2)}</strong>`;
   }
 
-  // --- DYNAMIC CALENDAR DRAW ENGINE ---
-  const cal = document.getElementById("calendar");
-  if (cal) {
-    cal.innerHTML = "";
-
-    const todayState = calcUpToDay(today);
-    const futureDaysCount = Math.max(1, days - today); 
-    const futureDailyAllowance = futureDaysCount > 0 ? (todayState.remaining / futureDaysCount) : 0;
-
-    for(let i = 1; i <= days; i++){
-      let cls = "day";
-      let displayAllowance = 0;
-      let actualSpendOnDay = 0;
-      let isFuture = false;
-
-      if (i < today) {
-        const historicalYesterday = calcUpToDay(i - 1);
-        const historicalDaysLeft = Math.max(1, days - i + 1);
-        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
-      } 
-      else if (i === today) {
-        const historicalYesterday = calcUpToDay(i - 1);
-        const historicalDaysLeft = Math.max(1, days - i + 1);
-        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
-      } 
-      else {
-        displayAllowance = futureDailyAllowance;
-        cls += " future";
-        isFuture = true;
-      }
-
-      if(i === selectedDay) cls += " selected";
-
-      const div = document.createElement("div");
-      div.className = cls;
-      
-      const dayRemainingMargin = displayAllowance - actualSpendOnDay;
-      
-      if (!isFuture) {
-        const sign = dayRemainingMargin >= 0 ? "£" : "-£";
-        div.innerText = `${i}\nLeft:\n${sign}${Math.abs(dayRemainingMargin).toFixed(0)}`;
-      } else {
-        div.innerText = `${i}\nSafe:\n£${displayAllowance.toFixed(0)}`;
-      }
-
-      div.onclick = ()=>{
-        selectedDay = i;
-        render();
-      };
-
-      cal.appendChild(div);
+  const logDayLabel = document.getElementById('logDayLabel');
+  if (logDayLabel) logDayLabel.textContent = selectedDay;
+  const logList = document.getElementById('logList');
+  if (logList) {
+    const entries = historyList.filter(h => h && h.day === selectedDay);
+    if (entries.length === 0) {
+      logList.innerHTML = '<div class="log-empty">No entries for this day</div>';
+    } else {
+      logList.innerHTML = entries.map(e => `
+        <div class="log-entry">
+          <span class="log-amount">£${(e.amount || 0).toFixed(2)}</span>
+          <button class="log-delete" onclick="deleteEntry(${e.id})" title="Delete entry">×</button>
+        </div>
+      `).join('');
     }
+  }
+
+  const cal = document.getElementById('calendar');
+  if (!cal) return;
+  cal.innerHTML = '';
+
+  const offset = monthStartOffset();
+  for (let i = 0; i < offset; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-empty';
+    cal.appendChild(blank);
+  }
+
+  const todayNum = today || days;
+  const todayState = calcUpToDay(todayNum, viewYear, viewMonth);
+  const futureDaysCount = Math.max(1, days - todayNum);
+  const futureDailyAllowance = todayState.remaining / futureDaysCount;
+
+  for (let i = 1; i <= days; i++) {
+    const isFuture = today ? i > today : false;
+    const isToday  = today ? i === today : false;
+
+    let cls = 'day';
+    let allowance = 0;
+    let actualSpend = 0;
+
+    if (!isFuture) {
+      allowance   = dailyAllowanceForDay(i, totalDays, viewYear, viewMonth);
+      actualSpend = spentOnDay(i, historyList);
+      cls += actualSpend <= allowance ? ' green' : ' red';
+    } else {
+      allowance = futureDailyAllowance;
+      cls += ' future';
+    }
+
+    if (isToday)           cls += ' today-ring';
+    if (i === selectedDay) cls += ' selected';
+
+    const div = document.createElement('div');
+    div.className = cls;
+
+    if (!isFuture) {
+      const margin = allowance - actualSpend;
+      const sign = margin >= 0 ? '£' : '-£';
+      div.textContent = `${i}\n${sign}${Math.abs(margin).toFixed(0)}`;
+    } else {
+      div.textContent = `${i}\n£${Math.max(0, allowance).toFixed(0)}`;
+    }
+
+    div.onclick = () => { selectedDay = i; render(); };
+    cal.appendChild(div);
   }
 }
 
 try {
   render();
 } catch(e) {
-  console.error("Initial render failed: ", e);
+  console.error('Initial render error:', e);
 }
 </script>
-
 </body>
 </html>
