@@ -129,20 +129,14 @@
   <button onclick="resetSelectedDay()">Reset Selected Day</button>
   <button onclick="resetMonth()">Reset Month</button>
 
-  <div class="tabs">
-    <button onclick="setView('day')" id="tab-day" class="active">Day</button>
-    <button onclick="setView('week')" id="tab-week">Week</button>
-    <button onclick="setView('month')" id="tab-month">Month</button>
-  </div>
-
   <div class="panel">
     <div class="big" id="safeText">—</div>
-    <div class="sub" id="periodText">—</div>
+    <div class="sub" id="periodText">Forecast View</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
   <div class="selectedBox" id="selectedDayBox">
-    Click a day to select it
+    Click a day to see forecast impact
   </div>
 
   <div class="calendarHeader" id="calendarHeader"></div>
@@ -151,10 +145,8 @@
 
 <script>
 
-let view = "day";
 let selectedDay = null;
 
-// ---------------- DATE ----------------
 function now() {
   return new Date();
 }
@@ -164,7 +156,6 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
-// ---------------- STORAGE ----------------
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -176,22 +167,38 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// ---------------- BUDGET INPUT ----------------
-document.getElementById("budget").addEventListener("input", (e) => {
-  const data = getData();
-  const value = parseFloat(e.target.value);
-  data.budget = isNaN(value) ? 0 : value;
-  saveData(data);
-  updateUI();
-});
+// ---------------- CORE FORECAST ENGINE ----------------
+function buildForecast(data) {
 
-// ---------------- ACTIVE DAY ----------------
-function getActiveDay() {
-  return selectedDay;
+  const daysInMonth = new Date(
+    now().getFullYear(),
+    now().getMonth()+1,
+    0
+  ).getDate();
+
+  const dailyBase = data.budget / daysInMonth;
+
+  let balance = data.budget;
+
+  const forecast = {};
+
+  for (let d = 1; d <= daysInMonth; d++) {
+
+    const spent = data.history
+      .filter(h => h.day === d)
+      .reduce((s,h)=>s+h.amount,0);
+
+    balance = balance - spent;
+
+    forecast[d] = balance;
+  }
+
+  return forecast;
 }
 
-// ---------------- ADD SPEND (STRICT) ----------------
+// ---------------- ADD SPEND ----------------
 function addSpend() {
+
   const errorEl = document.getElementById("error");
   errorEl.innerText = "";
 
@@ -219,6 +226,7 @@ function addSpend() {
 
 // ---------------- RESET DAY ----------------
 function resetSelectedDay() {
+
   if (!selectedDay) return;
 
   const data = getData();
@@ -235,62 +243,32 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- CORE CALC ----------------
-function getRemainingBudget(data) {
-  return data.budget - data.history.reduce((s,h)=>s+h.amount,0);
-}
-
-function getDaysRemaining() {
-  const d = now();
-  const total = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-  return total - d.getDate() + 1;
-}
-
-// VIEW-AWARE ALLOWANCE
-function getViewRemaining(data) {
-  const remaining = getRemainingBudget(data);
-
-  if (view === "month") return remaining;
-
-  if (view === "week") return remaining / Math.max(1, Math.ceil(getDaysRemaining()/7));
-
-  // day view
-  return remaining / getDaysRemaining();
-}
-
 // ---------------- PANEL ----------------
-function updatePanel(data) {
+function updatePanel(data, forecast) {
 
-  const remaining = getRemainingBudget(data);
+  const today = now().getDate();
+
+  const current = forecast[today] ?? data.budget;
 
   document.body.style.background =
-    remaining >= 0 ? "#1f8f4a" : "#c0392b";
+    current >= 0 ? "#1f8f4a" : "#c0392b";
 
-  const active = selectedDay ?? now().getDate();
-
-  const activeSpend = data.history
-    .filter(h => h.day === active)
-    .reduce((s,h)=>s+h.amount,0);
-
-  let label =
-    view === "day" ? "Day" :
-    view === "week" ? "Week" : "Month";
+  const active = selectedDay ?? today;
 
   document.getElementById("safeText").innerHTML =
-    `Remaining £${getViewRemaining(data).toFixed(2)}`;
-
-  document.getElementById("periodText").innerHTML =
-    `${label} view`;
+    current >= 0
+      ? `£${current.toFixed(2)} remaining (forecast)`
+      : `£${Math.abs(current).toFixed(2)} over (forecast)`;
 
   document.getElementById("breakdownText").innerHTML = `
-    Monthly remaining: £${remaining.toFixed(2)}<br>
-    Selected day spend: £${activeSpend.toFixed(2)}<br>
-    Budget: £${data.budget || 0}
+    Monthly budget: £${data.budget || 0}<br>
+    Today forecast balance: £${current.toFixed(2)}
   `;
 }
 
 // ---------------- CALENDAR ----------------
-function renderCalendar(data) {
+function renderCalendar(data, forecast) {
+
   const el = document.getElementById("calendar");
   el.innerHTML = "";
 
@@ -306,19 +284,17 @@ function renderCalendar(data) {
   document.getElementById("calendarHeader").innerText =
     `${monthName} ${year}`;
 
-  const dailyAllowance = getRemainingBudget(data) / getDaysRemaining();
-
   for (let i = 1; i <= daysInMonth; i++) {
-
-    const spend = data.history
-      .filter(h => h.day === i)
-      .reduce((s,h)=>s+h.amount,0);
 
     let cls = "day";
 
-    if (i > today) cls += " future";
-    else if (spend <= dailyAllowance) cls += " green";
-    else cls += " red";
+    const balance = forecast[i];
+
+    if (i > today) {
+      cls += " future";
+    } else {
+      cls += balance >= 0 ? " green" : " red";
+    }
 
     const div = document.createElement("div");
     div.className = cls;
@@ -328,9 +304,8 @@ function renderCalendar(data) {
       selectedDay = i;
 
       document.getElementById("selectedDayBox").innerHTML =
-        `<b>${monthName} ${i}</b><br>Selected`;
+        `<b>${monthName} ${i}</b><br>Forecast updated`;
 
-      document.getElementById("error").innerText = "";
       updateUI();
     };
 
@@ -338,23 +313,15 @@ function renderCalendar(data) {
   }
 }
 
-// ---------------- VIEW SWITCH ----------------
-function setView(v) {
-  view = v;
-
-  document.querySelectorAll(".tabs button")
-    .forEach(b => b.classList.remove("active"));
-
-  document.getElementById("tab-" + v).classList.add("active");
-
-  updateUI();
-}
-
-// ---------------- MAIN ----------------
+// ---------------- UI ----------------
 function updateUI() {
+
   const data = getData();
-  updatePanel(data);
-  renderCalendar(data);
+
+  const forecast = buildForecast(data);
+
+  updatePanel(data, forecast);
+  renderCalendar(data, forecast);
 }
 
 updateUI();
