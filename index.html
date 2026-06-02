@@ -7,15 +7,6 @@
 
 <style>
 :root {
-  --safe: #1b5e20;
-  --safe-bg: #2e7d32;
-  --safe-light: #a5d6a7;
-  --over: #b71c1c;
-  --over-bg: #c62828;
-  --over-light: #ef9a9a;
-  --future-bg: rgba(255,255,255,0.82);
-  --future-color: #1a1a1a;
-  --white: #ffffff;
   --glass: rgba(255,255,255,0.14);
   --glass-border: rgba(255,255,255,0.2);
 }
@@ -29,13 +20,12 @@ body {
   justify-content: center;
   padding: 24px 16px 48px;
   min-height: 100vh;
-  background: var(--safe-bg);
+  background: #2e7d32;
   transition: background 0.5s ease;
 }
 
 .container { width: 100%; max-width: 580px; }
 
-/* ---- HEADER ---- */
 .header {
   display: flex;
   align-items: baseline;
@@ -77,7 +67,6 @@ body {
   margin-bottom: 22px;
 }
 
-/* ---- INPUTS ---- */
 .input-group { position: relative; margin: 5px 0; }
 .currency-symbol {
   position: absolute; left: 13px; top: 50%;
@@ -98,13 +87,10 @@ input[type="number"] {
   outline: none;
   transition: box-shadow 0.2s;
 }
-input[type="number"]:focus {
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
-}
+input[type="number"]:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.5); }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-/* ---- BUTTONS ---- */
 .btn-primary {
   width: 100%; padding: 13px; margin: 6px 0;
   border: none; border-radius: 9px;
@@ -131,7 +117,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .btn-row button:hover { background: rgba(255,255,255,0.28); }
 
-/* ---- TABS ---- */
 .tabs { display: flex; gap: 6px; margin: 14px 0 8px; }
 .tabs button {
   flex: 1; padding: 10px;
@@ -144,7 +129,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .tabs button.active { background: white; color: #111; border-color: white; }
 
-/* ---- PANEL ---- */
 .panel {
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -169,7 +153,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .sub { font-size: 13px; opacity: 0.8; margin-top: 6px; }
 
-/* ---- SELECTED BOX ---- */
 .selected-box {
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -181,7 +164,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .selected-box strong { font-family: 'Courier New', Courier, monospace; font-size: 12px; }
 
-/* ---- SPEND LOG ---- */
 .log-section {
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -216,7 +198,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .log-delete:hover { color: #ef9a9a; }
 .log-empty { font-size: 12px; opacity: 0.5; text-align: center; padding: 6px 0; }
 
-/* ---- CALENDAR ---- */
 .calendar-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -243,7 +224,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
 }
-.cal-empty { }
 .day {
   padding: 8px 2px;
   border-radius: 7px;
@@ -265,7 +245,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .day.today-ring { outline: 3px solid rgba(255,255,255,0.6); outline-offset: 1px; }
 .day.selected { outline: 3px solid white; box-shadow: 0 0 12px rgba(255,255,255,0.55); }
 
-/* ---- SCROLLBAR ---- */
 .log-section::-webkit-scrollbar { width: 4px; }
 .log-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
 </style>
@@ -275,13 +254,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 <div class="container">
 
   <div class="header">
-    <div>
-      <div class="brand">GreenTrack</div>
-    </div>
+    <div><div class="brand">GreenTrack</div></div>
     <div class="month-nav">
-      <button onclick="prevMonth()" title="Previous month">&#8249;</button>
+      <button onclick="prevMonth()">&#8249;</button>
       <span id="monthLabel">—</span>
-      <button onclick="nextMonth()" title="Next month">&#8250;</button>
+      <button onclick="nextMonth()">&#8250;</button>
     </div>
   </div>
   <div class="brand-subtitle">Monthly Budget Tool</div>
@@ -317,7 +294,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
   <div class="selected-box" id="selectedBox">Tap a day below to view details</div>
 
-  <div class="log-section" id="logSection">
+  <div class="log-section">
     <h4>Day <span id="logDayLabel">—</span> Entries</h4>
     <div id="logList"><div class="log-empty">No entries yet</div></div>
   </div>
@@ -344,17 +321,21 @@ let viewMonth = new Date().getMonth();
 let selectedDay = new Date().getDate();
 
 function todayObj() { return new Date(); }
+
 function isCurrentMonth() {
   const t = todayObj();
   return viewYear === t.getFullYear() && viewMonth === t.getMonth();
 }
+
 function daysInViewMonth() {
   return new Date(viewYear, viewMonth + 1, 0).getDate();
 }
+
 function monthStartOffset() {
   const d = new Date(viewYear, viewMonth, 1).getDay();
   return (d + 6) % 7;
 }
+
 function formatMonth(y, m) {
   return new Date(y, m, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 }
@@ -362,6 +343,7 @@ function formatMonth(y, m) {
 function key(y, m) {
   return `gt_${y}-${String(m + 1).padStart(2, '0')}`;
 }
+
 function getData(y, m) {
   try {
     return JSON.parse(localStorage.getItem(key(y, m))) || { budget: 0, history: [] };
@@ -369,6 +351,7 @@ function getData(y, m) {
     return { budget: 0, history: [] };
   }
 }
+
 function save(d, y, m) {
   try {
     localStorage.setItem(key(y, m), JSON.stringify(d));
@@ -376,6 +359,7 @@ function save(d, y, m) {
     alert('Could not save: storage may be full.');
   }
 }
+
 function saveBudget() {
   const val = parseFloat(document.getElementById('budget').value);
   const d = getData(viewYear, viewMonth);
@@ -390,6 +374,7 @@ function prevMonth() {
   selectedDay = 1;
   render();
 }
+
 function nextMonth() {
   if (viewMonth === 11) { viewMonth = 0; viewYear++; }
   else viewMonth++;
@@ -397,23 +382,41 @@ function nextMonth() {
   render();
 }
 
-function calcUpToDay(targetDay, y, m) {
-  const d = getData(y, m);
-  const totalBudget = d.budget || 0;
-  const historyList = d.history || [];
-  let totalSpent = 0;
+function calcSpentUpToDay(targetDay, historyList) {
+  let total = 0;
   for (let i = 1; i <= targetDay; i++) {
-    totalSpent += historyList
+    total += historyList
       .filter(h => h && h.day === i)
       .reduce((s, h) => s + (h.amount || 0), 0);
   }
-  return { remaining: totalBudget - totalSpent };
+  return total;
 }
+
+function remainingAfterDay(dayNum, y, m) {
+  const d = getData(y, m);
+  const budget = d.budget || 0;
+  const spent = calcSpentUpToDay(dayNum, d.history || []);
+  return budget - spent;
+}
+
+function todayDateFor(y, m) {
+  const t = todayObj();
+  return (y === t.getFullYear() && m === t.getMonth()) ? t.getDate() : null;
+}
+
 function dailyAllowanceForDay(dayNum, totalDays, y, m) {
-  const prev = calcUpToDay(dayNum - 1, y, m);
-  const daysLeft = Math.max(1, totalDays - dayNum + 1);
-  return prev.remaining / daysLeft;
+  const todayDate = todayDateFor(y, m);
+  if (todayDate && dayNum >= todayDate) {
+    const remaining = remainingAfterDay(todayDate - 1, y, m);
+    const daysLeft = Math.max(1, totalDays - todayDate + 1);
+    return remaining / daysLeft;
+  } else {
+    const remaining = remainingAfterDay(dayNum - 1, y, m);
+    const daysLeft = Math.max(1, totalDays - dayNum + 1);
+    return remaining / daysLeft;
+  }
 }
+
 function spentOnDay(dayNum, historyList) {
   return historyList
     .filter(h => h && h.day === dayNum)
@@ -456,6 +459,7 @@ function resetDay() {
   save(d, viewYear, viewMonth);
   render();
 }
+
 function resetMonth() {
   if (!confirm('Reset the entire month? This cannot be undone.')) return;
   localStorage.removeItem(key(viewYear, viewMonth));
@@ -464,7 +468,7 @@ function resetMonth() {
 
 function render() {
   const days = daysInViewMonth();
-  const today = isCurrentMonth() ? todayObj().getDate() : null;
+  const todayDate = todayDateFor(viewYear, viewMonth);
   const d = getData(viewYear, viewMonth);
   const historyList = d.history || [];
 
@@ -478,8 +482,7 @@ function render() {
     budgetEl.value = d.budget || '';
   }
 
-  const totalDays = days;
-  const allowanceForSelected = dailyAllowanceForDay(selectedDay, totalDays, viewYear, viewMonth);
+  const allowanceForSelected = dailyAllowanceForDay(selectedDay, days, viewYear, viewMonth);
   const selectedSpend = spentOnDay(selectedDay, historyList);
 
   let mainAmount = 0;
@@ -490,16 +493,15 @@ function render() {
     subText = `Left to spend on Day ${selectedDay}`;
   } else if (view === 'week') {
     const endDay = Math.min(selectedDay + 6, days);
-    let weekBudget = 0;
-    let weekSpent = 0;
+    let weekBudget = 0, weekSpent = 0;
     for (let i = selectedDay; i <= endDay; i++) {
-      weekBudget += dailyAllowanceForDay(i, totalDays, viewYear, viewMonth);
+      weekBudget += dailyAllowanceForDay(i, days, viewYear, viewMonth);
       weekSpent  += spentOnDay(i, historyList);
     }
     mainAmount = weekBudget - weekSpent;
     subText = `Left for Days ${selectedDay}–${endDay}`;
   } else {
-    mainAmount = calcUpToDay(days, viewYear, viewMonth).remaining;
+    mainAmount = remainingAfterDay(days, viewYear, viewMonth);
     subText = 'Total remaining for the month';
   }
 
@@ -512,21 +514,23 @@ function render() {
       ? `£${mainAmount.toFixed(2)} left`
       : `-£${Math.abs(mainAmount).toFixed(2)} over`;
   }
+
   const statusEl = document.getElementById('statusIndicator');
   if (statusEl) {
     statusEl.textContent = onTrack ? '✓ On Track' : '⚠ Over Budget';
     statusEl.style.color = onTrack ? '#a5d6a7' : '#ef9a9a';
   }
+
   const subEl = document.getElementById('subValue');
   if (subEl) subEl.textContent = subText;
 
-  const currentState = calcUpToDay(selectedDay, viewYear, viewMonth);
+  const remainingAfterSelected = remainingAfterDay(selectedDay, viewYear, viewMonth);
   const safeToday = Math.max(0, allowanceForSelected);
   const selectedBoxEl = document.getElementById('selectedBox');
   if (selectedBoxEl) {
     selectedBoxEl.innerHTML =
       `<strong>Day ${selectedDay}</strong> &nbsp;·&nbsp; ` +
-      `Total remaining after today: <strong>£${currentState.remaining.toFixed(2)}</strong><br>` +
+      `Remaining after today: <strong>£${remainingAfterSelected.toFixed(2)}</strong><br>` +
       `Safe to spend today: <strong>£${safeToday.toFixed(2)}</strong> &nbsp;·&nbsp; ` +
       `Spent today: <strong>£${selectedSpend.toFixed(2)}</strong>`;
   }
@@ -542,7 +546,7 @@ function render() {
       logList.innerHTML = entries.map(e => `
         <div class="log-entry">
           <span class="log-amount">£${(e.amount || 0).toFixed(2)}</span>
-          <button class="log-delete" onclick="deleteEntry(${e.id})" title="Delete entry">×</button>
+          <button class="log-delete" onclick="deleteEntry(${e.id})" title="Delete">×</button>
         </div>
       `).join('');
     }
@@ -554,33 +558,22 @@ function render() {
 
   const offset = monthStartOffset();
   for (let i = 0; i < offset; i++) {
-    const blank = document.createElement('div');
-    blank.className = 'cal-empty';
-    cal.appendChild(blank);
+    cal.appendChild(document.createElement('div'));
   }
 
-  const todayNum = today || days;
-  const todayState = calcUpToDay(todayNum, viewYear, viewMonth);
-  const futureDaysCount = Math.max(1, days - todayNum);
-  const futureDailyAllowance = todayState.remaining / futureDaysCount;
-
   for (let i = 1; i <= days; i++) {
-    const isFuture = today ? i > today : false;
-    const isToday  = today ? i === today : false;
+    const isFuture = todayDate ? i > todayDate : false;
+    const isToday  = todayDate ? i === todayDate : false;
+
+    const allowance   = dailyAllowanceForDay(i, days, viewYear, viewMonth);
+    const actualSpend = spentOnDay(i, historyList);
 
     let cls = 'day';
-    let allowance = 0;
-    let actualSpend = 0;
-
-    if (!isFuture) {
-      allowance   = dailyAllowanceForDay(i, totalDays, viewYear, viewMonth);
-      actualSpend = spentOnDay(i, historyList);
-      cls += actualSpend <= allowance ? ' green' : ' red';
-    } else {
-      allowance = futureDailyAllowance;
+    if (isFuture) {
       cls += ' future';
+    } else {
+      cls += actualSpend <= allowance ? ' green' : ' red';
     }
-
     if (isToday)           cls += ' today-ring';
     if (i === selectedDay) cls += ' selected';
 
