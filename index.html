@@ -121,14 +121,12 @@
   <button onclick="resetSelectedDay()">Reset Selected Day</button>
   <button onclick="resetMonth()">Reset Month</button>
 
-  <!-- TABS -->
   <div class="tabs">
     <button onclick="setView('day')" id="tab-day" class="active">Day</button>
     <button onclick="setView('week')" id="tab-week">Week</button>
     <button onclick="setView('month')" id="tab-month">Month</button>
   </div>
 
-  <!-- PANEL -->
   <div class="panel">
     <div class="big" id="safeText">—</div>
     <div class="sub" id="periodText">—</div>
@@ -139,7 +137,7 @@
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDayBox">
-    Click a day to select it (defaults to today)
+    Click a day to select it
   </div>
 </div>
 
@@ -148,7 +146,6 @@
 let view = "day";
 let selectedDay = null;
 
-// ---------------- DATE ----------------
 function now() {
   return new Date();
 }
@@ -158,7 +155,6 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
-// ---------------- STORAGE ----------------
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -169,14 +165,6 @@ function getData() {
 function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
-
-// ---------------- BUDGET ----------------
-document.getElementById("budget").addEventListener("change", (e) => {
-  const data = getData();
-  data.budget = parseFloat(e.target.value);
-  saveData(data);
-  updateUI();
-});
 
 // ---------------- ACTIVE DAY ----------------
 function getActiveDay() {
@@ -189,17 +177,18 @@ function addSpend() {
   if (isNaN(val)) return;
 
   const data = getData();
-  const day = getActiveDay();
 
-  data.history.push({ amount: val, day: day });
+  data.history.push({
+    amount: val,
+    day: getActiveDay()
+  });
 
   saveData(data);
   document.getElementById("spend").value = "";
-
   updateUI();
 }
 
-// ---------------- RESET SELECTED DAY ----------------
+// ---------------- RESET DAY ----------------
 function resetSelectedDay() {
   const data = getData();
   const day = getActiveDay();
@@ -216,63 +205,51 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- HELPERS ----------------
-function getDaySpend(data, day) {
-  return data.history
-    .filter(h => h.day === day)
-    .reduce((s, h) => s + h.amount, 0);
+// ---------------- CORE ROLLING BUDGET ----------------
+function getRemainingBudget(data) {
+  return data.history.reduce((sum, h) => sum - h.amount, data.budget);
 }
 
-// ---------------- REMAINING ----------------
-function getRemaining(data) {
-  const total = data.history.reduce((s,h)=>s+h.amount,0);
-
-  const daysInMonth = new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
-
-  let allowed = 0;
-
-  if (view === "day") allowed = data.budget / daysInMonth;
-  if (view === "week") allowed = (data.budget / daysInMonth) * 7;
-  if (view === "month") allowed = data.budget;
-
-  return allowed - total;
-}
-
-// ---------------- LABEL ----------------
-function formatLabel() {
+function getDaysRemaining() {
   const d = now();
-  const monthName = d.toLocaleString('default', { month: 'short' });
+  const total = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  return total - d.getDate() + 1;
+}
 
-  const today = d.getDate();
-  const active = getActiveDay();
-
-  return view === "day"
-    ? `${monthName} ${active}${active === today ? " (Today)" : ""}`
-    : view === "week"
-      ? "This Week"
-      : "This Month";
+function getDailyAllowance(data) {
+  return getRemainingBudget(data) / getDaysRemaining();
 }
 
 // ---------------- PANEL ----------------
 function updatePanel(data) {
-  const remaining = getRemaining(data);
+
+  const remaining = getRemainingBudget(data);
+  const daily = getDailyAllowance(data);
+
+  document.body.style.background =
+    remaining >= 0 ? "#1f8f4a" : "#c0392b";
 
   document.getElementById("safeText").innerHTML =
     remaining >= 0
       ? `Remaining £${remaining.toFixed(2)}`
       : `Over by £${Math.abs(remaining).toFixed(2)}`;
 
-  document.getElementById("periodText").innerHTML = formatLabel();
-
   const active = getActiveDay();
 
-  const activeTotal = data.history
+  const activeSpend = data.history
     .filter(h => h.day === active)
     .reduce((s,h)=>s+h.amount,0);
 
+  document.getElementById("periodText").innerHTML =
+    view === "day"
+      ? `Day ${active}`
+      : view === "week"
+        ? "This Week"
+        : "This Month";
+
   document.getElementById("breakdownText").innerHTML = `
-    Budget: £${data.budget || 0}<br>
-    Spent (selected day): £${activeTotal.toFixed(2)}
+    Daily allowance (dynamic): £${daily.toFixed(2)}<br>
+    Selected day spend: £${activeSpend.toFixed(2)}
   `;
 }
 
@@ -289,19 +266,22 @@ function renderCalendar(data) {
   const today = d.getDate();
 
   const monthName = d.toLocaleString('default', { month: 'long' });
+
   document.getElementById("calendarHeader").innerText =
     `${monthName} ${year}`;
 
-  const dailyBudget = data.budget / daysInMonth;
+  const dailyAllowance = getDailyAllowance(data);
 
   for (let i = 1; i <= daysInMonth; i++) {
 
-    const spend = getDaySpend(data, i);
+    const spend = data.history
+      .filter(h => h.day === i)
+      .reduce((s,h)=>s+h.amount,0);
 
     let cls = "day";
 
     if (i > today) cls += " future";
-    else if (spend <= dailyBudget) cls += " green";
+    else if (spend <= dailyAllowance) cls += " green";
     else cls += " red";
 
     const div = document.createElement("div");
@@ -313,7 +293,7 @@ function renderCalendar(data) {
 
       document.getElementById("selectedDayBox").innerHTML = `
         <b>${monthName} ${i}</b><br>
-        Selected day active
+        Selected day
       `;
     };
 
@@ -321,11 +301,13 @@ function renderCalendar(data) {
   }
 }
 
-// ---------------- VIEW SWITCH ----------------
+// ---------------- VIEW ----------------
 function setView(v) {
   view = v;
 
-  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tabs button")
+    .forEach(b => b.classList.remove("active"));
+
   document.getElementById("tab-" + v).classList.add("active");
 
   updateUI();
@@ -334,12 +316,6 @@ function setView(v) {
 // ---------------- MAIN ----------------
 function updateUI() {
   const data = getData();
-
-  const remaining = getRemaining(data);
-
-  document.body.style.background =
-    remaining >= 0 ? "#1f8f4a" : "#c0392b";
-
   updatePanel(data);
   renderCalendar(data);
 }
