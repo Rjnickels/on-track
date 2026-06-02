@@ -139,7 +139,7 @@
   <div class="calendar" id="calendar"></div>
 
   <div class="selectedBox" id="selectedDay">
-    Click a day to set where spending goes (defaults to today)
+    Click a day to set spending target (defaults to today)
   </div>
 </div>
 
@@ -183,7 +183,7 @@ function getActiveDay() {
   return selectedDay ?? now().getDate();
 }
 
-// ---------------- ADD SPEND (FIXED) ----------------
+// ---------------- ADD SPEND ----------------
 function addSpend() {
   const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
@@ -224,7 +224,7 @@ function getDaySpend(data, day) {
     .reduce((s, h) => s + h.amount, 0);
 }
 
-// ---------------- PANEL ----------------
+// ---------------- REMAINING ----------------
 function getRemaining(data) {
   const total = data.history.reduce((s,h)=>s+h.amount,0);
 
@@ -239,6 +239,25 @@ function getRemaining(data) {
   return allowed - total;
 }
 
+// ---------------- LABEL ----------------
+function formatLabel() {
+  const d = now();
+  const monthName = d.toLocaleString('default', { month: 'short' });
+
+  const today = d.getDate();
+  const active = getActiveDay();
+
+  if (view === "day") {
+    return active === today
+      ? `${monthName} ${active} (Today)`
+      : `${monthName} ${active}`;
+  }
+
+  if (view === "week") return "This Week";
+  if (view === "month") return "This Month";
+}
+
+// ---------------- PANEL ----------------
 function updatePanel(data) {
   const remaining = getRemaining(data);
 
@@ -247,15 +266,17 @@ function updatePanel(data) {
       ? `Remaining £${remaining.toFixed(2)}`
       : `Over by £${Math.abs(remaining).toFixed(2)}`;
 
-  document.getElementById("periodText").innerHTML =
-    view === "day" ? "Today" :
-    view === "week" ? "This Week" : "This Month";
+  document.getElementById("periodText").innerHTML = formatLabel();
 
-  const total = data.history.reduce((s,h)=>s+h.amount,0);
+  const active = getActiveDay();
+
+  const activeTotal = data.history
+    .filter(h => h.day === active)
+    .reduce((s,h)=>s+h.amount,0);
 
   document.getElementById("breakdownText").innerHTML = `
     Budget: £${data.budget || 0}<br>
-    Spent: £${total.toFixed(2)}
+    Spent (selected day): £${activeTotal.toFixed(2)}
   `;
 }
 
@@ -291,14 +312,13 @@ function renderCalendar(data) {
     div.className = cls;
     div.innerText = i;
 
-    // CLICK = SET TARGET DAY FOR SPENDING
     div.onclick = () => {
       selectedDay = i;
 
       document.getElementById("selectedDay").innerHTML = `
         <b>${monthName} ${i}</b><br>
-        Spending will be added to this day<br>
-        Current spent: £${spend.toFixed(2)}
+        Selected as spending target<br>
+        Spent: £${spend.toFixed(2)}
       `;
     };
 
