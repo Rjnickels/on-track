@@ -37,7 +37,7 @@ input{
   border:none;
   border-radius:8px;
   font-size:16px;
-  box-sizing: border-box; /* Fixes input overflow */
+  box-sizing: border-box;
 }
 
 button{
@@ -167,7 +167,6 @@ function save(d){
   localStorage.setItem(key(),JSON.stringify(d));
 }
 
-// Added function to save budget changes
 function saveBudget(){
   const val = parseFloat(document.getElementById("budget").value) || 0;
   const d = getData();
@@ -178,29 +177,21 @@ function saveBudget(){
 
 /* ---------------- CORE ENGINE ---------------- */
 
-function calc(targetDay) {
+// Calculates what happened UP TO a specific day
+function calcUpToDay(targetDay) {
   const d = getData();
-  const days = daysInMonth();
   const totalBudget = d.budget || 0;
 
-  // 1. Calculate TOTAL spent up to the target day
-  let totalSpentUpToTarget = 0;
+  let totalSpent = 0;
   for (let i = 1; i <= targetDay; i++) {
-    totalSpentUpToTarget += (d.history || [])
+    totalSpent += (d.history || [])
       .filter(h => h.day === i)
       .reduce((s, h) => s + (h.amount || 0), 0);
   }
 
-  // 2. What is left out of the total budget on that target day
-  let remaining = totalBudget - totalSpentUpToTarget;
-
-  // 3. Daily safe spend calculation
-  const daysLeft = Math.max(1, days - targetDay + 1);
-  let daily = remaining / daysLeft;
-
   return {
-    remaining,
-    daily
+    remaining: totalBudget - totalSpent,
+    spentOnThisDay: (d.history || []).filter(h => h.day === targetDay).reduce((s, h) => s + (h.amount || 0), 0)
   };
 }
 
@@ -208,12 +199,8 @@ function calc(targetDay) {
 
 function setView(v){
   view = v;
-
-  document.querySelectorAll(".tabs button")
-    .forEach(b=>b.classList.remove("active"));
-
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
   document.getElementById(v+"Btn").classList.add("active");
-
   render();
 }
 
@@ -245,20 +232,6 @@ function resetMonth(){
   location.reload();
 }
 
-/* ---------------- TARGET LOGIC ---------------- */
-
-function getTargetDay(){
-  const days = daysInMonth();
-
-  if(view === "day"){
-    return selectedDay;
-  }
-  if(view === "week"){
-    return Math.min(selectedDay + 6, days);
-  }
-  return days; // Month view looks at the end of the month
-}
-
 /* ---------------- RENDER ---------------- */
 
 function render(){
@@ -266,53 +239,88 @@ function render(){
   const today = now().getDate();
   const d = getData();
 
-  // Keep the budget input field showing what's saved
   if(document.activeElement !== document.getElementById("budget")) {
     document.getElementById("budget").value = d.budget || "";
   }
 
-  const target = getTargetDay();
-  const state = calc(target);
-  const remaining = state.remaining;
+  // --- NEW PERSPECTIVE MATH FOR THE MAIN PANEL ---
+  let mainDisplayAmount = 0;
+  let subValueText = "";
 
-  // Update background color based on the dynamic view selection
-  document.body.style.background = remaining >= 0 ? "#1f8f4a" : "#c0392b";
+  // 1. Calculate base remaining from the start of yesterday to find today's fresh allowance
+  const yesterdayState = calcUpToDay(selectedDay - 1);
+  const daysLeftFromSelected = Math.max(1, days - selectedDay + 1);
+  const dailyAllowanceForSelectedDay = yesterdayState.remaining / daysLeftFromSelected;
+  
+  const selectedDayActualSpend = (d.history || [])
+    .filter(h => h.day === selectedDay)
+    .reduce((s, h) => s + (h.amount || 0), 0);
 
-  // Dynamic text depending on Day/Week/Month view selection
-  let viewText = "Day";
-  if(view === "week") viewText = "Week (Next 7 Days)";
-  if(view === "month") viewText = "Month End";
+  if (view === "day") {
+    // Budget allocated for today minus what you actually spent today
+    mainDisplayAmount = dailyAllowanceForSelectedDay - selectedDayActualSpend;
+    subValueText = `Remaining allowance for Day ${selectedDay}`;
+  } 
+  else if (view === "week") {
+    // Allowance for the next 7 days (or whatever is left of the month)
+    const daysInWeekView = Math.min(7, daysLeftFromSelected);
+    const targetEndDay = Math.min(selectedDay + daysInWeekView - 1, days);
+    
+    // Total spent during this week block
+    let spentInWeekBlock = 0;
+    for(let i = selectedDay; i <= targetEndDay; i++) {
+      spentInWeekBlock += (d.history || []).filter(h => h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+    }
 
+    const totalWeekBudget = dailyAllowanceForSelectedDay * daysInWeekView;
+    mainDisplayAmount = totalWeekBudget - spentInWeekBlock;
+    subValueText = `Budget for Days ${selectedDay} to ${targetEndDay}`;
+  } 
+  else if (view === "month") {
+    // True leftover cash for the whole month
+    const totalMonthState = calcUpToDay(days);
+    mainDisplayAmount = totalMonthState.remaining;
+    subValueText = `Total remaining for the whole month`;
+  }
+
+  // Update Background & Main text
+  document.body.style.background = mainDisplayAmount >= 0 ? "#1f8f4a" : "#c0392b";
   document.getElementById("mainValue").innerText =
-    remaining >= 0
-      ? `£${remaining.toFixed(2)} Safe`
-      : `-£${Math.abs(remaining).toFixed(2)} Over`;
+    mainDisplayAmount >= 0
+      ? `£${mainDisplayAmount.toFixed(2)} Safe`
+      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Over`;
 
-  document.getElementById("subValue").innerText =
-    `Target: ${viewText} (Day ${target})`;
+  document.getElementById("subValue").innerText = subValueText;
 
-  const sel = calc(selectedDay);
-
+  // Update Selected Day Box
+  const currentDayState = calcUpToDay(selectedDay);
   document.getElementById("selectedBox").innerHTML =
     `<b>Day ${selectedDay}</b><br>
-     Remaining: £${sel.remaining.toFixed(2)}<br>
-     Safe/day: £${sel.daily.toFixed(2)}`;
+     Month Rolling Bal: £${currentDayState.remaining.toFixed(2)}<br>
+     Ideal Daily Limit: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
 
+  // Render Calendar
   const cal = document.getElementById("calendar");
   cal.innerHTML = "";
 
   for(let i=1;i<=days;i++){
-    const r = calc(i);
-    let cls = "day";
+    const historicalYesterday = calcUpToDay(i - 1);
+    const historicalDaysLeft = Math.max(1, days - i + 1);
+    const historicalDailyAllowance = historicalYesterday.remaining / historicalDaysLeft;
 
+    let cls = "day";
     if(i > today) cls += " future";
-    else cls += (r.remaining >= 0 ? " green" : " red");
+    else {
+      // Did we overspend our allowance on that specific day?
+      const daySpend = (d.history || []).filter(h => h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
+      cls += (daySpend <= historicalDailyAllowance ? " green" : " red");
+    }
 
     if(i === selectedDay) cls += " selected";
 
     const div = document.createElement("div");
     div.className = cls;
-    div.innerText = i + "\n£" + r.daily.toFixed(0);
+    div.innerText = i + "\n£" + Math.max(0, historicalDailyAllowance).toFixed(0);
 
     div.onclick = ()=>{
       selectedDay = i;
@@ -323,9 +331,7 @@ function render(){
   }
 }
 
-// Initial pull on load
 render();
-
 </script>
 
 </body>
