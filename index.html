@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GreenTrack | Stay in the Green Zone</title>
+<title>GreenTrack | Simple Daily Budget</title>
 
 <style>
 body{
@@ -23,7 +23,7 @@ body{
 .brand-subtitle {
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   margin-top: -10px;
   margin-bottom: 25px;
   opacity: 0.8;
@@ -112,15 +112,15 @@ button{
 .day{
   padding:8px 2px;
   border-radius:8px;
-  font-size:9px;
+  font-size:10px;
   line-height:1.3;
   cursor:pointer;
   white-space:pre-line;
 }
 
-/* GreenTrack Color Signals */
-.green{background:#2e7d32;} /* Optimal Trajectory */
-.red{background:#c62828;}   /* Deficit Trajectory */
+/* Color Signals */
+.green{background:#2e7d32;} /* Safe Zone */
+.red{background:#c62828;}   /* Over Budget */
 .future{background:rgba(255,255,255,0.35);color:#1b5e20;}
 .selected{outline:3px solid white;}
 </style>
@@ -130,29 +130,29 @@ button{
 
 <div class="container">
 <h1>GreenTrack</h1>
-<div class="brand-subtitle">Pacing & Balance Engine</div>
+<div class="brand-subtitle">Simple Daily Budget</div>
 
 <div class="inputWrap">
 <span class="currency">£</span>
-<input id="budget" type="number" placeholder="Enter target limit for this month" oninput="saveBudget()"/>
+<input id="budget" type="number" placeholder="Enter monthly spending money" oninput="saveBudget()"/>
 </div>
 
 <div class="inputWrap">
 <span class="currency">£</span>
-<input id="spend" type="number" placeholder="Log expense amount" />
+<input id="spend" type="number" placeholder="Amount spent" />
 </div>
 
-<button onclick="addSpend()">Log Transaction</button>
+<button onclick="addSpend()">Enter spending</button>
 
 <div class="btnRow">
-<button onclick="resetDay()">Clear Selected Day</button>
-<button onclick="resetMonth()">Reset Track Cycle</button>
+<button onclick="resetDay()">Clear Today</button>
+<button onclick="resetMonth()">Reset Month</button>
 </div>
 
 <div class="tabs">
-<button onclick="setView('day')" id="dayBtn" class="active">Daily Track</button>
-<button onclick="setView('week')" id="weekBtn">Weekly Pacing</button>
-<button onclick="setView('month')" id="monthBtn">Cycle Summary</button>
+<button onclick="setView('day')" id="dayBtn" class="active">Day</button>
+<button onclick="setView('week')" id="weekBtn">Week</button>
+<button onclick="setView('month')" id="monthBtn">Month</button>
 </div>
 
 <div class="panel">
@@ -161,7 +161,7 @@ button{
 <div class="sub" id="subValue">—</div>
 </div>
 
-<div class="selectedBox" id="selectedBox">Select calendar day below</div>
+<div class="selectedBox" id="selectedBox">Tap a day below to view info</div>
 
 <div class="calendar" id="calendar"></div>
 </div>
@@ -208,7 +208,7 @@ function saveBudget(){
   render();
 }
 
-/* ---------------- CORE ENGINE ---------------- */
+/* ---------------- CALCULATIONS ---------------- */
 
 function calcUpToDay(targetDay) {
   const d = getData();
@@ -248,174 +248,3 @@ function addSpend(){
   const d = getData();
   if(!d.history) d.history = [];
   d.history.push({day:selectedDay, amount:val});
-  save(d);
-
-  document.getElementById("spend").value = "";
-  render();
-}
-
-/* ---------------- RESET ---------------- */
-
-function resetDay(){
-  const d = getData();
-  if(d.history) {
-    d.history = d.history.filter(h => h && h.day !== selectedDay);
-  }
-  save(d);
-  render();
-}
-
-function resetMonth(){
-  localStorage.removeItem(key());
-  location.reload();
-}
-
-/* ---------------- RENDER ---------------- */
-
-function render(){
-  const days = daysInMonth();
-  const today = now().getDate();
-  const d = getData();
-
-  const budgetInput = document.getElementById("budget");
-  if(budgetInput && document.activeElement !== budgetInput) {
-    budgetInput.value = d.budget || "";
-  }
-
-  // --- PERSPECTIVE MATH FOR THE MAIN PANEL ---
-  let mainDisplayAmount = 0;
-  let subValueText = "";
-
-  const yesterdayState = calcUpToDay(selectedDay - 1);
-  const daysLeftFromSelected = Math.max(1, days - selectedDay + 1);
-  const dailyAllowanceForSelectedDay = daysLeftFromSelected > 0 ? (yesterdayState.remaining / daysLeftFromSelected) : 0;
-  
-  const historyList = d.history || [];
-  const selectedDayActualSpend = historyList
-    .filter(h => h && h.day === selectedDay)
-    .reduce((s, h) => s + (h.amount || 0), 0);
-
-  if (view === "day") {
-    mainDisplayAmount = dailyAllowanceForSelectedDay - selectedDayActualSpend;
-    subValueText = `Safe margin allocation for Day ${selectedDay}`;
-  } 
-  else if (view === "week") {
-    const daysInWeekView = Math.min(7, daysLeftFromSelected);
-    const targetEndDay = Math.min(selectedDay + daysInWeekView - 1, days);
-    
-    let spentInWeekBlock = 0;
-    for(let i = selectedDay; i <= targetEndDay; i++) {
-      spentInWeekBlock += historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-    }
-
-    const totalWeekBudget = dailyAllowanceForSelectedDay * daysInWeekView;
-    mainDisplayAmount = totalWeekBudget - spentInWeekBlock;
-    subValueText = `Combined baseline for Days ${selectedDay} to ${targetEndDay}`;
-  } 
-  else if (view === "month") {
-    const totalMonthState = calcUpToDay(days);
-    mainDisplayAmount = totalMonthState.remaining;
-    subValueText = `Total remaining cycle runway`;
-  }
-
-  // Update Background & Main text
-  const isOnTrack = mainDisplayAmount >= 0;
-  document.body.style.background = isOnTrack ? "#2e7d32" : "#c62828";
-  
-  const mainValEl = document.getElementById("mainValue");
-  if (mainValEl) {
-    mainValEl.innerText = isOnTrack
-      ? `£${mainDisplayAmount.toFixed(2)} Ahead`
-      : `-£${Math.abs(mainDisplayAmount).toFixed(2)} Behind`;
-  }
-
-  // Track Status Signals
-  const statusEl = document.getElementById("statusIndicator");
-  if (statusEl) {
-    statusEl.innerText = isOnTrack ? "✓ ON TRACK" : "⚠ OFF TRACK";
-    statusEl.style.color = isOnTrack ? "#a5d6a7" : "#ef9a9a";
-  }
-
-  const subValEl = document.getElementById("subValue");
-  if (subValEl) subValEl.innerText = subValueText;
-
-  // Update Selected Day Box
-  const currentDayState = calcUpToDay(selectedDay);
-  const selectedBoxEl = document.getElementById("selectedBox");
-  if (selectedBoxEl) {
-    selectedBoxEl.innerHTML =
-      `<b>Day ${selectedDay} Pacing Profile</b><br>
-       Rolling Reserve Remaining: £${currentDayState.remaining.toFixed(2)}<br>
-       Target Daily Limit: £${Math.max(0, dailyAllowanceForSelectedDay).toFixed(2)}`;
-  }
-
-  // --- LIVE PROJECTING CALENDAR GENERATOR ---
-  const cal = document.getElementById("calendar");
-  if (cal) {
-    cal.innerHTML = "";
-
-    const todayState = calcUpToDay(today);
-    const futureDaysCount = Math.max(1, days - today); 
-    const futureDailyAllowance = futureDaysCount > 0 ? (todayState.remaining / futureDaysCount) : 0;
-
-    for(let i = 1; i <= days; i++){
-      let cls = "day";
-      let displayAllowance = 0;
-      let actualSpendOnDay = 0;
-      let isFuture = false;
-
-      if (i < today) {
-        const historicalYesterday = calcUpToDay(i - 1);
-        const historicalDaysLeft = Math.max(1, days - i + 1);
-        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
-      } 
-      else if (i === today) {
-        const historicalYesterday = calcUpToDay(i - 1);
-        const historicalDaysLeft = Math.max(1, days - i + 1);
-        displayAllowance = historicalDaysLeft > 0 ? (historicalYesterday.remaining / historicalDaysLeft) : 0;
-        actualSpendOnDay = historyList.filter(h => h && h.day === i).reduce((s, h) => s + (h.amount || 0), 0);
-        cls += (actualSpendOnDay <= displayAllowance ? " green" : " red");
-      } 
-      else {
-        displayAllowance = futureDailyAllowance;
-        cls += " future";
-        isFuture = true;
-      }
-
-      if(i === selectedDay) cls += " selected";
-
-      const div = document.createElement("div");
-      div.className = cls;
-      
-      // Calculate day's remaining margin (Allowance - Actual Spent)
-      const dayRemainingMargin = displayAllowance - actualSpendOnDay;
-      
-      // Show Day #, Allowed Limit, and the accurate Day Remaining Balance
-      if (!isFuture) {
-        const sign = dayRemainingMargin >= 0 ? "£" : "-£";
-        div.innerText = `${i}\nLmt:£${displayAllowance.toFixed(0)}\nRem:${sign}${Math.abs(dayRemainingMargin).toFixed(0)}`;
-      } else {
-        div.innerText = `${i}\nProj\n£${displayAllowance.toFixed(0)}`;
-      }
-
-      div.onclick = ()=>{
-        selectedDay = i;
-        render();
-      };
-
-      cal.appendChild(div);
-    }
-  }
-}
-
-try {
-  render();
-} catch(e) {
-  console.error("Initial render failed: ", e);
-}
-</script>
-
-</body>
-</html>
