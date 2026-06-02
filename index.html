@@ -73,6 +73,12 @@
     opacity: 0.9;
   }
 
+  .error {
+    color: #ff4d4d;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
   .calendarHeader {
     margin-top: 10px;
     font-size: 14px;
@@ -117,6 +123,8 @@
   <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
   <input id="spend" type="number" placeholder="Enter spend (£)" />
 
+  <div id="error" class="error"></div>
+
   <button onclick="addSpend()">Add Spend</button>
   <button onclick="resetSelectedDay()">Reset Selected Day</button>
   <button onclick="resetMonth()">Reset Month</button>
@@ -128,12 +136,11 @@
   </div>
 
   <div class="panel">
-    <div class="big" id="safeText">—</div>
+    <div class="big" id="safeText">Enter budget to begin</div>
     <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
 
-  <!-- 👇 MOVED UP HERE -->
   <div class="selectedBox" id="selectedDayBox">
     Click a day to select it
   </div>
@@ -147,6 +154,7 @@
 let view = "day";
 let selectedDay = null;
 
+// ---------------- DATE ----------------
 function now() {
   return new Date();
 }
@@ -156,6 +164,7 @@ function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
+// ---------------- STORAGE ----------------
 function getData() {
   return JSON.parse(localStorage.getItem(monthKey())) || {
     budget: 0,
@@ -167,20 +176,40 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
+// ---------------- LIVE BUDGET INPUT ----------------
+document.getElementById("budget").addEventListener("input", (e) => {
+  const data = getData();
+
+  const value = parseFloat(e.target.value);
+  data.budget = isNaN(value) ? 0 : value;
+
+  saveData(data);
+  updateUI();
+});
+
+// ---------------- ACTIVE DAY ----------------
 function getActiveDay() {
   return selectedDay ?? now().getDate();
 }
 
 // ---------------- ADD SPEND ----------------
 function addSpend() {
+  const errorEl = document.getElementById("error");
+  errorEl.innerText = "";
+
   const val = parseFloat(document.getElementById("spend").value);
   if (isNaN(val)) return;
+
+  if (!selectedDay) {
+    errorEl.innerText = "Please select a day first";
+    return;
+  }
 
   const data = getData();
 
   data.history.push({
     amount: val,
-    day: getActiveDay()
+    day: selectedDay
   });
 
   saveData(data);
@@ -190,10 +219,11 @@ function addSpend() {
 
 // ---------------- RESET DAY ----------------
 function resetSelectedDay() {
-  const data = getData();
-  const day = getActiveDay();
+  if (!selectedDay) return;
 
-  data.history = data.history.filter(h => h.day !== day);
+  const data = getData();
+
+  data.history = data.history.filter(h => h.day !== selectedDay);
 
   saveData(data);
   updateUI();
@@ -205,7 +235,7 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- BUDGET LOGIC ----------------
+// ---------------- CORE ----------------
 function getRemainingBudget(data) {
   return data.budget - data.history.reduce((s,h)=>s+h.amount,0);
 }
@@ -230,7 +260,7 @@ function updatePanel(data) {
   document.body.style.background =
     remaining >= 0 ? "#1f8f4a" : "#c0392b";
 
-  const active = getActiveDay();
+  const active = selectedDay ?? now().getDate();
 
   const activeSpend = data.history
     .filter(h => h.day === active)
@@ -240,11 +270,7 @@ function updatePanel(data) {
     `Remaining £${remaining.toFixed(2)}`;
 
   document.getElementById("periodText").innerHTML =
-    view === "day"
-      ? `Day ${active}`
-      : view === "week"
-        ? "This Week"
-        : "This Month";
+    `Day ${active}`;
 
   document.getElementById("breakdownText").innerHTML = `
     Daily allowance: £${getDailyAllowance(data).toFixed(2)}<br>
@@ -293,8 +319,10 @@ function renderCalendar(data) {
 
       document.getElementById("selectedDayBox").innerHTML = `
         <b>${monthName} ${i}</b><br>
-        Selected day
+        Selected day active
       `;
+
+      document.getElementById("error").innerText = "";
     };
 
     el.appendChild(div);
