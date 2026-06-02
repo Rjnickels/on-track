@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stay Green</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    transition: background 0.3s ease;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  .container {
+    text-align: center;
+    width: 90%;
+    max-width: 420px;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  button {
+    background: white;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .big {
+    font-size: 48px;
+    margin: 20px 0;
+  }
+
+  .small {
+    opacity: 0.9;
+    font-size: 14px;
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .row button {
+    flex: 1;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Stay Green</h1>
+
+  <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
+
+  <div class="row">
+    <button onclick="addSpend(5)">£5</button>
+    <button onclick="addSpend(10)">£10</button>
+    <button onclick="addSpend(20)">£20</button>
+    <button onclick="addSpend(50)">£50</button>
+  </div>
+
+  <input id="customSpend" type="number" placeholder="Custom spend (£)" />
+  <button onclick="addSpend(parseFloat(document.getElementById('customSpend').value))">
+    Add Spend
+  </button>
+
+  <div class="big" id="status">—</div>
+  <div class="small" id="details"></div>
+</div>
+
+<script>
+const monthKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}`;
+};
+
+function getData() {
+  const key = monthKey();
+  return JSON.parse(localStorage.getItem(key)) || {
+    budget: 0,
+    spent: 0
+  };
+}
+
+function saveData(data) {
+  localStorage.setItem(monthKey(), JSON.stringify(data));
+}
+
+document.getElementById("budget").addEventListener("change", (e) => {
+  const data = getData();
+  data.budget = parseFloat(e.target.value);
+  saveData(data);
+  updateUI();
+});
+
+function addSpend(amount) {
+  if (isNaN(amount)) return;
+
+  const data = getData();
+  data.spent += amount;
+  saveData(data);
+  updateUI();
+}
+
+function updateUI() {
+  const data = getData();
+
+  const now = new Date();
+  const day = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+
+  const expected = data.budget * (day / daysInMonth);
+
+  const status = document.getElementById("status");
+  const details = document.getElementById("details");
+
+  if (data.spent <= expected) {
+    document.body.style.background = "#1f8f4a";
+    status.innerHTML = "🟢 GREEN";
+  } else {
+    document.body.style.background = "#c0392b";
+    status.innerHTML = "🔴 RED";
+  }
+
+  details.innerHTML = `
+    Budget: £${data.budget || 0}<br>
+    Spent: £${data.spent.toFixed(2)}<br>
+    Expected: £${expected.toFixed(2)}
+  `;
+}
+
+updateUI();
+</script>
+
+</body>
+</html>
