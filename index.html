@@ -136,7 +136,7 @@
   </div>
 
   <div class="panel">
-    <div class="big" id="safeText">Enter budget to begin</div>
+    <div class="big" id="safeText">—</div>
     <div class="sub" id="periodText">—</div>
     <div class="sub" id="breakdownText">—</div>
   </div>
@@ -176,32 +176,31 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// ---------------- LIVE BUDGET INPUT ----------------
+// ---------------- BUDGET INPUT ----------------
 document.getElementById("budget").addEventListener("input", (e) => {
   const data = getData();
-
   const value = parseFloat(e.target.value);
   data.budget = isNaN(value) ? 0 : value;
-
   saveData(data);
   updateUI();
 });
 
 // ---------------- ACTIVE DAY ----------------
 function getActiveDay() {
-  return selectedDay ?? now().getDate();
+  return selectedDay;
 }
 
-// ---------------- ADD SPEND ----------------
+// ---------------- ADD SPEND (STRICT) ----------------
 function addSpend() {
   const errorEl = document.getElementById("error");
   errorEl.innerText = "";
 
   const val = parseFloat(document.getElementById("spend").value);
+
   if (isNaN(val)) return;
 
   if (!selectedDay) {
-    errorEl.innerText = "Please select a day first";
+    errorEl.innerText = "Select a day first";
     return;
   }
 
@@ -213,6 +212,7 @@ function addSpend() {
   });
 
   saveData(data);
+
   document.getElementById("spend").value = "";
   updateUI();
 }
@@ -235,7 +235,7 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- CORE ----------------
+// ---------------- CORE CALC ----------------
 function getRemainingBudget(data) {
   return data.budget - data.history.reduce((s,h)=>s+h.amount,0);
 }
@@ -246,10 +246,16 @@ function getDaysRemaining() {
   return total - d.getDate() + 1;
 }
 
-function getDailyAllowance(data) {
+// VIEW-AWARE ALLOWANCE
+function getViewRemaining(data) {
   const remaining = getRemainingBudget(data);
-  const daysLeft = getDaysRemaining();
-  return daysLeft > 0 ? remaining / daysLeft : 0;
+
+  if (view === "month") return remaining;
+
+  if (view === "week") return remaining / Math.max(1, Math.ceil(getDaysRemaining()/7));
+
+  // day view
+  return remaining / getDaysRemaining();
 }
 
 // ---------------- PANEL ----------------
@@ -266,14 +272,18 @@ function updatePanel(data) {
     .filter(h => h.day === active)
     .reduce((s,h)=>s+h.amount,0);
 
+  let label =
+    view === "day" ? "Day" :
+    view === "week" ? "Week" : "Month";
+
   document.getElementById("safeText").innerHTML =
-    `Remaining £${remaining.toFixed(2)}`;
+    `Remaining £${getViewRemaining(data).toFixed(2)}`;
 
   document.getElementById("periodText").innerHTML =
-    `Day ${active}`;
+    `${label} view`;
 
   document.getElementById("breakdownText").innerHTML = `
-    Daily allowance: £${getDailyAllowance(data).toFixed(2)}<br>
+    Monthly remaining: £${remaining.toFixed(2)}<br>
     Selected day spend: £${activeSpend.toFixed(2)}<br>
     Budget: £${data.budget || 0}
   `;
@@ -296,7 +306,7 @@ function renderCalendar(data) {
   document.getElementById("calendarHeader").innerText =
     `${monthName} ${year}`;
 
-  const dailyAllowance = getDailyAllowance(data);
+  const dailyAllowance = getRemainingBudget(data) / getDaysRemaining();
 
   for (let i = 1; i <= daysInMonth; i++) {
 
@@ -317,19 +327,18 @@ function renderCalendar(data) {
     div.onclick = () => {
       selectedDay = i;
 
-      document.getElementById("selectedDayBox").innerHTML = `
-        <b>${monthName} ${i}</b><br>
-        Selected day active
-      `;
+      document.getElementById("selectedDayBox").innerHTML =
+        `<b>${monthName} ${i}</b><br>Selected`;
 
       document.getElementById("error").innerText = "";
+      updateUI();
     };
 
     el.appendChild(div);
   }
 }
 
-// ---------------- VIEW ----------------
+// ---------------- VIEW SWITCH ----------------
 function setView(v) {
   view = v;
 
