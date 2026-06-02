@@ -158,25 +158,15 @@ function setView(v) {
   document.querySelectorAll(".tabs button").forEach(btn => btn.classList.remove("active"));
   document.getElementById("tab-" + v).classList.add("active");
 
-  updateUI();
-}
-
-function getExpected(budget, day) {
-  const daysInMonth = new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
-  return budget * (day / daysInMonth);
-}
-
 function updateUI() {
   const data = getData();
   const now = new Date();
 
-  let spent = data.spent;
+  const day = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
   let expected = 0;
   let label = "";
-
-  const day = now.getDate();
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  const weekProgress = day / 7;
 
   if (view === "day") {
     expected = data.budget / daysInMonth;
@@ -196,7 +186,7 @@ function updateUI() {
   const status = document.getElementById("status");
   const details = document.getElementById("details");
 
-  if (spent <= expected) {
+  if (data.spent <= expected) {
     document.body.style.background = "#1f8f4a";
     status.innerHTML = "🟢 GREEN";
   } else {
@@ -207,13 +197,10 @@ function updateUI() {
   details.innerHTML = `
     <b>${label}</b><br><br>
     Budget: £${data.budget || 0}<br>
-    Spent: £${spent.toFixed(2)}<br>
+    Spent: £${data.spent.toFixed(2)}<br>
     Expected: £${expected.toFixed(2)}
   `;
 }
-
-updateUI();
-</script>
 
 </body>
 </html>
