@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Stay Green</title>
 
 <style>
-  body {
+  body{
     margin:0;
     font-family:Arial;
     transition:0.3s;
@@ -17,11 +17,11 @@
     min-height:100vh;
   }
 
-  .container {width:100%;max-width:560px;text-align:center;}
+  .container{width:100%;max-width:560px;text-align:center;}
 
-  .inputWrap {position:relative;margin:6px 0;}
+  .inputWrap{position:relative;margin:6px 0;}
 
-  .currency {
+  .currency{
     position:absolute;
     left:12px;
     top:50%;
@@ -31,7 +31,7 @@
     font-weight:bold;
   }
 
-  input {
+  input{
     width:100%;
     padding:12px 12px 12px 28px;
     border:none;
@@ -39,7 +39,7 @@
     font-size:16px;
   }
 
-  button {
+  button{
     width:100%;
     padding:12px;
     margin:6px 0;
@@ -52,38 +52,38 @@
     cursor:pointer;
   }
 
-  .btnRow {display:flex;gap:8px;}
-  .btnRow button {width:50%;font-size:13px;padding:10px;}
+  .btnRow{display:flex;gap:8px;}
+  .btnRow button{width:50%;font-size:13px;padding:10px;}
 
-  .tabs {display:flex;gap:6px;margin:10px 0;}
-  .tabs button {flex:1;background:rgba(255,255,255,0.2);color:white;}
-  .tabs button.active {background:white;color:black;}
+  .tabs{display:flex;gap:6px;margin:10px 0;}
+  .tabs button{flex:1;background:rgba(255,255,255,0.2);color:white;}
+  .tabs button.active{background:white;color:black;}
 
-  .panel {
+  .panel{
     background:rgba(255,255,255,0.12);
     padding:14px;
     border-radius:10px;
     margin:10px 0;
   }
 
-  .big {font-size:22px;font-weight:bold;}
-  .sub {font-size:14px;opacity:0.9;}
+  .big{font-size:22px;font-weight:bold;}
+  .sub{font-size:14px;opacity:0.9;}
 
-  .selectedBox {
+  .selectedBox{
     margin:10px 0;
     padding:10px;
     border-radius:8px;
     background:rgba(255,255,255,0.12);
   }
 
-  .calendar {
+  .calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
     gap:6px;
     margin-top:10px;
   }
 
-  .day {
+  .day{
     padding:10px 0;
     border-radius:8px;
     font-size:10px;
@@ -91,48 +91,49 @@
     white-space:pre-line;
   }
 
-  .green {background:#1f8f4a;}
-  .red {background:#c0392b;}
-  .future {background:rgba(255,255,255,0.35); color:black;}
+  .green{background:#1f8f4a;}
+  .red{background:#c0392b;}
+  .future{background:rgba(255,255,255,0.35);color:black;}
+  .selected{outline:2px solid white;}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>Stay Green</h1>
+<h1>Stay Green</h1>
 
-  <div class="inputWrap">
-    <span class="currency">£</span>
-    <input id="budget" type="number" placeholder="Monthly budget"/>
-  </div>
+<div class="inputWrap">
+<span class="currency">£</span>
+<input id="budget" type="number" placeholder="Monthly budget"/>
+</div>
 
-  <div class="inputWrap">
-    <span class="currency">£</span>
-    <input id="spend" type="number" placeholder="Spend"/>
-  </div>
+<div class="inputWrap">
+<span class="currency">£</span>
+<input id="spend" type="number" placeholder="Spend"/>
+</div>
 
-  <button onclick="addSpend()">Add Spend</button>
+<button onclick="addSpend()">Add Spend</button>
 
-  <div class="btnRow">
-    <button onclick="resetDay()">Reset Day</button>
-    <button onclick="resetMonth()">Reset Month</button>
-  </div>
+<div class="btnRow">
+<button onclick="resetDay()">Reset Day</button>
+<button onclick="resetMonth()">Reset Month</button>
+</div>
 
-  <div class="tabs">
-    <button onclick="setView('day')" id="dayBtn" class="active">Day</button>
-    <button onclick="setView('week')" id="weekBtn">Week</button>
-    <button onclick="setView('month')" id="monthBtn">Month</button>
-  </div>
+<div class="tabs">
+<button onclick="setView('day')" id="dayBtn" class="active">Day</button>
+<button onclick="setView('week')" id="weekBtn">Week</button>
+<button onclick="setView('month')" id="monthBtn">Month</button>
+</div>
 
-  <div class="panel">
-    <div class="big" id="mainValue">—</div>
-    <div class="sub" id="subValue">Live remaining</div>
-  </div>
+<div class="panel">
+<div class="big" id="mainValue">—</div>
+<div class="sub" id="subValue">—</div>
+</div>
 
-  <div class="selectedBox" id="selectedBox">Click a day</div>
+<div class="selectedBox" id="selectedBox">Click a day</div>
 
-  <div class="calendar" id="calendar"></div>
+<div class="calendar" id="calendar"></div>
 </div>
 
 <script>
@@ -141,6 +142,10 @@ let view="day";
 let selectedDay=null;
 
 function now(){return new Date();}
+
+function daysInMonth(){
+  return new Date(now().getFullYear(), now().getMonth()+1, 0).getDate();
+}
 
 function key(){
   const d=now();
@@ -155,7 +160,8 @@ function save(d){
   localStorage.setItem(key(),JSON.stringify(d));
 }
 
-// ---------------- INPUT ----------------
+/* ---------------- INPUT ---------------- */
+
 document.getElementById("budget").addEventListener("input",(e)=>{
   const d=getData();
   d.budget=parseFloat(e.target.value)||0;
@@ -163,7 +169,8 @@ document.getElementById("budget").addEventListener("input",(e)=>{
   render();
 });
 
-// ---------------- VIEW ----------------
+/* ---------------- VIEW ---------------- */
+
 function setView(v){
   view=v;
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
@@ -171,7 +178,50 @@ function setView(v){
   render();
 }
 
-// ---------------- ADD ----------------
+/* ---------------- ENGINE ---------------- */
+
+function getDailyResult(day){
+
+  const d=getData();
+  const days = daysInMonth();
+
+  let spent = d.history
+    .filter(h=>h.day===day)
+    .reduce((s,h)=>s+h.amount,0);
+
+  let allowance = d.budget / days;
+
+  let remaining = allowance - spent;
+
+  return {allowance, spent, remaining};
+}
+
+/* rollover projection */
+
+function getProjection(upToDay){
+
+  const d=getData();
+  const days = daysInMonth();
+
+  let remaining = d.budget;
+
+  for(let i=1;i<=upToDay;i++){
+    const spent = d.history
+      .filter(h=>h.day===i)
+      .reduce((s,h)=>s+h.amount,0);
+
+    remaining -= spent;
+  }
+
+  const daysLeft = days - upToDay + 1;
+
+  const dailySafe = remaining / daysLeft;
+
+  return {remaining, dailySafe};
+}
+
+/* ---------------- ADD ---------------- */
+
 function addSpend(){
 
   const val=parseFloat(document.getElementById("spend").value);
@@ -183,14 +233,15 @@ function addSpend(){
   }
 
   const d=getData();
-  d.history.push({amount:val,day:selectedDay});
+  d.history.push({day:selectedDay, amount:val});
   save(d);
 
   document.getElementById("spend").value="";
   render();
 }
 
-// ---------------- RESET DAY ----------------
+/* ---------------- RESET ---------------- */
+
 function resetDay(){
   if(!selectedDay) return;
   const d=getData();
@@ -199,104 +250,97 @@ function resetDay(){
   render();
 }
 
-// ---------------- RESET MONTH ----------------
 function resetMonth(){
   localStorage.removeItem(key());
   location.reload();
 }
 
-// ---------------- ENGINE (SAFE) ----------------
-function build(){
+/* ---------------- VIEW CALC ---------------- */
 
-  const data=getData();
+function viewState(){
 
-  const daysInMonth = new Date(
-    now().getFullYear(),
-    now().getMonth()+1,
-    0
-  ).getDate();
+  const days = daysInMonth();
 
-  const map={};
+  if(view==="day" && selectedDay){
+    return getDailyResult(selectedDay);
+  }
 
-  for(let i=1;i<=daysInMonth;i++){
+  if(view==="week"){
+    let start = selectedDay || now().getDate();
+    let totalSpent=0;
+    let allowance=0;
 
-    let spentSoFar=0;
-
-    for(let j=1;j<=i;j++){
-      spentSoFar += data.history
-        .filter(h=>h.day===j)
-        .reduce((s,h)=>s+h.amount,0);
+    for(let i=start;i<start+7 && i<=days;i++){
+      const r=getDailyResult(i);
+      totalSpent += r.spent;
+      allowance += r.allowance;
     }
 
-    const remaining = data.budget - spentSoFar;
-    const daysLeft = daysInMonth - i + 1;
-
-    map[i]={
-      remaining: remaining || 0,
-      dailySafe: daysLeft > 0 ? (remaining / daysLeft) : 0
+    return {
+      remaining: allowance - totalSpent
     };
   }
 
-  return map;
+  // month default
+  const p = getProjection(now().getDate());
+
+  return p;
 }
 
-// ---------------- VIEW LOGIC (SAFE) ----------------
-function viewValue(val){
+/* ---------------- RENDER ---------------- */
 
-  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
-  const daysLeft=days-now().getDate()+1;
-
-  if(view==="day") return val/(daysLeft||1);
-  if(view==="week") return val/Math.max(1,Math.ceil(daysLeft/7));
-  return val;
-}
-
-// ---------------- RENDER ----------------
 function render(){
 
-  const map=build();
+  const d=getData();
+  const days=daysInMonth();
   const today=now().getDate();
 
-  const state=map[today] || {remaining:0,dailySafe:0};
+  const state=viewState();
 
-  document.body.style.background=
-    state.remaining>=0 ? "#1f8f4a" : "#c0392b";
+  const remaining = state.remaining ?? state.dailySafe ?? 0;
 
-  document.getElementById("mainValue").innerText=
-    `£${viewValue(state.remaining).toFixed(2)} (${view})`;
+  document.body.style.background =
+    remaining >= 0 ? "#1f8f4a" : "#c0392b";
 
-  document.getElementById("subValue").innerText=
-    `Remaining: £${state.remaining.toFixed(2)}`;
+  document.getElementById("mainValue").innerText =
+    remaining >= 0
+      ? `£${remaining.toFixed(2)} Safe`
+      : `-£${Math.abs(remaining).toFixed(2)} Over`;
+
+  document.getElementById("subValue").innerText =
+    `View: ${view}`;
 
   if(selectedDay){
-    const s=map[selectedDay] || {remaining:0,dailySafe:0};
+    const r=getDailyResult(selectedDay);
 
     document.getElementById("selectedBox").innerHTML=
       `<b>Day ${selectedDay}</b><br>
-       Remaining: £${s.remaining.toFixed(2)}<br>
-       Safe/day: £${s.dailySafe.toFixed(2)}`;
+      Allowance: £${r.allowance.toFixed(2)}<br>
+      Spent: £${r.spent.toFixed(2)}<br>
+      Remaining: ${r.remaining>=0?'+':'-'}£${Math.abs(r.remaining).toFixed(2)}`;
   }
 
   const cal=document.getElementById("calendar");
   cal.innerHTML="";
 
-  const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
-
   for(let i=1;i<=days;i++){
 
-    const s=map[i] || {remaining:0,dailySafe:0};
+    const r=getDailyResult(i);
 
     let cls="day";
+
     if(i>today) cls+=" future";
-    else cls+=(s.remaining>=0?" green":" red");
+    else cls+=(r.remaining>=0?" green":" red");
+
+    if(i===selectedDay) cls+=" selected";
 
     const div=document.createElement("div");
+
     div.className=cls;
 
     div.innerText=
       i+
-      "\n£"+s.remaining.toFixed(0)+
-      "\n/day £"+s.dailySafe.toFixed(0);
+      "\n"+(r.remaining>=0?"+":"-")+"£"+Math.abs(r.remaining).toFixed(0);
 
     div.onclick=()=>{
       selectedDay=i;
