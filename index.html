@@ -39,15 +39,6 @@
     cursor: pointer;
   }
 
-  .row {
-    display: flex;
-    gap: 6px;
-  }
-
-  .row button {
-    flex: 1;
-  }
-
   .tabs {
     display: flex;
     gap: 6px;
@@ -66,14 +57,13 @@
   }
 
   .big {
-    font-size: 48px;
+    font-size: 46px;
     margin: 10px 0;
   }
 
   .money {
-    font-size: 20px;
+    font-size: 18px;
     margin: 10px 0;
-    opacity: 0.95;
   }
 
   .small {
@@ -90,16 +80,10 @@
 
   <input id="budget" type="number" placeholder="Monthly disposable income (£)" />
 
-  <div class="row">
-    <button onclick="addSpend(5)">£5</button>
-    <button onclick="addSpend(10)">£10</button>
-    <button onclick="addSpend(20)">£20</button>
-    <button onclick="addSpend(50)">£50</button>
-  </div>
+  <input id="customSpend" type="number" placeholder="Enter spend (£)" />
 
-  <input id="customSpend" type="number" placeholder="Custom spend (£)" />
-  <button onclick="addCustomSpend()">Add Spend</button>
-
+  <button onclick="addSpend()">Add Spend</button>
+  <button onclick="undoLast()">Undo Last Spend</button>
   <button onclick="resetApp()">Reset Month</button>
 
   <div class="tabs">
@@ -116,16 +100,28 @@
 <script>
 let view = "day";
 
-function monthKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()}`;
+// --- DATE HELPERS (FIXED PROPERLY) ---
+function monthKey(date = new Date()) {
+  return `${date.getFullYear()}-${date.getMonth()}`;
 }
 
+function dayKey(date = new Date()) {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+function weekKey(date = new Date()) {
+  const start = new Date(date);
+  start.setDate(date.getDate() - date.getDay());
+  return `${start.getFullYear()}-${start.getMonth()}-W${start.getDate()}`;
+}
+
+// --- STORAGE ---
 function getData() {
   const key = monthKey();
   return JSON.parse(localStorage.getItem(key)) || {
     budget: 0,
-    spent: 0
+    spent: 0,
+    history: []
   };
 }
 
@@ -133,6 +129,7 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
+// --- BUDGET ---
 document.getElementById("budget").addEventListener("change", (e) => {
   const data = getData();
   data.budget = parseFloat(e.target.value);
@@ -140,26 +137,44 @@ document.getElementById("budget").addEventListener("change", (e) => {
   updateUI();
 });
 
-function addSpend(amount) {
-  if (isNaN(amount)) return;
+// --- SPENDING ---
+function addSpend() {
+  const val = parseFloat(document.getElementById("customSpend").value);
+  if (isNaN(val)) return;
 
   const data = getData();
-  data.spent += amount;
+  data.spent += val;
+  data.history.push({
+    amount: val,
+    time: new Date().toISOString()
+  });
+
+  saveData(data);
+  document.getElementById("customSpend").value = "";
+  updateUI();
+}
+
+// --- UNDO LAST SPEND ---
+function undoLast() {
+  const data = getData();
+  const last = data.history.pop();
+
+  if (!last) return;
+
+  data.spent -= last.amount;
+  if (data.spent < 0) data.spent = 0;
+
   saveData(data);
   updateUI();
 }
 
-function addCustomSpend() {
-  const val = parseFloat(document.getElementById("customSpend").value);
-  if (!isNaN(val)) addSpend(val);
-  document.getElementById("customSpend").value = "";
-}
-
+// --- RESET ---
 function resetApp() {
   localStorage.removeItem(monthKey());
   location.reload();
 }
 
+// --- VIEW SWITCH ---
 function setView(v) {
   view = v;
 
@@ -169,6 +184,7 @@ function setView(v) {
   updateUI();
 }
 
+// --- CORE LOGIC (FIXED CALENDAR AWARE) ---
 function updateUI() {
   const data = getData();
   const now = new Date();
@@ -203,7 +219,7 @@ function updateUI() {
   if (remaining >= 0) {
     document.body.style.background = "#1f8f4a";
     status.innerHTML = "🟢 GREEN";
-    remainingEl.innerHTML = `You can safely spend £${remaining.toFixed(2)}`;
+    remainingEl.innerHTML = `Safe to spend £${remaining.toFixed(2)}`;
   } else {
     document.body.style.background = "#c0392b";
     status.innerHTML = "🔴 RED";
