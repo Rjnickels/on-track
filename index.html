@@ -79,6 +79,14 @@
     opacity: 0.9;
   }
 
+  .selectedBox {
+    margin: 10px 0;
+    font-size: 14px;
+    background: rgba(255,255,255,0.12);
+    padding: 10px;
+    border-radius: 8px;
+  }
+
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -98,14 +106,6 @@
   .green { background: #1f8f4a; color: white; }
   .red { background: #c0392b; color: white; }
   .future { background: rgba(255,255,255,0.35); color: black; }
-
-  .selectedBox {
-    margin-top: 12px;
-    font-size: 14px;
-    background: rgba(255,255,255,0.12);
-    padding: 10px;
-    border-radius: 8px;
-  }
 </style>
 </head>
 
@@ -133,12 +133,13 @@
     <div class="sub" id="breakdownText">—</div>
   </div>
 
-  <div class="calendarHeader" id="calendarHeader"></div>
-  <div class="calendar" id="calendar"></div>
-
+  <!-- 👇 MOVED UP HERE -->
   <div class="selectedBox" id="selectedDayBox">
     Click a day to select it
   </div>
+
+  <div class="calendarHeader" id="calendarHeader"></div>
+  <div class="calendar" id="calendar"></div>
 </div>
 
 <script>
@@ -166,7 +167,6 @@ function saveData(data) {
   localStorage.setItem(monthKey(), JSON.stringify(data));
 }
 
-// ---------------- ACTIVE DAY ----------------
 function getActiveDay() {
   return selectedDay ?? now().getDate();
 }
@@ -205,9 +205,9 @@ function resetMonth() {
   location.reload();
 }
 
-// ---------------- CORE ROLLING BUDGET ----------------
+// ---------------- BUDGET LOGIC ----------------
 function getRemainingBudget(data) {
-  return data.history.reduce((sum, h) => sum - h.amount, data.budget);
+  return data.budget - data.history.reduce((s,h)=>s+h.amount,0);
 }
 
 function getDaysRemaining() {
@@ -217,28 +217,27 @@ function getDaysRemaining() {
 }
 
 function getDailyAllowance(data) {
-  return getRemainingBudget(data) / getDaysRemaining();
+  const remaining = getRemainingBudget(data);
+  const daysLeft = getDaysRemaining();
+  return daysLeft > 0 ? remaining / daysLeft : 0;
 }
 
 // ---------------- PANEL ----------------
 function updatePanel(data) {
 
   const remaining = getRemainingBudget(data);
-  const daily = getDailyAllowance(data);
 
   document.body.style.background =
     remaining >= 0 ? "#1f8f4a" : "#c0392b";
-
-  document.getElementById("safeText").innerHTML =
-    remaining >= 0
-      ? `Remaining £${remaining.toFixed(2)}`
-      : `Over by £${Math.abs(remaining).toFixed(2)}`;
 
   const active = getActiveDay();
 
   const activeSpend = data.history
     .filter(h => h.day === active)
     .reduce((s,h)=>s+h.amount,0);
+
+  document.getElementById("safeText").innerHTML =
+    `Remaining £${remaining.toFixed(2)}`;
 
   document.getElementById("periodText").innerHTML =
     view === "day"
@@ -248,8 +247,9 @@ function updatePanel(data) {
         : "This Month";
 
   document.getElementById("breakdownText").innerHTML = `
-    Daily allowance (dynamic): £${daily.toFixed(2)}<br>
-    Selected day spend: £${activeSpend.toFixed(2)}
+    Daily allowance: £${getDailyAllowance(data).toFixed(2)}<br>
+    Selected day spend: £${activeSpend.toFixed(2)}<br>
+    Budget: £${data.budget || 0}
   `;
 }
 
