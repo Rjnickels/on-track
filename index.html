@@ -178,34 +178,16 @@ function setView(v){
   render();
 }
 
-/* ---------------- ENGINE ---------------- */
+/* ---------------- ROLLING ENGINE ---------------- */
 
-function getDailyResult(day){
-
-  const d=getData();
-  const days = daysInMonth();
-
-  let spent = d.history
-    .filter(h=>h.day===day)
-    .reduce((s,h)=>s+h.amount,0);
-
-  let allowance = d.budget / days;
-
-  let remaining = allowance - spent;
-
-  return {allowance, spent, remaining};
-}
-
-/* rollover projection */
-
-function getProjection(upToDay){
+function getProjection(day){
 
   const d=getData();
   const days = daysInMonth();
 
   let remaining = d.budget;
 
-  for(let i=1;i<=upToDay;i++){
+  for(let i=1;i<=day;i++){
     const spent = d.history
       .filter(h=>h.day===i)
       .reduce((s,h)=>s+h.amount,0);
@@ -213,8 +195,7 @@ function getProjection(upToDay){
     remaining -= spent;
   }
 
-  const daysLeft = days - upToDay + 1;
-
+  const daysLeft = days - day + 1;
   const dailySafe = remaining / daysLeft;
 
   return {remaining, dailySafe};
@@ -255,48 +236,40 @@ function resetMonth(){
   location.reload();
 }
 
-/* ---------------- VIEW CALC ---------------- */
+/* ---------------- VIEW STATE ---------------- */
 
 function viewState(){
-
-  const days = daysInMonth();
+  const today = now().getDate();
 
   if(view==="day" && selectedDay){
-    return getDailyResult(selectedDay);
+    return getProjection(selectedDay);
   }
 
   if(view==="week"){
-    let start = selectedDay || now().getDate();
-    let totalSpent=0;
-    let allowance=0;
+    let start = selectedDay || today;
+    let end = Math.min(start+6, daysInMonth());
 
-    for(let i=start;i<start+7 && i<=days;i++){
-      const r=getDailyResult(i);
-      totalSpent += r.spent;
-      allowance += r.allowance;
+    let remaining = 0;
+
+    for(let i=start;i<=end;i++){
+      const p=getProjection(i);
+      remaining = p.remaining;
     }
 
-    return {
-      remaining: allowance - totalSpent
-    };
+    return {remaining};
   }
 
-  // month default
-  const p = getProjection(now().getDate());
-
-  return p;
+  return getProjection(today);
 }
 
 /* ---------------- RENDER ---------------- */
 
 function render(){
 
-  const d=getData();
   const days=daysInMonth();
   const today=now().getDate();
 
   const state=viewState();
-
   const remaining = state.remaining ?? state.dailySafe ?? 0;
 
   document.body.style.background =
@@ -311,13 +284,12 @@ function render(){
     `View: ${view}`;
 
   if(selectedDay){
-    const r=getDailyResult(selectedDay);
+    const r=getProjection(selectedDay);
 
     document.getElementById("selectedBox").innerHTML=
       `<b>Day ${selectedDay}</b><br>
-      Allowance: £${r.allowance.toFixed(2)}<br>
-      Spent: £${r.spent.toFixed(2)}<br>
-      Remaining: ${r.remaining>=0?'+':'-'}£${Math.abs(r.remaining).toFixed(2)}`;
+      Remaining: £${r.remaining.toFixed(2)}<br>
+      Safe/day: £${r.dailySafe.toFixed(2)}`;
   }
 
   const cal=document.getElementById("calendar");
@@ -325,7 +297,7 @@ function render(){
 
   for(let i=1;i<=days;i++){
 
-    const r=getDailyResult(i);
+    const r=getProjection(i);
 
     let cls="day";
 
@@ -338,9 +310,8 @@ function render(){
 
     div.className=cls;
 
-    div.innerText=
-      i +
-    "\n£" + r.dailySafe.toFixed(0);
+    div.innerText =
+      i + "\n£" + r.dailySafe.toFixed(0);
 
     div.onclick=()=>{
       selectedDay=i;
