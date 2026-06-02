@@ -240,30 +240,26 @@ function resetMonth(){
 
 /* ---------------- VIEW LOGIC ---------------- */
 
-function viewState(){
+function getViewValue(){
 
   const today = now().getDate();
   const days = daysInMonth();
 
-  // DAY VIEW → exact selected day
+  let targetDay = today;
+
   if(view === "day"){
-    const d = selectedDay || today;
-    return getRemainingAt(d);
+    targetDay = selectedDay || today;
   }
 
-  // WEEK VIEW → 7-day window from selected/today
   if(view === "week"){
-    const start = selectedDay || today;
-    const end = Math.min(start + 6, days);
-    return getRemainingAt(end);
+    targetDay = Math.min((selectedDay || today) + 6, days);
   }
 
-  // MONTH VIEW → full month projection
   if(view === "month"){
-    return getRemainingAt(days);
+    targetDay = days;
   }
 
-  return getRemainingAt(today);
+  return getRemainingAt(targetDay);
 }
 
 /* ---------------- RENDER ---------------- */
