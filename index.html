@@ -7,108 +7,110 @@
 
 <style>
   body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    transition: background 0.3s ease;
-    color: white;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    min-height: 100vh;
+    margin:0;
+    font-family:Arial;
+    transition:0.3s;
+    color:white;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+    min-height:100vh;
   }
 
   .container {
-    width: 100%;
-    max-width: 560px;
-    text-align: center;
+    width:100%;
+    max-width:560px;
+    text-align:center;
   }
 
   .inputWrap {
-    position: relative;
-    margin: 6px 0;
+    position:relative;
+    margin:6px 0;
   }
 
   .currency {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.6;
-    color: black;
-    font-weight: bold;
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:0.6;
+    color:black;
+    font-weight:bold;
   }
 
   input {
-    width: 100%;
-    padding: 12px 12px 12px 28px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    width:100%;
+    padding:12px 12px 12px 28px;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
   }
 
   button {
-    width: 100%;
-    padding: 12px;
-    margin: 6px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    background: white;
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    background:white;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
   }
 
   .tabs {
-    display: flex;
-    gap: 6px;
-    margin: 10px 0;
+    display:flex;
+    gap:6px;
+    margin:10px 0;
   }
 
   .tabs button {
-    flex: 1;
-    background: rgba(255,255,255,0.2);
-    color: white;
+    flex:1;
+    background:rgba(255,255,255,0.2);
+    color:white;
   }
 
   .tabs button.active {
-    background: white;
-    color: black;
+    background:white;
+    color:black;
   }
 
   .panel {
-    background: rgba(255,255,255,0.12);
-    padding: 14px;
-    border-radius: 10px;
-    margin: 10px 0;
+    background:rgba(255,255,255,0.12);
+    padding:14px;
+    border-radius:10px;
+    margin:10px 0;
   }
 
-  .big { font-size: 22px; font-weight: bold; }
-  .sub { font-size: 14px; opacity: 0.9; }
+  .big {font-size:22px;font-weight:bold;}
+  .sub {font-size:14px;opacity:0.9;}
 
-  .error {
-    color: #ff4d4d;
-    font-size: 14px;
+  .selectedBox {
+    margin:10px 0;
+    padding:10px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.12);
   }
 
   .calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-top: 10px;
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    margin-top:10px;
   }
 
   .day {
-    padding: 10px 0;
-    border-radius: 8px;
-    font-size: 11px;
-    white-space: pre-line;
-    cursor: pointer;
+    padding:10px 0;
+    border-radius:8px;
+    font-size:10px;
+    cursor:pointer;
+    white-space:pre-line;
   }
 
-  .green { background:#1f8f4a; }
-  .red { background:#c0392b; }
-  .future { background:rgba(255,255,255,0.35); color:black; }
+  .green {background:#1f8f4a;}
+  .red {background:#c0392b;}
+  .future {background:rgba(255,255,255,0.35); color:black;}
 </style>
 </head>
 
@@ -127,19 +129,15 @@
     <input id="spend" type="number" placeholder="Spend"/>
   </div>
 
-  <div id="error"></div>
-
   <button onclick="addSpend()">Add Spend</button>
-
-  <div class="tabs">
-    <button onclick="setView('day')" id="dayBtn" class="active">Day</button>
-    <button onclick="setView('week')" id="weekBtn">Week</button>
-    <button onclick="setView('month')" id="monthBtn">Month</button>
-  </div>
 
   <div class="panel">
     <div class="big" id="mainValue">—</div>
-    <div class="sub" id="subValue">—</div>
+    <div class="sub" id="subValue">Live remaining</div>
+  </div>
+
+  <div class="selectedBox" id="selectedBox">
+    Click a day
   </div>
 
   <div class="calendar" id="calendar"></div>
@@ -147,13 +145,12 @@
 
 <script>
 
-let view = "day";
-let selectedDay = null;
+let selectedDay=null;
 
-function now(){ return new Date(); }
+function now(){return new Date();}
 
 function key(){
-  const d = now();
+  const d=now();
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
@@ -162,7 +159,7 @@ function getData(){
 }
 
 function save(d){
-  localStorage.setItem(key(), JSON.stringify(d));
+  localStorage.setItem(key(),JSON.stringify(d));
 }
 
 // ---------------- INPUT ----------------
@@ -173,60 +170,68 @@ document.getElementById("budget").addEventListener("input",(e)=>{
   render();
 });
 
-// ---------------- VIEW ----------------
-function setView(v){
-  view=v;
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  document.getElementById(v+"Btn").classList.add("active");
+// ---------------- ADD ----------------
+function addSpend(){
+
+  const val=parseFloat(document.getElementById("spend").value);
+  if(isNaN(val)) return;
+
+  if(!selectedDay){
+    alert("Select a day first");
+    return;
+  }
+
+  const d=getData();
+  d.history.push({amount:val,day:selectedDay});
+  save(d);
+
+  document.getElementById("spend").value="";
   render();
 }
 
-// ---------------- ENGINE ----------------
-function build(){
-  const d=getData();
+// ---------------- CORE ENGINE ----------------
+function buildRunning(data){
+
   const days=new Date(now().getFullYear(),now().getMonth()+1,0).getDate();
 
-  let bal=d.budget;
+  let balance=data.budget;
   const map={};
 
   for(let i=1;i<=days;i++){
-    const spent=d.history.filter(h=>h.day===i).reduce((s,h)=>s+h.amount,0);
-    bal-=spent;
-    map[i]=bal;
+
+    const spent=data.history
+      .filter(h=>h.day===i)
+      .reduce((s,h)=>s+h.amount,0);
+
+    balance-=spent;
+
+    const daysLeft=days-i+1;
+
+    const dailyAllowance = balance / daysLeft;
+
+    map[i]={
+      balance,
+      dailyAllowance
+    };
   }
 
   return map;
 }
 
-// ---------------- VIEW LOGIC (FIXED PROPERLY) ----------------
-function viewValue(balance){
-
-  const d=getData();
-  const daysLeft=new Date(now().getFullYear(),now().getMonth()+1,0).getDate()-now().getDate()+1;
-
-  if(view==="day") return balance/daysLeft;
-  if(view==="week") return balance/Math.max(1,Math.ceil(daysLeft/7));
-  return balance;
-}
-
-// ---------------- MAIN ----------------
+// ---------------- RENDER ----------------
 function render(){
 
   const d=getData();
-  const map=build();
+  const map=buildRunning(d);
   const today=now().getDate();
 
-  const balance=map[today];
+  const state=map[today];
 
-  document.body.style.background=balance>=0?"#1f8f4a":"#c0392b";
-
-  const display=viewValue(balance);
+  document.body.style.background=
+    state.balance>=0?"#1f8f4a":"#c0392b";
 
   document.getElementById("mainValue").innerText=
-    (display>=0?`£${display.toFixed(2)}`:`-£${Math.abs(display).toFixed(2)}`)+" ("+view+")";
-
-  document.getElementById("subValue").innerText=
-    "Remaining: £"+balance.toFixed(2);
+    `£${state.balance.toFixed(2)} remaining`;
 
   const cal=document.getElementById("calendar");
   cal.innerHTML="";
@@ -235,17 +240,31 @@ function render(){
 
   for(let i=1;i<=days;i++){
 
-    const b=map[i];
-
-    const div=document.createElement("div");
+    const s=map[i];
 
     let cls="day";
-    if(i>today) cls+=" future";
-    else cls+=(b>=0?" green":" red");
 
+    if(i>today) cls+=" future";
+    else cls+=(s.balance>=0?" green":" red");
+
+    const div=document.createElement("div");
     div.className=cls;
 
-    div.innerText=i+"\n£"+b.toFixed(0);
+    div.innerText=
+      i+
+      "\n£"+s.balance.toFixed(0)+
+      "\n/day £"+s.dailyAllowance.toFixed(0);
+
+    div.onclick=()=>{
+      selectedDay=i;
+
+      document.getElementById("selectedBox").innerHTML=
+        `<b>Day ${i}</b><br>
+         Remaining: £${s.balance.toFixed(2)}<br>
+         Safe/day: £${s.dailyAllowance.toFixed(2)}`;
+
+      render();
+    };
 
     cal.appendChild(div);
   }
