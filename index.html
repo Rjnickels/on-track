@@ -9,11 +9,18 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
+  /* Unified green palette */
+  --green:        #21c25a;   /* primary brand green */
+  --green-bright: #34d76b;   /* highlights / glow */
+  --green-deep:   #14843d;   /* calendar safe days */
+  --green-soft:   #7be09a;   /* text on dark green */
+
   --bg:      #1a1a1a;
   --surface: rgba(255,255,255,0.07);
   --border:  rgba(255,255,255,0.12);
   --text:    #f0f0f0;
   --muted:   rgba(255,255,255,0.45);
+  --red:     #b71c1c;
 }
 
 html, body {
@@ -32,11 +39,12 @@ html, body {
   margin: 0 auto;
 }
 
+/* ── HEADER ── */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px 8px;
+  padding: 14px 24px 10px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -47,8 +55,9 @@ html, body {
   letter-spacing: -0.5px;
 }
 .wordmark .wm-on    { color: #ffffff; }
-.wordmark .wm-track { color: #4caf50; }
+.wordmark .wm-track { color: var(--green); }
 
+/* ── SCREENS ── */
 .screen {
   display: none;
   flex: 1;
@@ -62,11 +71,12 @@ html, body {
   text-align: center;
   font-size: 10px;
   color: rgba(255,255,255,0.2);
-  padding: 10px 0 4px;
+  padding: 12px 0 4px;
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 
+/* ── BOTTOM NAV ── */
 .nav {
   display: flex;
   background: #111;
@@ -83,33 +93,39 @@ html, body {
   padding: 10px 0 12px;
   background: none;
   border: none;
+  border-top: 2px solid transparent;
   color: var(--muted);
   font-size: 10px;
   font-family: 'Poppins', sans-serif;
+  font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s, border-color 0.2s;
 }
 .nav-btn svg { transition: transform 0.2s; }
-.nav-btn.active { color: var(--text); }
+.nav-btn.active {
+  color: var(--green);
+  border-top-color: var(--green);
+}
 .nav-btn.active svg { transform: scale(1.1); }
 
+/* ── HOME ── */
 .home-top {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px 24px 8px;
-  gap: 8px;
+  padding: 20px 24px 12px;
+  gap: 14px;
 }
 
 .date-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
+  gap: 14px;
+  margin-bottom: 2px;
 }
 .day-arrow {
   background: var(--surface);
@@ -136,10 +152,11 @@ html, body {
 }
 .date-label.is-today { color: var(--text); }
 
+/* Ring — enlarged */
 .ring-wrap {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 256px;
+  height: 256px;
   margin: 4px 0;
 }
 .ring-wrap svg {
@@ -151,13 +168,16 @@ html, body {
 .ring-track {
   fill: none;
   stroke: rgba(255,255,255,0.08);
-  stroke-width: 12;
+  stroke-width: 13;
 }
 .ring-fill {
   fill: none;
-  stroke-width: 12;
+  stroke-width: 13;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease;
+  transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease;
+}
+.ring-fill.glow {
+  filter: drop-shadow(0 0 6px rgba(33,194,90,0.55));
 }
 .ring-center {
   position: absolute;
@@ -166,28 +186,28 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
 }
 .ring-amount {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 700;
-  letter-spacing: -1px;
+  letter-spacing: -1.5px;
   line-height: 1;
   transition: color 0.6s;
 }
 .ring-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--muted);
 }
 .ring-status {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
   transition: color 0.4s;
 }
 
@@ -206,6 +226,7 @@ html, body {
   animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s;
 }
 
+/* View tabs */
 .view-tabs {
   display: flex;
   gap: 6px;
@@ -227,8 +248,13 @@ html, body {
   transition: background 0.2s, color 0.2s, border-color 0.2s;
   text-align: center;
 }
-.view-tab.active { background: white; color: #111; border-color: white; }
+.view-tab.active {
+  background: var(--green);
+  color: #06220f;
+  border-color: var(--green);
+}
 
+/* Spend area */
 .spend-area {
   padding: 8px 24px 0;
   display: flex;
@@ -240,6 +266,7 @@ html, body {
   flex: 1;
   display: flex;
   align-items: center;
+  height: 48px;
   border: 1px solid var(--border);
   border-radius: 9px;
   background: rgba(255,255,255,0.06);
@@ -256,7 +283,8 @@ html, body {
 .input-wrap input {
   flex: 1;
   width: 100%;
-  padding: 13px 13px 13px 4px;
+  height: 100%;
+  padding: 0 13px 0 4px;
   border: none;
   border-radius: 9px;
   font-size: 15px;
@@ -267,24 +295,25 @@ html, body {
 }
 .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
 .input-wrap:focus-within {
-  border-color: rgba(255,255,255,0.35);
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.07);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(33,194,90,0.18);
 }
 
 .btn-add {
-  padding: 13px 20px;
+  padding: 0 22px;
+  height: 48px;
   border: none;
   border-radius: 9px;
   font-size: 15px;
   font-weight: 700;
   font-family: 'Poppins', sans-serif;
-  background: white;
-  color: #111;
+  background: var(--green);
+  color: #06220f;
   cursor: pointer;
-  transition: transform 0.1s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.1s, background 0.2s;
   white-space: nowrap;
 }
+.btn-add:hover { background: var(--green-bright); }
 .btn-add:active { transform: scale(0.97); }
 
 .btn-clear {
@@ -302,6 +331,7 @@ html, body {
 }
 .btn-clear:hover { background: var(--surface); color: var(--text); }
 
+/* Budget setup */
 .budget-setup {
   flex: 1;
   display: flex;
@@ -312,27 +342,31 @@ html, body {
   gap: 16px;
   text-align: center;
 }
-.budget-setup h2 { font-size: 20px; font-weight: 700; }
+.budget-setup h2 { font-size: 21px; font-weight: 700; }
+.budget-setup h2 .g { color: var(--green); }
 .budget-setup p { color: var(--muted); font-size: 13px; line-height: 1.7; }
 .budget-setup .input-wrap { width: 100%; }
 .btn-set {
   width: 100%;
-  padding: 14px;
+  height: 50px;
   border: none;
   border-radius: 9px;
   font-size: 15px;
   font-weight: 700;
   font-family: 'Poppins', sans-serif;
-  background: white;
-  color: #111;
+  background: var(--green);
+  color: #06220f;
   cursor: pointer;
+  transition: background 0.2s;
 }
+.btn-set:hover { background: var(--green-bright); }
 
+/* ── CALENDAR ── */
 .cal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px 10px;
+  padding: 18px 24px 10px;
 }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
@@ -383,13 +417,14 @@ html, body {
 .cal-cell:active { transform: scale(0.93); }
 .cal-cell .cal-num { font-size: 12px; }
 .cal-cell .cal-val { font-size: 8px; opacity: 0.85; }
-.cal-cell.green  { background: #1b5e20; color: #c8e6c9; }
-.cal-cell.red    { background: #b71c1c; color: #ffcdd2; }
+.cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
+.cal-cell.red    { background: var(--red); color: #ffcdd2; }
 .cal-cell.future { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
-.cal-cell.today  { outline: 2px solid rgba(255,255,255,0.5); outline-offset: 1px; }
+.cal-cell.today  { outline: 2px solid var(--green); outline-offset: 1px; }
 .cal-cell.selected { outline: 2px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
 
-.log-header { padding: 16px 24px 8px; }
+/* ── LOG ── */
+.log-header { padding: 18px 24px 8px; }
 .log-header h2 { font-size: 17px; font-weight: 700; }
 .log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
@@ -439,6 +474,7 @@ html, body {
   margin-bottom: 6px;
 }
 .log-entry .log-amt { font-size: 15px; font-weight: 600; }
+.log-entry .log-day { font-size: 11px; color: var(--muted); margin-left: 8px; }
 .log-del {
   background: none; border: none;
   color: var(--muted); font-size: 20px;
@@ -484,11 +520,11 @@ html, body {
   <div class="screen active" id="homeScreen">
 
     <div class="budget-setup" id="budgetSetup">
-      <h2>Welcome to OnTrack</h2>
+      <h2>Welcome to <span class="g">OnTrack</span></h2>
       <p>Enter your monthly disposable income to get started.</p>
       <div class="input-wrap">
         <span>£</span>
-        <input id="budgetInput" type="number" min="0" placeholder="Monthly budget"/>
+        <input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/>
       </div>
       <button class="btn-set" onclick="setBudget()">Set Budget</button>
     </div>
@@ -501,9 +537,9 @@ html, body {
       </div>
 
       <div class="ring-wrap" id="ringWrap">
-        <svg viewBox="0 0 220 220">
-          <circle class="ring-track" cx="110" cy="110" r="95"/>
-          <circle class="ring-fill" id="ringFill" cx="110" cy="110" r="95"/>
+        <svg viewBox="0 0 256 256">
+          <circle class="ring-track" cx="128" cy="128" r="112"/>
+          <circle class="ring-fill" id="ringFill" cx="128" cy="128" r="112"/>
         </svg>
         <div class="ring-center">
           <div class="ring-amount" id="ringAmount">—</div>
@@ -523,7 +559,7 @@ html, body {
       <div class="input-row">
         <div class="input-wrap">
           <span>£</span>
-          <input id="spendInput" type="number" min="0" placeholder="How much did you spend?"/>
+          <input id="spendInput" type="number" min="0" placeholder="How much did you spend?" inputmode="decimal"/>
         </div>
         <button class="btn-add" onclick="addSpend()">Add</button>
       </div>
@@ -553,20 +589,20 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- LOG -->
+  <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
-      <h2>Summary</h2>
+      <h2>Overview</h2>
       <p id="logDateLabel">—</p>
     </div>
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Safe today</div>
-        <div class="stat-val" id="statAllowance">—</div>
+      <div class="stat-card" id="cardStatus">
+        <div class="stat-label" id="statStatusLabel">Status so far</div>
+        <div class="stat-val" id="statStatus">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Spent today</div>
-        <div class="stat-val" id="statSpent">—</div>
+        <div class="stat-label">Daily budget from tomorrow</div>
+        <div class="stat-val" id="statDailyFwd">—</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Left this month</div>
@@ -579,7 +615,7 @@ html, body {
     </div>
     <div class="divider"></div>
     <div class="log-entries">
-      <h3>Entries — Day <span id="logDayNum">—</span></h3>
+      <h3>This Month's Spending</h3>
       <div id="logList"></div>
     </div>
     <div class="divider"></div>
@@ -606,7 +642,7 @@ html, body {
         <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
         <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
       </svg>
-      Log
+      Overview
     </button>
   </nav>
 
@@ -700,7 +736,7 @@ function ringColor(ratio) {
   if (ratio < 0.25) return '#c62828';
   if (ratio < 0.5)  return '#e65100';
   if (ratio < 0.75) return '#f9a825';
-  return '#2e7d32';
+  return '#21c25a';
 }
 
 function setBudget() {
@@ -828,7 +864,7 @@ function render() {
         totalForView = budget;
       }
 
-      const circumference = 2 * Math.PI * 95;
+      const circumference = 2 * Math.PI * 112;
       const ratio  = totalForView > 0 ? Math.max(0, amount) / totalForView : 0;
       const offset = circumference * (1 - Math.min(1, ratio));
       const color  = ringColor(ratio);
@@ -836,6 +872,7 @@ function render() {
       fill.style.strokeDasharray  = circumference;
       fill.style.strokeDashoffset = offset;
       fill.style.stroke           = color;
+      fill.classList.toggle('glow', amount >= 0 && ratio >= 0.5);
 
       $('ringWrap').classList.toggle('over', amount < 0);
       $('ringAmount').textContent = amount >= 0
@@ -843,7 +880,7 @@ function render() {
         : `-£${Math.abs(amount).toFixed(2)}`;
       $('ringAmount').style.color = color;
       $('ringStatus').textContent = amount >= 0 ? '✓ on track' : '⚠ over budget';
-      $('ringStatus').style.color = amount >= 0 ? '#81c784' : '#ef9a9a';
+      $('ringStatus').style.color = amount >= 0 ? 'var(--green-soft)' : '#ef9a9a';
     }
   }
 
@@ -879,31 +916,75 @@ function render() {
   }
 
   if (activeTab === 'log') {
-    const displayDay = isCurrentMonth() ? todayDate() : selectedDay;
-    const allowance  = dailyAllowance(displayDay, days, viewYear, viewMonth);
-    const spent      = spentOnDay(displayDay, history);
+    $('logDateLabel').textContent = formatMonth(viewYear, viewMonth);
 
-    $('logDateLabel').textContent  = formatMonth(viewYear, viewMonth);
-    $('logDayNum').textContent     = displayDay;
-    $('statAllowance').textContent = fmt(Math.max(0, allowance));
-    $('statSpent').textContent     = fmt(spent);
-    $('statMonthLeft').textContent = fmt(remainingAfter(days, viewYear, viewMonth));
+    const td2 = todayDateFor(viewYear, viewMonth);
+    const elapsedDays = td2 ? td2 : days;
+
+    const flatDaily = days > 0 ? budget / days : 0;
+    const expectedByNow = flatDaily * elapsedDays;
+    const actualByNow   = spentUpToDay(elapsedDays, history);
+    const diff = actualByNow - expectedByNow;
+
+    const statusEl = $('statStatus');
+    const labelEl  = $('statStatusLabel');
+    if (diff > 0.005) {
+      labelEl.textContent = 'Overspent so far';
+      statusEl.textContent = fmt(diff);
+      statusEl.style.color = '#ef9a9a';
+    } else if (diff < -0.005) {
+      labelEl.textContent = 'Underspent so far';
+      statusEl.textContent = fmt(diff);
+      statusEl.style.color = 'var(--green)';
+    } else {
+      labelEl.textContent = 'Right on track';
+      statusEl.textContent = '£0.00';
+      statusEl.style.color = 'var(--text)';
+    }
+
+    const monthLeft = remainingAfter(days, viewYear, viewMonth);
+    const daysFromTomorrow = td2 ? Math.max(0, days - td2) : 0;
+    const dailyFwdEl = $('statDailyFwd');
+    if (daysFromTomorrow > 0) {
+      const perDay = monthLeft / daysFromTomorrow;
+      dailyFwdEl.textContent = fmt(perDay);
+      dailyFwdEl.style.color = perDay >= 0 ? 'var(--text)' : '#ef9a9a';
+    } else {
+      dailyFwdEl.textContent = fmt(monthLeft);
+      dailyFwdEl.style.color = 'var(--text)';
+    }
+
+    $('statMonthLeft').textContent = fmt(monthLeft);
     $('statBudget').textContent    = fmt(budget);
 
-    const entries = history.filter(h => h && h.day === displayDay);
-    const list    = $('logList');
-    if (entries.length === 0) {
-      list.innerHTML = '<div class="log-empty">Nothing logged for today</div>';
+    const list = $('logList');
+    const allEntries = (history || [])
+      .filter(h => h && typeof h.day === 'number')
+      .sort((a, b) => b.day - a.day || b.id - a.id);
+
+    if (allEntries.length === 0) {
+      list.innerHTML = '<div class="log-empty">No spending logged this month yet</div>';
     } else {
-      list.innerHTML = entries.map(e => `
+      list.innerHTML = allEntries.map(e => `
         <div class="log-entry">
-          <span class="log-amt">${fmt(e.amount||0)}</span>
+          <span>
+            <span class="log-amt">${fmt(e.amount||0)}</span>
+            <span class="log-day">${formatDay(e.day, viewYear, viewMonth)}</span>
+          </span>
           <button class="log-del" onclick="deleteEntry(${e.id})">×</button>
         </div>
       `).join('');
     }
   }
 }
+
+/* Press Enter to submit */
+document.getElementById('budgetInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); setBudget(); }
+});
+document.getElementById('spendInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addSpend(); }
+});
 
 try { render(); } catch(e) { console.error(e); }
 </script>
