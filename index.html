@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-<title>Spend Green</title>
+<title>OnTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -41,10 +41,13 @@ html, body {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.app-header img {
-  height: 44px;
-  width: auto;
+.wordmark {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
+.wordmark .wm-on    { color: #ffffff; }
+.wordmark .wm-track { color: #4caf50; }
 
 .screen {
   display: none;
@@ -233,35 +236,40 @@ html, body {
   gap: 8px;
 }
 .input-row { display: flex; gap: 8px; }
-.input-wrap { flex: 1; position: relative; }
+.input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.06);
+  padding-left: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
 .input-wrap span {
-  position: absolute;
-  left: 13px; top: 50%;
-  transform: translateY(-50%);
-  color: #666;
+  color: #888;
   font-weight: 600;
   font-size: 15px;
-  pointer-events: none;
+  flex-shrink: 0;
+  margin-right: 2px;
 }
 .input-wrap input {
+  flex: 1;
   width: 100%;
-  padding: 13px 13px 13px 28px;
-  border: 1px solid var(--border);
+  padding: 13px 13px 13px 4px;
+  border: none;
   border-radius: 9px;
   font-size: 15px;
   font-family: 'Poppins', sans-serif;
-  background: rgba(255,255,255,0.06);
+  background: transparent;
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
-.input-wrap input:focus {
+.input-wrap:focus-within {
   border-color: rgba(255,255,255,0.35);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.07);
 }
-.input-wrap input::-webkit-inner-spin-button,
-.input-wrap input::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 .btn-add {
   padding: 13px 20px;
@@ -469,14 +477,14 @@ html, body {
 <div class="app">
 
   <header class="app-header">
-    <img src="logo.png" alt="Spend Green"/>
+    <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
   </header>
 
   <!-- HOME -->
   <div class="screen active" id="homeScreen">
 
     <div class="budget-setup" id="budgetSetup">
-      <h2>Welcome to Spend Green</h2>
+      <h2>Welcome to OnTrack</h2>
       <p>Enter your monthly disposable income to get started.</p>
       <div class="input-wrap">
         <span>£</span>
