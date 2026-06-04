@@ -9,17 +9,15 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  /* Unified green palette */
-  --green:        #21c25a;   /* primary brand green */
-  --green-bright: #34d76b;   /* highlights / glow */
-  --green-deep:   #14843d;   /* calendar safe days */
-  --green-soft:   #7be09a;   /* text on dark green */
-
+  --green:        #21c25a;
+  --green-bright: #34d76b;
+  --green-deep:   #14843d;
+  --green-soft:   #7be09a;
   --bg:      #1a1a1a;
   --surface: rgba(255,255,255,0.07);
   --border:  rgba(255,255,255,0.12);
   --text:    #f0f0f0;
-  --muted:   rgba(255,255,255,0.45);
+  --muted:   rgba(255,255,255,0.7);
   --red:     #b71c1c;
 }
 
@@ -39,7 +37,6 @@ html, body {
   margin: 0 auto;
 }
 
-/* ── HEADER ── */
 .app-header {
   display: flex;
   align-items: center;
@@ -49,461 +46,159 @@ html, body {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.wordmark {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
+.wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
 .wordmark .wm-on    { color: #ffffff; }
 .wordmark .wm-track { color: var(--green); }
 
-/* ── SCREENS ── */
-.screen {
-  display: none;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0 0 8px;
-}
+.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 0 8px; }
 .screen.active { display: flex; flex-direction: column; }
 
-.credit {
-  text-align: center;
-  font-size: 10px;
-  color: rgba(255,255,255,0.2);
-  padding: 12px 0 4px;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
+.credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
-/* ── BOTTOM NAV ── */
-.nav {
-  display: flex;
-  background: #111;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
+.nav { display: flex; background: #111; border-top: 1px solid var(--border); flex-shrink: 0; }
 .nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 0 12px;
-  background: none;
-  border: none;
-  border-top: 2px solid transparent;
-  color: var(--muted);
-  font-size: 10px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 10px 0 12px; background: none; border: none;
+  border-top: 2px solid transparent; color: var(--muted); font-size: 10px;
+  font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 0.5px;
+  text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s;
 }
 .nav-btn svg { transition: transform 0.2s; }
-.nav-btn.active {
-  color: var(--green);
-  border-top-color: var(--green);
-}
+.nav-btn.active { color: var(--green); border-top-color: var(--green); }
 .nav-btn.active svg { transform: scale(1.1); }
 
-/* ── HOME ── */
-.home-top {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 24px 12px;
-  gap: 14px;
-}
+.home-top { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px 12px; gap: 14px; }
 
-.date-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 2px;
-}
+.date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
-  flex-shrink: 0;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 20px;
+  display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0;
 }
 .day-arrow:hover { background: rgba(255,255,255,0.14); }
 .day-arrow:disabled { opacity: 0.25; cursor: default; }
-.date-label {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-align: center;
-  min-width: 160px;
-}
+.date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
-/* Ring — enlarged */
-.ring-wrap {
-  position: relative;
-  width: 256px;
-  height: 256px;
-  margin: 4px 0;
-}
-.ring-wrap svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  transform: rotate(-90deg);
-}
-.ring-track {
-  fill: none;
-  stroke: rgba(255,255,255,0.08);
-  stroke-width: 13;
-}
-.ring-fill {
-  fill: none;
-  stroke-width: 13;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease;
-}
-.ring-fill.glow {
-  filter: drop-shadow(0 0 6px rgba(33,194,90,0.55));
-}
-.ring-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-.ring-amount {
-  font-size: 40px;
-  font-weight: 700;
-  letter-spacing: -1.5px;
-  line-height: 1;
-  transition: color 0.6s;
-}
-.ring-label {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ring-status {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 3px;
-  transition: color 0.4s;
-}
+.ring-wrap { position: relative; width: 256px; height: 256px; margin: 4px 0; }
+.ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 13; }
+.ring-fill { fill: none; stroke-width: 13; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
+.ring-fill.glow { filter: drop-shadow(0 0 6px rgba(33,194,90,0.55)); }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.ring-amount { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; transition: color 0.6s; }
+.ring-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.ring-status { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; transition: color 0.4s; }
 
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20%     { transform: translateX(-6px); }
-  40%     { transform: translateX(6px); }
-  60%     { transform: translateX(-4px); }
-  80%     { transform: translateX(4px); }
-}
-@keyframes pulse-ring {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0.5; }
-}
-.ring-wrap.over {
-  animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s;
-}
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
 
-/* View tabs */
-.view-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 0 24px;
-  margin-bottom: 4px;
-  width: 100%;
-}
+.view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
 .view-tab {
-  flex: 1;
-  padding: 9px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: 'Poppins', sans-serif;
-  background: var(--surface);
-  color: var(--muted);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-  text-align: center;
+  flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;
+  background: var(--surface); color: var(--muted); cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s; text-align: center;
 }
-.view-tab.active {
-  background: var(--green);
-  color: #06220f;
-  border-color: var(--green);
-}
+.view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); }
 
-/* Spend area */
-.spend-area {
-  padding: 8px 24px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.spend-area { padding: 8px 24px 0; display: flex; flex-direction: column; gap: 8px; }
 .input-row { display: flex; gap: 8px; }
 .input-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  height: 48px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: rgba(255,255,255,0.06);
-  padding-left: 13px;
+  flex: 1; display: flex; align-items: center; height: 48px;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: rgba(255,255,255,0.06); padding-left: 13px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.input-wrap span {
-  color: #888;
-  font-weight: 600;
-  font-size: 15px;
-  flex-shrink: 0;
-  margin-right: 2px;
-}
+.input-wrap span { color: #888; font-weight: 600; font-size: 15px; flex-shrink: 0; margin-right: 2px; }
 .input-wrap input {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  padding: 0 13px 0 4px;
-  border: none;
-  border-radius: 9px;
-  font-size: 15px;
-  font-family: 'Poppins', sans-serif;
-  background: transparent;
-  color: var(--text);
-  outline: none;
+  flex: 1; width: 100%; height: 100%; padding: 0 13px 0 4px; border: none;
+  border-radius: 9px; font-size: 15px; font-family: 'Poppins', sans-serif;
+  background: transparent; color: var(--text); outline: none;
 }
 .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
-.input-wrap:focus-within {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(33,194,90,0.18);
-}
+.input-wrap:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(33,194,90,0.18); }
 
 .btn-add {
-  padding: 0 22px;
-  height: 48px;
-  border: none;
-  border-radius: 9px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'Poppins', sans-serif;
-  background: var(--green);
-  color: #06220f;
-  cursor: pointer;
-  transition: transform 0.1s, background 0.2s;
-  white-space: nowrap;
+  padding: 0 22px; height: 48px; border: none; border-radius: 9px;
+  font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
+  background: var(--green); color: #06220f; cursor: pointer;
+  transition: transform 0.1s, background 0.2s; white-space: nowrap;
 }
 .btn-add:hover { background: var(--green-bright); }
 .btn-add:active { transform: scale(0.97); }
 
 .btn-clear {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
+  width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 9px;
+  font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
+  background: transparent; color: var(--muted); cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
 .btn-clear:hover { background: var(--surface); color: var(--text); }
 
-/* Budget setup */
-.budget-setup {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 24px;
-  gap: 16px;
-  text-align: center;
-}
+.toast { text-align: center; font-size: 13px; font-weight: 600; color: var(--green); padding: 6px 0; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
+.toast.show { opacity: 1; height: auto; }
+
+.budget-setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
 .budget-setup h2 { font-size: 21px; font-weight: 700; }
 .budget-setup h2 .g { color: var(--green); }
 .budget-setup p { color: var(--muted); font-size: 13px; line-height: 1.7; }
-.budget-setup .input-wrap { width: 100%; }
+.budget-setup .input-wrap { width: 100%; flex: none; height: 48px; }
 .btn-set {
-  width: 100%;
-  height: 50px;
-  border: none;
-  border-radius: 9px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'Poppins', sans-serif;
-  background: var(--green);
-  color: #06220f;
-  cursor: pointer;
-  transition: background 0.2s;
+  width: 100%; height: 50px; border: none; border-radius: 9px;
+  font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
+  background: var(--green); color: #06220f; cursor: pointer; transition: background 0.2s;
 }
 .btn-set:hover { background: var(--green-bright); }
 
-/* ── CALENDAR ── */
-.cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px 10px;
-}
+.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 10px; }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px;
   display: flex; align-items: center; justify-content: center;
 }
-.cal-day-labels {
-  display: grid;
-  grid-template-columns: repeat(7,1fr);
-  gap: 3px;
-  padding: 0 16px 4px;
-}
-.cal-day-label {
-  text-align: center;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  color: var(--muted);
-  text-transform: uppercase;
-  padding: 2px 0;
-}
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7,1fr);
-  gap: 3px;
-  padding: 0 16px;
-}
+.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 16px 4px; }
+.cal-day-label { text-align: center; font-size: 9px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 2px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 16px; }
 .cal-cell {
-  aspect-ratio: 1;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: 700;
-  line-height: 1.3;
-  text-align: center;
-  transition: transform 0.1s;
-  user-select: none;
+  aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; font-weight: 700; line-height: 1.3;
+  text-align: center; user-select: none;
 }
-.cal-cell:active { transform: scale(0.93); }
 .cal-cell .cal-num { font-size: 12px; }
 .cal-cell .cal-val { font-size: 8px; opacity: 0.85; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
 .cal-cell.future { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
 .cal-cell.today  { outline: 2px solid var(--green); outline-offset: 1px; }
-.cal-cell.selected { outline: 2px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
 
-/* ── LOG ── */
 .log-header { padding: 18px 24px 8px; }
 .log-header h2 { font-size: 17px; font-weight: 700; }
 .log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 8px 24px;
+.projection {
+  margin: 10px 24px 8px; padding: 24px 20px; border-radius: 14px;
+  font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
 }
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-.stat-card .stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--muted);
-  margin-bottom: 5px;
-}
-.stat-card .stat-val {
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
+.projection strong { font-size: 22px; display: block; margin-top: 4px; }
+.projection .on { color: #ffffff; }
+.projection .track { color: var(--green); }
 
-.log-entries { padding: 8px 24px; }
-.log-entries h3 {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.log-entry {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 11px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  margin-bottom: 6px;
-}
-.log-entry .log-amt { font-size: 15px; font-weight: 600; }
-.log-entry .log-day { font-size: 11px; color: var(--muted); margin-left: 8px; }
-.log-del {
-  background: none; border: none;
-  color: var(--muted); font-size: 20px;
-  cursor: pointer; padding: 0 4px;
-  transition: color 0.2s; line-height: 1;
-}
-.log-del:hover { color: #ef9a9a; }
-.log-empty {
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-  padding: 28px 0;
-}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.stat-card .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 5px; }
+.stat-card .stat-val { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
 
 .divider { height: 1px; background: var(--border); margin: 8px 24px; }
 
 .reset-btn {
-  margin: 8px 24px 0;
-  width: calc(100% - 48px);
-  padding: 11px;
-  border: 1px solid rgba(239,154,154,0.3);
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  background: transparent;
-  color: #ef9a9a;
-  cursor: pointer;
-  transition: background 0.2s;
+  margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px;
+  border: 1px solid rgba(239,154,154,0.3); border-radius: 9px;
+  font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
+  background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s;
 }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
 </style>
@@ -520,13 +215,15 @@ html, body {
   <div class="screen active" id="homeScreen">
 
     <div class="budget-setup" id="budgetSetup">
-      <h2>Welcome to <span class="g">OnTrack</span></h2>
-      <p>Enter your monthly disposable income to get started.</p>
+      <h2>Welcome to On<span class="g">Track</span></h2>
+      <p style="font-size:15px; color:var(--text); margin-bottom:4px;">Know exactly what you can spend today.</p>
+      <p>Set your monthly budget once. Log what you spend each day. OnTrack works out what's safe to spend — and rolls any savings forward.</p>
       <div class="input-wrap">
         <span>£</span>
         <input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/>
       </div>
-      <button class="btn-set" onclick="setBudget()">Set Budget</button>
+      <p style="font-size:11px; opacity:0.5; margin-top:-6px;">Your spending money after bills and essentials</p>
+      <button class="btn-set" onclick="setBudget()">Get Started</button>
     </div>
 
     <div class="home-top" id="homeMain" style="display:none">
@@ -543,7 +240,7 @@ html, body {
         </svg>
         <div class="ring-center">
           <div class="ring-amount" id="ringAmount">—</div>
-          <div class="ring-label">remaining</div>
+          <div class="ring-label" id="ringLabel">remaining today</div>
           <div class="ring-status" id="ringStatus">—</div>
         </div>
       </div>
@@ -563,7 +260,8 @@ html, body {
         </div>
         <button class="btn-add" onclick="addSpend()">Add</button>
       </div>
-      <button class="btn-clear" onclick="clearSelectedDay()">Clear this day's entries</button>
+      <button class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
+      <div class="toast" id="spendToast"></div>
     </div>
 
     <div class="credit">Created by Robert Nickels</div>
@@ -595,13 +293,14 @@ html, body {
       <h2>Overview</h2>
       <p id="logDateLabel">—</p>
     </div>
+    <div class="projection" id="projectionBanner">—</div>
     <div class="stats-grid">
       <div class="stat-card" id="cardStatus">
         <div class="stat-label" id="statStatusLabel">Status so far</div>
         <div class="stat-val" id="statStatus">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Daily budget from tomorrow</div>
+        <div class="stat-label">Tomorrow's budget</div>
         <div class="stat-val" id="statDailyFwd">—</div>
       </div>
       <div class="stat-card">
@@ -612,11 +311,6 @@ html, body {
         <div class="stat-label">Monthly budget</div>
         <div class="stat-val" id="statBudget">—</div>
       </div>
-    </div>
-    <div class="divider"></div>
-    <div class="log-entries">
-      <h3>This Month's Spending</h3>
-      <div id="logList"></div>
     </div>
     <div class="divider"></div>
     <button class="reset-btn" onclick="resetMonth()">Reset whole month</button>
@@ -763,6 +457,10 @@ function addSpend() {
   d.history.push({ day: selectedDay, amount: raw, id: Date.now() });
   saveData(d, viewYear, viewMonth);
   $('spendInput').value = '';
+  const toast = $('spendToast');
+  toast.textContent = `£${raw.toFixed(2)} added ✓`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1800);
   render();
 }
 
@@ -829,7 +527,7 @@ function render() {
   const days    = daysInMonth(viewYear, viewMonth);
   const td      = todayDateFor(viewYear, viewMonth);
 
-  if (activeTab === 'home') {
+  {  // HOME
     const hasBudget = budget > 0;
     $('budgetSetup').style.display = hasBudget ? 'none' : 'flex';
     $('homeMain').style.display    = hasBudget ? 'flex' : 'none';
@@ -881,10 +579,13 @@ function render() {
       $('ringAmount').style.color = color;
       $('ringStatus').textContent = amount >= 0 ? '✓ on track' : '⚠ over budget';
       $('ringStatus').style.color = amount >= 0 ? 'var(--green-soft)' : '#ef9a9a';
+      $('ringLabel').textContent = view === 'day' ? 'remaining today' : view === 'week' ? 'remaining this week' : 'remaining this month';
+      const hasEntries = history.filter(h => h && h.day === selectedDay).length > 0;
+      $('btnClear').style.display = hasEntries ? 'block' : 'none';
     }
   }
 
-  if (activeTab === 'cal') {
+  {  // CALENDAR
     $('calMonthLabel').textContent = formatMonth(viewYear, viewMonth);
     const grid = $('calGrid');
     grid.innerHTML = '';
@@ -901,7 +602,6 @@ function render() {
       if (isFuture)        cls += ' future';
       else                 cls += actualSpend <= allowance ? ' green' : ' red';
       if (isToday)         cls += ' today';
-      if (i===selectedDay) cls += ' selected';
 
       const cell = document.createElement('div');
       cell.className = cls;
@@ -910,12 +610,11 @@ function render() {
       cell.innerHTML = isFuture
         ? `<span class="cal-num">${i}</span><span class="cal-val">£${Math.max(0,allowance).toFixed(0)}</span>`
         : `<span class="cal-num">${i}</span><span class="cal-val">${sign}${Math.abs(margin).toFixed(0)}</span>`;
-      cell.onclick = () => { selectedDay = i; render(); };
       grid.appendChild(cell);
     }
   }
 
-  if (activeTab === 'log') {
+  {  // OVERVIEW
     $('logDateLabel').textContent = formatMonth(viewYear, viewMonth);
 
     const td2 = todayDateFor(viewYear, viewMonth);
@@ -957,23 +656,24 @@ function render() {
     $('statMonthLeft').textContent = fmt(monthLeft);
     $('statBudget').textContent    = fmt(budget);
 
-    const list = $('logList');
-    const allEntries = (history || [])
-      .filter(h => h && typeof h.day === 'number')
-      .sort((a, b) => b.day - a.day || b.id - a.id);
-
-    if (allEntries.length === 0) {
-      list.innerHTML = '<div class="log-empty">No spending logged this month yet</div>';
+    // Projection banner — projects average daily underspend across the month
+    const banner = $('projectionBanner');
+    if (elapsedDays >= 2 && actualByNow > 0) {
+      banner.style.display = 'block';
+      const dailyUnderspend = (expectedByNow - actualByNow) / elapsedDays;
+      const projectedSaving = dailyUnderspend * days;
+      if (projectedSaving >= 0.005) {
+        banner.innerHTML = `Based on previous days, you're <span class="on">On</span><span class="track">Track</span> to save <strong style="color:var(--green)">£${projectedSaving.toFixed(2)}</strong> this month`;
+        banner.style.borderColor = 'var(--green-deep)';
+      } else if (projectedSaving <= -0.005) {
+        banner.innerHTML = `Based on previous days, you'll be over budget by <strong style="color:#ef9a9a">£${Math.abs(projectedSaving).toFixed(2)}</strong> this month`;
+        banner.style.borderColor = 'var(--red)';
+      } else {
+        banner.innerHTML = `Based on previous days, you're <span class="on">On</span><span class="track">Track</span> — spending exactly on budget`;
+        banner.style.borderColor = 'var(--green-deep)';
+      }
     } else {
-      list.innerHTML = allEntries.map(e => `
-        <div class="log-entry">
-          <span>
-            <span class="log-amt">${fmt(e.amount||0)}</span>
-            <span class="log-day">${formatDay(e.day, viewYear, viewMonth)}</span>
-          </span>
-          <button class="log-del" onclick="deleteEntry(${e.id})">×</button>
-        </div>
-      `).join('');
+      banner.style.display = 'none';
     }
   }
 }
