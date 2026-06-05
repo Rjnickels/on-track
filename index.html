@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>OnTrack</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 form { margin: 0; padding: 0; }
@@ -27,7 +27,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow: hidden;
 }
 
@@ -81,7 +81,7 @@ html, body {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px; padding: 10px 0 12px; background: none; border: none;
   border-top: 2px solid transparent; color: var(--muted); font-size: 10px;
-  font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px;
   text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s;
 }
 .nav-btn svg { transition: transform 0.2s; }
@@ -120,7 +120,7 @@ html, body {
 .view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
 .view-tab {
   flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px;
-  font-size: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;
+  font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif;
   background: var(--glass); color: var(--muted); cursor: pointer;
   transition: all 0.25s ease; text-align: center;
 }
@@ -136,14 +136,14 @@ html, body {
 .input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
 .input-wrap input {
   flex: 1; width: 100%; height: 100%; padding: 0 8px 0 2px; border: none; border-radius: 0;
-  font-size: 18px; font-family: 'Poppins', sans-serif; background: transparent; color: var(--text); outline: none;
+  font-size: 18px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text); outline: none;
 }
 .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
 .input-wrap:focus-within { border-bottom-color: var(--green); }
 
 .btn-add {
   padding: 0 22px; height: 48px; border: none; border-radius: 50px;
-  font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
+  font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
   background: var(--green); color: #06220f; cursor: pointer;
   transition: transform 0.1s, background 0.2s, box-shadow 0.2s; white-space: nowrap;
   box-shadow: 0 2px 12px rgba(33,194,90,0.3);
@@ -153,7 +153,7 @@ html, body {
 
 .btn-clear {
   width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 50px;
-  font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
+  font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif;
   background: transparent; color: var(--muted); cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
@@ -169,14 +169,14 @@ html, body {
 .budget-setup .input-wrap { width: 100%; flex: none; height: 48px; }
 .btn-set {
   width: 100%; height: 50px; border: none; border-radius: 50px;
-  font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
+  font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
   background: var(--green); color: #06220f; cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 12px rgba(33,194,90,0.3);
 }
 .btn-set:hover { background: var(--green-bright); }
 
-.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 10px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 12px 10px; }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
   background: var(--glass); border: 1px solid var(--border); color: var(--text);
@@ -185,17 +185,17 @@ html, body {
   transition: background 0.2s, transform 0.1s;
 }
 .cal-nav-btn:active { transform: scale(0.92); }
-.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; padding: 0 10px 6px; }
-.cal-day-label { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; padding: 0 10px; }
+.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 6px 6px; }
+.cal-day-label { text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 6px; }
 .cal-cell {
   aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column;
   align-items: center; justify-content: center; font-weight: 700; line-height: 1.3;
   text-align: center; user-select: none;
   animation: cellFade 0.3s ease both;
 }
-.cal-cell .cal-num { font-size: 14px; }
-.cal-cell .cal-val { font-size: 10px; opacity: 0.9; margin-top: 1px; }
+.cal-cell .cal-num { font-size: 16px; }
+.cal-cell .cal-val { font-size: 11px; opacity: 0.9; margin-top: 2px; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
 .cal-cell.future { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
@@ -245,7 +245,7 @@ html, body {
 .reset-btn {
   margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px;
   border: 1px solid rgba(239,154,154,0.2); border-radius: 50px;
-  font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
+  font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif;
   background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s;
 }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
@@ -259,7 +259,6 @@ html, body {
     <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
   </header>
 
-  <!-- HOME -->
   <div class="screen active" id="homeScreen">
     <div class="budget-setup" id="budgetSetup">
       <h2>Welcome to On<span class="g">Track</span></h2>
@@ -270,7 +269,7 @@ html, body {
           <span>£</span>
           <input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/>
         </div>
-        <p style="font-size:11px; opacity:0.5; margin-top:6px;">Your spending money after bills and essentials</p>
+        <p style="font-size:11px; opacity:0.5; margin-top:6px; margin-bottom:12px;">What's left once your bills are paid</p>
         <button type="submit" class="btn-set">Get Started</button>
       </form>
     </div>
@@ -288,7 +287,7 @@ html, body {
         </svg>
         <div class="ring-center">
           <div class="ring-amount" id="ringAmount">—</div>
-          <div class="ring-label" id="ringLabel">remaining today</div>
+          <div class="ring-label" id="ringLabel">left to spend today</div>
           <div class="ring-status" id="ringStatus">—</div>
         </div>
       </div>
@@ -304,7 +303,7 @@ html, body {
         <div class="input-row">
           <div class="input-wrap">
             <span>£</span>
-            <input id="spendInput" type="number" min="0" placeholder="How much did you spend?" inputmode="decimal"/>
+            <input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/>
           </div>
           <button type="submit" class="btn-add">Add</button>
         </div>
@@ -315,7 +314,6 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- CALENDAR -->
   <div class="screen" id="calScreen">
     <div class="cal-header">
       <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
@@ -331,7 +329,6 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
       <h2>Overview</h2>
@@ -340,20 +337,19 @@ html, body {
     <div class="projection" id="projectionBanner">—</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Tomorrow's budget</div>
+        <div class="stat-label">Tomorrow you can spend</div>
         <div class="stat-val" id="statDailyFwd">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Monthly budget</div>
+        <div class="stat-label">Your monthly budget</div>
         <div class="stat-val" id="statBudget">—</div>
       </div>
     </div>
     <div class="divider"></div>
-    <button class="reset-btn" onclick="resetMonth()">Reset whole month</button>
+    <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="nav">
     <button class="nav-btn active" id="navHome" onclick="goTab('home')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -463,7 +459,7 @@ function render() {
       $('ringAmount').style.color=col;
       $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
       $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
-      $('ringLabel').textContent=view==='day'?'remaining today':view==='week'?'remaining this week':'remaining this month';
+      $('ringLabel').textContent=view==='day'?'left to spend today':view==='week'?'left this week':'left this month';
       $('btnClear').style.display=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'block':'none';
     }
   }
@@ -514,4 +510,4 @@ try{render();}catch(e){console.error(e);}
 </html>
 ```
 
-Go get it live! 🚀
+Go paste it! 🚀
