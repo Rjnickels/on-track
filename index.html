@@ -39,7 +39,6 @@ html, body {
   margin: 0 auto;
 }
 
-/* ── HEADER ── */
 .app-header {
   display: flex;
   align-items: center;
@@ -53,13 +52,12 @@ html, body {
 .wordmark .wm-on    { color: #ffffff; }
 .wordmark .wm-track { color: var(--green); }
 
-/* ── SCREENS with fade ── */
 .screen {
   display: none;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 0 90px;
+  padding: 0 0 8px;
   opacity: 0;
   transition: opacity 0.25s ease;
 }
@@ -71,22 +69,13 @@ html, body {
 
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
-/* ── BOTTOM NAV — frosted glass ── */
 .nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  max-width: 480px;
-  margin: 0 auto;
-
   display: flex;
-  background: rgba(17,17,17,0.92);
+  background: rgba(17,17,17,0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
-  z-index: 9999;
+  flex-shrink: 0;
 }
 .nav-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -99,7 +88,6 @@ html, body {
 .nav-btn.active { color: var(--green); border-top-color: var(--green); }
 .nav-btn.active svg { transform: scale(1.1); }
 
-/* ── HOME ── */
 .home-top { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px 12px; gap: 14px; }
 
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
@@ -115,8 +103,9 @@ html, body {
 .date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
-/* Ring */
-.ring-wrap { position: relative; width: 290px; height: 290px; margin: 4px 0; }
+.ring-wrap { position: relative; width: 290px; height: 290px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
+.ring-wrap.slide-left  { transform: translateX(-60px); opacity: 0; }
+.ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
 .ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
@@ -130,7 +119,6 @@ html, body {
 @keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
 
-/* View tabs — pill shaped */
 .view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
 .view-tab {
   flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px;
@@ -140,7 +128,6 @@ html, body {
 }
 .view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
 
-/* Spend area */
 .spend-area { padding: 8px 24px 0; display: flex; flex-direction: column; gap: 8px; }
 .input-row { display: flex; gap: 8px; }
 .input-wrap {
@@ -204,7 +191,6 @@ html, body {
   color: var(--text);
 }
 
-/* Budget setup */
 .budget-setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
 .budget-setup h2 { font-size: 21px; font-weight: 700; }
 .budget-setup h2 .g { color: var(--green); }
@@ -219,7 +205,6 @@ html, body {
 }
 .btn-set:hover { background: var(--green-bright); }
 
-/* ── CALENDAR — larger ── */
 .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 12px 10px; }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
@@ -250,7 +235,6 @@ html, body {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* ── OVERVIEW ── */
 .log-header { padding: 18px 24px 8px; }
 .log-header h2 { font-size: 17px; font-weight: 700; }
 .log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -273,7 +257,6 @@ html, body {
 .projection .on { color: #ffffff; }
 .projection .track { color: var(--green); }
 
-/* Glass stat cards */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 20px; }
 .stat-card {
   background: var(--glass);
@@ -305,7 +288,6 @@ html, body {
     <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
   </header>
 
-  <!-- HOME -->
   <div class="screen active" id="homeScreen">
     <div class="budget-setup" id="budgetSetup">
       <h2>Welcome to On<span class="g">Track</span></h2>
@@ -339,9 +321,9 @@ html, body {
         </div>
       </div>
       <div class="view-tabs">
-        <button class="view-tab active" id="tabDay"   onclick="setView('day')">Day</button>
-        <button class="view-tab"        id="tabWeek"  onclick="setView('week')">Week</button>
-        <button class="view-tab"        id="tabMonth" onclick="setView('month')">Month</button>
+        <button class="view-tab active" id="tabDay" onclick="setView('day')">Day</button>
+        <button class="view-tab" id="tabWeek" onclick="setView('week')">Week</button>
+        <button class="view-tab" id="tabMonth" onclick="setView('month')">Month</button>
       </div>
     </div>
 
@@ -359,7 +341,6 @@ html, body {
       <div class="toast" id="spendToast"></div>
     </div>
 
-    <!-- Onboarding overlay -->
     <div class="overlay" id="onboardOverlay">
       <div class="overlay-card">
         <p class="overlay-text" id="onboardText"></p>
@@ -370,7 +351,6 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- CALENDAR -->
   <div class="screen" id="calScreen">
     <div class="cal-header">
       <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
@@ -387,7 +367,6 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
       <h2>Overview</h2>
@@ -409,7 +388,6 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="nav">
     <button class="nav-btn active" id="navHome" onclick="goTab('home')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -457,20 +435,35 @@ function dailyAllowance(day, totalDays, y, m) {
   if (td && day >= td) { const r=remainingAfter(td-1,y,m); return r/Math.max(1,totalDays-td+1); }
   else { const r=remainingAfter(day-1,y,m); return r/Math.max(1,totalDays-day+1); }
 }
-function ringColor(r) { if(r<=0)return'#b71c1c';if(r<.25)return'#c62828';if(r<.5)return'#e65100';if(r<.75)return'#f9a825';return'#21c25a'; }
+function ringColor(r) { if(r<=0)return'#b71c1c';if(r<.2)return'#2e7d32';if(r<.5)return'#388e3c';return'#21c25a'; }
 
 function setBudget() {
   const v=parseFloat($('budgetInput').value); if(isNaN(v)||v<=0){alert('Please enter a valid budget.');return;}
   const d=getData(viewYear,viewMonth); d.budget=v; saveData(d,viewYear,viewMonth); render();
-  // Show onboarding if past day 1
   if(todayDate()>1){
     const overlay=$('onboardOverlay');
-    $('onboardText').innerHTML=`You're on day ${todayDate()} of the month.<br><br>Use the <strong>‹ ›</strong> arrows to go back and log what you've already spent.`;
+    $('onboardText').innerHTML=`You're on day <span style="color:var(--green);font-size:22px;font-weight:700">${todayDate()}</span> of the month.<br><br>Swipe or use the <strong>‹ ›</strong> arrows to go day to day and log what you've spent.`;
     overlay.classList.add('show');
   }
 }
 function dismissOnboard(){ $('onboardOverlay').classList.remove('show'); }
-function shiftDay(dir) { const n=selectedDay+dir; if(n<1||n>todayDate())return; selectedDay=n; render(); }
+function shiftDay(dir) {
+  const n=selectedDay+dir; if(n<1||n>todayDate())return;
+  const ring=$('ringWrap');
+  const slideOut=dir>0?'slide-left':'slide-right';
+  const slideIn=dir>0?'slide-right':'slide-left';
+  ring.classList.add(slideOut);
+  setTimeout(()=>{
+    selectedDay=n; render();
+    ring.style.transition='none';
+    ring.classList.remove(slideOut);
+    ring.classList.add(slideIn);
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+      ring.style.transition='';
+      ring.classList.remove(slideIn);
+    });});
+  },250);
+}
 function addSpend() {
   const raw=parseFloat($('spendInput').value); if(isNaN(raw)||raw<0){alert('Please enter a valid amount.');return;}
   const d=getData(viewYear,viewMonth); if(!d.history)d.history=[];
@@ -580,8 +573,8 @@ homeTop.addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-touchStartX;
   const dy=e.changedTouches[0].clientY-touchStartY;
   if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5){
-    if(dx>0) shiftDay(-1); // swipe right = previous day
-    else shiftDay(1);      // swipe left = next day
+    if(dx>0) shiftDay(-1);
+    else shiftDay(1);
   }
 },{passive:true});
 
