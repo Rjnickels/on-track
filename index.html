@@ -1,3 +1,6 @@
+Here's the full script:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+form { margin: 0; padding: 0; }
 
 :root {
   --green:        #21c25a;
@@ -14,8 +18,9 @@
   --green-deep:   #14843d;
   --green-soft:   #7be09a;
   --bg:      #1a1a1a;
-  --surface: rgba(255,255,255,0.07);
-  --border:  rgba(255,255,255,0.12);
+  --surface: rgba(255,255,255,0.06);
+  --glass:   rgba(255,255,255,0.08);
+  --border:  rgba(255,255,255,0.1);
   --text:    #f0f0f0;
   --muted:   rgba(255,255,255,0.7);
   --red:     #b71c1c;
@@ -50,12 +55,31 @@ html, body {
 .wordmark .wm-on    { color: #ffffff; }
 .wordmark .wm-track { color: var(--green); }
 
-.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 0 8px; }
-.screen.active { display: flex; flex-direction: column; }
+.screen {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0 8px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+}
 
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
-.nav { display: flex; background: #111; border-top: 1px solid var(--border); flex-shrink: 0; }
+.nav {
+  display: flex;
+  background: rgba(17,17,17,0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
 .nav-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 4px; padding: 10px 0 12px; background: none; border: none;
@@ -71,20 +95,22 @@ html, body {
 
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text);
-  width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 20px;
-  display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0;
+  background: var(--glass); border: 1px solid var(--border); color: var(--text);
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.1s; flex-shrink: 0;
 }
 .day-arrow:hover { background: rgba(255,255,255,0.14); }
+.day-arrow:active { transform: scale(0.92); }
 .day-arrow:disabled { opacity: 0.25; cursor: default; }
 .date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
 .ring-wrap { position: relative; width: 256px; height: 256px; margin: 4px 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 13; }
-.ring-fill { fill: none; stroke-width: 13; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
-.ring-fill.glow { filter: drop-shadow(0 0 6px rgba(33,194,90,0.55)); }
+.ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
+.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
+.ring-fill.glow { filter: drop-shadow(0 0 8px rgba(33,194,90,0.5)); }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
 .ring-amount { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; transition: color 0.6s; }
 .ring-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -96,46 +122,45 @@ html, body {
 
 .view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
 .view-tab {
-  flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px;
+  flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px;
   font-size: 12px; font-weight: 600; font-family: 'Poppins', sans-serif;
-  background: var(--surface); color: var(--muted); cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s; text-align: center;
+  background: var(--glass); color: var(--muted); cursor: pointer;
+  transition: all 0.25s ease; text-align: center;
 }
-.view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); }
+.view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
 
 .spend-area { padding: 8px 24px 0; display: flex; flex-direction: column; gap: 8px; }
 .input-row { display: flex; gap: 8px; }
 .input-wrap {
   flex: 1; display: flex; align-items: center; height: 48px;
-  border: 1px solid var(--border); border-radius: 9px;
-  background: rgba(255,255,255,0.06); padding-left: 13px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border: none; border-bottom: 2px solid var(--border); border-radius: 0;
+  background: transparent; padding-left: 4px; transition: border-color 0.2s;
 }
-.input-wrap span { color: #888; font-weight: 600; font-size: 15px; flex-shrink: 0; margin-right: 2px; }
+.input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
 .input-wrap input {
-  flex: 1; width: 100%; height: 100%; padding: 0 13px 0 4px; border: none;
-  border-radius: 9px; font-size: 15px; font-family: 'Poppins', sans-serif;
-  background: transparent; color: var(--text); outline: none;
+  flex: 1; width: 100%; height: 100%; padding: 0 8px 0 2px; border: none; border-radius: 0;
+  font-size: 18px; font-family: 'Poppins', sans-serif; background: transparent; color: var(--text); outline: none;
 }
 .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
-.input-wrap:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(33,194,90,0.18); }
+.input-wrap:focus-within { border-bottom-color: var(--green); }
 
 .btn-add {
-  padding: 0 22px; height: 48px; border: none; border-radius: 9px;
+  padding: 0 22px; height: 48px; border: none; border-radius: 50px;
   font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
   background: var(--green); color: #06220f; cursor: pointer;
-  transition: transform 0.1s, background 0.2s; white-space: nowrap;
+  transition: transform 0.1s, background 0.2s, box-shadow 0.2s; white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(33,194,90,0.3);
 }
 .btn-add:hover { background: var(--green-bright); }
-.btn-add:active { transform: scale(0.97); }
+.btn-add:active { transform: scale(0.95); }
 
 .btn-clear {
-  width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 9px;
+  width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 50px;
   font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
   background: transparent; color: var(--muted); cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.btn-clear:hover { background: var(--surface); color: var(--text); }
+.btn-clear:hover { background: var(--glass); color: var(--text); }
 
 .toast { text-align: center; font-size: 13px; font-weight: 600; color: var(--green); padding: 6px 0; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
 .toast.show { opacity: 1; height: auto; }
@@ -146,57 +171,83 @@ html, body {
 .budget-setup p { color: var(--muted); font-size: 13px; line-height: 1.7; }
 .budget-setup .input-wrap { width: 100%; flex: none; height: 48px; }
 .btn-set {
-  width: 100%; height: 50px; border: none; border-radius: 9px;
+  width: 100%; height: 50px; border: none; border-radius: 50px;
   font-size: 15px; font-weight: 700; font-family: 'Poppins', sans-serif;
-  background: var(--green); color: #06220f; cursor: pointer; transition: background 0.2s;
+  background: var(--green); color: #06220f; cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(33,194,90,0.3);
 }
 .btn-set:hover { background: var(--green-bright); }
 
-.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 10px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 10px; }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text);
-  width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px;
+  background: var(--glass); border: 1px solid var(--border); color: var(--text);
+  width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px;
   display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.1s;
 }
-.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 16px 4px; }
-.cal-day-label { text-align: center; font-size: 9px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 2px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 16px; }
+.cal-nav-btn:active { transform: scale(0.92); }
+.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; padding: 0 10px 6px; }
+.cal-day-label { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; padding: 0 10px; }
 .cal-cell {
-  aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+  aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column;
   align-items: center; justify-content: center; font-weight: 700; line-height: 1.3;
   text-align: center; user-select: none;
+  animation: cellFade 0.3s ease both;
 }
-.cal-cell .cal-num { font-size: 12px; }
-.cal-cell .cal-val { font-size: 8px; opacity: 0.85; }
+.cal-cell .cal-num { font-size: 14px; }
+.cal-cell .cal-val { font-size: 10px; opacity: 0.9; margin-top: 1px; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
-.cal-cell.future { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
-.cal-cell.today  { outline: 2px solid var(--green); outline-offset: 1px; }
+.cal-cell.future { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+.cal-cell.today  { outline: 2px solid var(--green); outline-offset: 2px; }
+
+@keyframes cellFade {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
 .log-header { padding: 18px 24px 8px; }
 .log-header h2 { font-size: 17px; font-weight: 700; }
 .log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
 .projection {
-  margin: 10px 24px 8px; padding: 24px 20px; border-radius: 14px;
+  margin: 10px 20px 8px; padding: 28px 24px; border-radius: 16px;
   font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center;
-  background: var(--surface); border: 1px solid var(--border);
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
 }
-.projection strong { font-size: 22px; display: block; margin-top: 4px; }
+.projection.ahead {
+  background: linear-gradient(135deg, rgba(33,194,90,0.12), rgba(33,194,90,0.03));
+  border-color: rgba(33,194,90,0.25);
+}
+.projection.behind {
+  background: linear-gradient(135deg, rgba(183,28,28,0.12), rgba(183,28,28,0.03));
+  border-color: rgba(183,28,28,0.25);
+}
+.projection strong { font-size: 28px; display: block; margin-top: 6px; }
 .projection .on { color: #ffffff; }
 .projection .track { color: var(--green); }
 
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 24px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-.stat-card .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 5px; }
-.stat-card .stat-val { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 20px; }
+.stat-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.stat-card .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; }
+.stat-card .stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
 
-.divider { height: 1px; background: var(--border); margin: 8px 24px; }
+.divider { height: 1px; background: var(--border); margin: 10px 24px; }
 
 .reset-btn {
   margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px;
-  border: 1px solid rgba(239,154,154,0.3); border-radius: 9px;
+  border: 1px solid rgba(239,154,154,0.2); border-radius: 50px;
   font-size: 12px; font-weight: 500; font-family: 'Poppins', sans-serif;
   background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s;
 }
@@ -213,17 +264,18 @@ html, body {
 
   <!-- HOME -->
   <div class="screen active" id="homeScreen">
-
     <div class="budget-setup" id="budgetSetup">
       <h2>Welcome to On<span class="g">Track</span></h2>
       <p style="font-size:15px; color:var(--text); margin-bottom:4px;">Know exactly what you can spend today.</p>
       <p>Set your monthly budget once. Log what you spend each day. OnTrack works out what's safe to spend — and rolls any savings forward.</p>
-      <div class="input-wrap">
-        <span>£</span>
-        <input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/>
-      </div>
-      <p style="font-size:11px; opacity:0.5; margin-top:-6px;">Your spending money after bills and essentials</p>
-      <button class="btn-set" onclick="setBudget()">Get Started</button>
+      <form onsubmit="event.preventDefault(); setBudget();">
+        <div class="input-wrap">
+          <span>£</span>
+          <input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/>
+        </div>
+        <p style="font-size:11px; opacity:0.5; margin-top:6px;">Your spending money after bills and essentials</p>
+        <button type="submit" class="btn-set">Get Started</button>
+      </form>
     </div>
 
     <div class="home-top" id="homeMain" style="display:none">
@@ -232,7 +284,6 @@ html, body {
         <div class="date-label" id="dateLabel">—</div>
         <button class="day-arrow" id="dayNext" onclick="shiftDay(1)">&#8250;</button>
       </div>
-
       <div class="ring-wrap" id="ringWrap">
         <svg viewBox="0 0 256 256">
           <circle class="ring-track" cx="128" cy="128" r="112"/>
@@ -244,26 +295,26 @@ html, body {
           <div class="ring-status" id="ringStatus">—</div>
         </div>
       </div>
-
       <div class="view-tabs">
-        <button class="view-tab active" id="tabDay"   onclick="setView('day')">Day</button>
-        <button class="view-tab"        id="tabWeek"  onclick="setView('week')">Week</button>
-        <button class="view-tab"        id="tabMonth" onclick="setView('month')">Month</button>
+        <button class="view-tab active" id="tabDay" onclick="setView('day')">Day</button>
+        <button class="view-tab" id="tabWeek" onclick="setView('week')">Week</button>
+        <button class="view-tab" id="tabMonth" onclick="setView('month')">Month</button>
       </div>
     </div>
 
     <div class="spend-area" id="spendArea" style="display:none">
-      <div class="input-row">
-        <div class="input-wrap">
-          <span>£</span>
-          <input id="spendInput" type="number" min="0" placeholder="How much did you spend?" inputmode="decimal"/>
+      <form onsubmit="event.preventDefault(); addSpend();">
+        <div class="input-row">
+          <div class="input-wrap">
+            <span>£</span>
+            <input id="spendInput" type="number" min="0" placeholder="How much did you spend?" inputmode="decimal"/>
+          </div>
+          <button type="submit" class="btn-add">Add</button>
         </div>
-        <button class="btn-add" onclick="addSpend()">Add</button>
-      </div>
-      <button class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
+      </form>
+      <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
-
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
@@ -275,12 +326,8 @@ html, body {
       <button class="cal-nav-btn" onclick="nextMonth()">&#8250;</button>
     </div>
     <div class="cal-day-labels">
-      <div class="cal-day-label">Mo</div>
-      <div class="cal-day-label">Tu</div>
-      <div class="cal-day-label">We</div>
-      <div class="cal-day-label">Th</div>
-      <div class="cal-day-label">Fr</div>
-      <div class="cal-day-label">Sa</div>
+      <div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div><div class="cal-day-label">We</div>
+      <div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>
       <div class="cal-day-label">Su</div>
     </div>
     <div class="cal-grid" id="calGrid"></div>
@@ -295,17 +342,9 @@ html, body {
     </div>
     <div class="projection" id="projectionBanner">—</div>
     <div class="stats-grid">
-      <div class="stat-card" id="cardStatus">
-        <div class="stat-label" id="statStatusLabel">Status so far</div>
-        <div class="stat-val" id="statStatus">—</div>
-      </div>
       <div class="stat-card">
         <div class="stat-label">Tomorrow's budget</div>
         <div class="stat-val" id="statDailyFwd">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Left this month</div>
-        <div class="stat-val" id="statMonthLeft">—</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Monthly budget</div>
@@ -320,22 +359,15 @@ html, body {
   <!-- BOTTOM NAV -->
   <nav class="nav">
     <button class="nav-btn active" id="navHome" onclick="goTab('home')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Home
     </button>
     <button class="nav-btn" id="navCal" onclick="goTab('cal')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Calendar
     </button>
     <button class="nav-btn" id="navLog" onclick="goTab('log')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-      </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       Overview
     </button>
   </nav>
@@ -343,350 +375,146 @@ html, body {
 </div>
 
 <script>
-let view        = 'day';
-let viewYear    = new Date().getFullYear();
-let viewMonth   = new Date().getMonth();
-let selectedDay = new Date().getDate();
-let activeTab   = 'home';
+let view = 'day', viewYear = new Date().getFullYear(), viewMonth = new Date().getMonth();
+let selectedDay = new Date().getDate(), activeTab = 'home';
 
 const $ = id => document.getElementById(id);
 const fmt = n => '£' + Math.abs(n).toFixed(2);
-
 function todayObj()   { return new Date(); }
 function todayDate()  { return todayObj().getDate(); }
 function todayYear()  { return todayObj().getFullYear(); }
 function todayMonth() { return todayObj().getMonth(); }
-
-function isCurrentMonth() {
-  return viewYear === todayYear() && viewMonth === todayMonth();
-}
-
-function daysInMonth(y, m) {
-  return new Date(y, m + 1, 0).getDate();
-}
-
-function monthStartOffset(y, m) {
-  return (new Date(y, m, 1).getDay() + 6) % 7;
-}
-
-function formatMonth(y, m) {
-  return new Date(y, m, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-}
-
+function isCurrentMonth() { return viewYear === todayYear() && viewMonth === todayMonth(); }
+function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+function monthStartOffset(y, m) { return (new Date(y, m, 1).getDay() + 6) % 7; }
+function formatMonth(y, m) { return new Date(y, m, 1).toLocaleString('default', { month: 'long', year: 'numeric' }); }
 function formatDay(day, y, m) {
-  const isToday = day === todayDate() && y === todayYear() && m === todayMonth();
-  if (isToday) return 'Today';
+  if (day === todayDate() && y === todayYear() && m === todayMonth()) return 'Today';
   return new Date(y, m, day).toLocaleDateString('default', { weekday: 'short', day: 'numeric', month: 'short' });
 }
-
-function storageKey(y, m) {
-  return `gt_${y}-${String(m+1).padStart(2,'0')}`;
-}
-
-function getData(y, m) {
-  try { return JSON.parse(localStorage.getItem(storageKey(y,m))) || {budget:0,history:[]}; }
-  catch(e) { return {budget:0,history:[]}; }
-}
-
-function saveData(d, y, m) {
-  try { localStorage.setItem(storageKey(y,m), JSON.stringify(d)); }
-  catch(e) { alert('Could not save — storage may be full.'); }
-}
-
-function spentOnDay(day, history) {
-  return history.filter(h => h && h.day === day).reduce((s,h) => s+(h.amount||0), 0);
-}
-
-function spentUpToDay(day, history) {
-  let t = 0;
-  for (let i = 1; i <= day; i++) t += spentOnDay(i, history);
-  return t;
-}
-
-function remainingAfter(day, y, m) {
-  const d = getData(y, m);
-  return (d.budget||0) - spentUpToDay(day, d.history||[]);
-}
-
-function todayDateFor(y, m) {
-  return (y===todayYear() && m===todayMonth()) ? todayDate() : null;
-}
-
+function storageKey(y, m) { return `gt_${y}-${String(m+1).padStart(2,'0')}`; }
+function getData(y, m) { try { return JSON.parse(localStorage.getItem(storageKey(y,m))) || {budget:0,history:[]}; } catch(e) { return {budget:0,history:[]}; } }
+function saveData(d, y, m) { try { localStorage.setItem(storageKey(y,m), JSON.stringify(d)); } catch(e) { alert('Could not save.'); } }
+function spentOnDay(day, h) { return h.filter(x => x && x.day === day).reduce((s,x) => s+(x.amount||0), 0); }
+function spentUpToDay(day, h) { let t=0; for(let i=1;i<=day;i++) t+=spentOnDay(i,h); return t; }
+function remainingAfter(day, y, m) { const d=getData(y,m); return (d.budget||0)-spentUpToDay(day, d.history||[]); }
+function todayDateFor(y, m) { return (y===todayYear()&&m===todayMonth()) ? todayDate() : null; }
 function dailyAllowance(day, totalDays, y, m) {
   const td = todayDateFor(y, m);
-  if (td && day >= td) {
-    const rem   = remainingAfter(td - 1, y, m);
-    const dLeft = Math.max(1, totalDays - td + 1);
-    return rem / dLeft;
-  } else {
-    const rem   = remainingAfter(day - 1, y, m);
-    const dLeft = Math.max(1, totalDays - day + 1);
-    return rem / dLeft;
-  }
+  if (td && day >= td) { const r=remainingAfter(td-1,y,m); return r/Math.max(1,totalDays-td+1); }
+  else { const r=remainingAfter(day-1,y,m); return r/Math.max(1,totalDays-day+1); }
 }
-
-function ringColor(ratio) {
-  if (ratio <= 0)   return '#b71c1c';
-  if (ratio < 0.25) return '#c62828';
-  if (ratio < 0.5)  return '#e65100';
-  if (ratio < 0.75) return '#f9a825';
-  return '#21c25a';
-}
+function ringColor(r) { if(r<=0)return'#b71c1c';if(r<.25)return'#c62828';if(r<.5)return'#e65100';if(r<.75)return'#f9a825';return'#21c25a'; }
 
 function setBudget() {
-  const val = parseFloat($('budgetInput').value);
-  if (isNaN(val) || val <= 0) { alert('Please enter a valid budget.'); return; }
-  const d = getData(viewYear, viewMonth);
-  d.budget = val;
-  saveData(d, viewYear, viewMonth);
-  render();
+  const v=parseFloat($('budgetInput').value); if(isNaN(v)||v<=0){alert('Please enter a valid budget.');return;}
+  const d=getData(viewYear,viewMonth); d.budget=v; saveData(d,viewYear,viewMonth); render();
 }
-
-function shiftDay(dir) {
-  const newDay = selectedDay + dir;
-  if (newDay < 1 || newDay > todayDate()) return;
-  selectedDay = newDay;
-  render();
-}
-
+function shiftDay(dir) { const n=selectedDay+dir; if(n<1||n>todayDate())return; selectedDay=n; render(); }
 function addSpend() {
-  const raw = parseFloat($('spendInput').value);
-  if (isNaN(raw) || raw < 0) { alert('Please enter a valid amount.'); return; }
-  const d = getData(viewYear, viewMonth);
-  if (!d.history) d.history = [];
-  d.history.push({ day: selectedDay, amount: raw, id: Date.now() });
-  saveData(d, viewYear, viewMonth);
-  $('spendInput').value = '';
-  const toast = $('spendToast');
-  toast.textContent = `£${raw.toFixed(2)} added ✓`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 1800);
-  render();
+  const raw=parseFloat($('spendInput').value); if(isNaN(raw)||raw<0){alert('Please enter a valid amount.');return;}
+  const d=getData(viewYear,viewMonth); if(!d.history)d.history=[];
+  d.history.push({day:selectedDay,amount:raw,id:Date.now()}); saveData(d,viewYear,viewMonth);
+  $('spendInput').value='';
+  const t=$('spendToast'); t.textContent=`£${raw.toFixed(2)} added ✓`; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800); render();
 }
-
-function deleteEntry(id) {
-  const d = getData(viewYear, viewMonth);
-  d.history = (d.history||[]).filter(h => h.id !== id);
-  saveData(d, viewYear, viewMonth);
-  render();
-}
-
+function deleteEntry(id) { const d=getData(viewYear,viewMonth); d.history=(d.history||[]).filter(h=>h.id!==id); saveData(d,viewYear,viewMonth); render(); }
 function clearSelectedDay() {
-  if (!confirm(`Clear all entries for ${formatDay(selectedDay, viewYear, viewMonth)}?`)) return;
-  const d = getData(viewYear, viewMonth);
-  d.history = (d.history||[]).filter(h => h && h.day !== selectedDay);
-  saveData(d, viewYear, viewMonth);
-  render();
+  if(!confirm(`Clear all entries for ${formatDay(selectedDay,viewYear,viewMonth)}?`))return;
+  const d=getData(viewYear,viewMonth); d.history=(d.history||[]).filter(h=>h&&h.day!==selectedDay); saveData(d,viewYear,viewMonth); render();
 }
-
 function resetMonth() {
-  if (!confirm('Reset the whole month? All data will be lost.')) return;
-  localStorage.removeItem(storageKey(viewYear, viewMonth));
-  viewYear    = todayYear();
-  viewMonth   = todayMonth();
-  selectedDay = todayDate();
-  view        = 'day';
-  goTab('home');
+  if(!confirm('Reset the whole month? All data will be lost.'))return;
+  localStorage.removeItem(storageKey(viewYear,viewMonth));
+  viewYear=todayYear();viewMonth=todayMonth();selectedDay=todayDate();view='day'; goTab('home');
 }
-
-function setView(v) {
-  view = v;
-  ['day','week','month'].forEach(x => {
-    $('tab' + x.charAt(0).toUpperCase() + x.slice(1)).classList.toggle('active', x === v);
-  });
-  render();
-}
-
+function setView(v) { view=v; ['day','week','month'].forEach(x=>{$('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===v);}); render(); }
 function goTab(tab) {
-  activeTab = tab;
-  ['home','cal','log'].forEach(t => {
-    $(`${t}Screen`).classList.toggle('active', t === tab);
-    $(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active', t === tab);
-  });
-  render();
+  activeTab=tab;
+  ['home','cal','log'].forEach(t=>{
+    const scr=$(`${t}Screen`); scr.classList.toggle('active',t===tab);
+    $(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active',t===tab);
+  }); render();
 }
-
-function prevMonth() {
-  if (viewMonth === 0) { viewMonth = 11; viewYear--; }
-  else viewMonth--;
-  selectedDay = 1;
-  render();
-}
-
-function nextMonth() {
-  if (viewMonth === 11) { viewMonth = 0; viewYear++; }
-  else viewMonth++;
-  selectedDay = 1;
-  render();
-}
+function prevMonth() { if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--; selectedDay=1; render(); }
+function nextMonth() { if(viewMonth===11){viewMonth=0;viewYear++;}else viewMonth++; selectedDay=1; render(); }
 
 function render() {
-  const d       = getData(viewYear, viewMonth);
-  const history = d.history || [];
-  const budget  = d.budget  || 0;
-  const days    = daysInMonth(viewYear, viewMonth);
-  const td      = todayDateFor(viewYear, viewMonth);
+  const d=getData(viewYear,viewMonth), history=d.history||[], budget=d.budget||0;
+  const days=daysInMonth(viewYear,viewMonth), td=todayDateFor(viewYear,viewMonth);
 
-  {  // HOME
-    const hasBudget = budget > 0;
-    $('budgetSetup').style.display = hasBudget ? 'none' : 'flex';
-    $('homeMain').style.display    = hasBudget ? 'flex' : 'none';
-    $('spendArea').style.display   = hasBudget ? 'flex' : 'none';
-
-    if (hasBudget) {
-      const isToday = selectedDay === todayDate() && isCurrentMonth();
-      const dlEl = $('dateLabel');
-      dlEl.textContent = formatDay(selectedDay, viewYear, viewMonth);
-      dlEl.classList.toggle('is-today', isToday);
-      $('dayPrev').disabled = selectedDay <= 1;
-      $('dayNext').disabled = isToday;
-
-      let amount = 0, totalForView = 0;
-
-      if (view === 'day') {
-        const allowance = dailyAllowance(selectedDay, days, viewYear, viewMonth);
-        const spent     = spentOnDay(selectedDay, history);
-        amount       = allowance - spent;
-        totalForView = allowance;
-      } else if (view === 'week') {
-        const end = Math.min(selectedDay + 6, days);
-        let b = 0, s = 0;
-        for (let i = selectedDay; i <= end; i++) {
-          b += dailyAllowance(i, days, viewYear, viewMonth);
-          s += spentOnDay(i, history);
-        }
-        amount       = b - s;
-        totalForView = b;
-      } else {
-        amount       = remainingAfter(days, viewYear, viewMonth);
-        totalForView = budget;
-      }
-
-      const circumference = 2 * Math.PI * 112;
-      const ratio  = totalForView > 0 ? Math.max(0, amount) / totalForView : 0;
-      const offset = circumference * (1 - Math.min(1, ratio));
-      const color  = ringColor(ratio);
-      const fill   = $('ringFill');
-      fill.style.strokeDasharray  = circumference;
-      fill.style.strokeDashoffset = offset;
-      fill.style.stroke           = color;
-      fill.classList.toggle('glow', amount >= 0 && ratio >= 0.5);
-
-      $('ringWrap').classList.toggle('over', amount < 0);
-      $('ringAmount').textContent = amount >= 0
-        ? `£${amount.toFixed(2)}`
-        : `-£${Math.abs(amount).toFixed(2)}`;
-      $('ringAmount').style.color = color;
-      $('ringStatus').textContent = amount >= 0 ? '✓ on track' : '⚠ over budget';
-      $('ringStatus').style.color = amount >= 0 ? 'var(--green-soft)' : '#ef9a9a';
-      $('ringLabel').textContent = view === 'day' ? 'remaining today' : view === 'week' ? 'remaining this week' : 'remaining this month';
-      const hasEntries = history.filter(h => h && h.day === selectedDay).length > 0;
-      $('btnClear').style.display = hasEntries ? 'block' : 'none';
+  { // HOME
+    const has=budget>0;
+    $('budgetSetup').style.display=has?'none':'flex';
+    $('homeMain').style.display=has?'flex':'none';
+    $('spendArea').style.display=has?'flex':'none';
+    if(has){
+      const isToday=selectedDay===todayDate()&&isCurrentMonth();
+      const dl=$('dateLabel'); dl.textContent=formatDay(selectedDay,viewYear,viewMonth);
+      dl.classList.toggle('is-today',isToday);
+      $('dayPrev').disabled=selectedDay<=1; $('dayNext').disabled=isToday;
+      let amount=0, total=0;
+      if(view==='day'){ const a=dailyAllowance(selectedDay,days,viewYear,viewMonth),s=spentOnDay(selectedDay,history); amount=a-s;total=a; }
+      else if(view==='week'){ const end=Math.min(selectedDay+6,days);let b=0,s=0;for(let i=selectedDay;i<=end;i++){b+=dailyAllowance(i,days,viewYear,viewMonth);s+=spentOnDay(i,history);}amount=b-s;total=b; }
+      else { amount=remainingAfter(days,viewYear,viewMonth);total=budget; }
+      const circ=2*Math.PI*112, ratio=total>0?Math.max(0,amount)/total:0, off=circ*(1-Math.min(1,ratio)), col=ringColor(ratio);
+      const fill=$('ringFill'); fill.style.strokeDasharray=circ; fill.style.strokeDashoffset=off; fill.style.stroke=col;
+      fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
+      $('ringWrap').classList.toggle('over',amount<0);
+      $('ringAmount').textContent=amount>=0?`£${amount.toFixed(2)}`:`-£${Math.abs(amount).toFixed(2)}`;
+      $('ringAmount').style.color=col;
+      $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
+      $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
+      $('ringLabel').textContent=view==='day'?'remaining today':view==='week'?'remaining this week':'remaining this month';
+      $('btnClear').style.display=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'block':'none';
     }
   }
 
-  {  // CALENDAR
-    $('calMonthLabel').textContent = formatMonth(viewYear, viewMonth);
-    const grid = $('calGrid');
-    grid.innerHTML = '';
-    const offset = monthStartOffset(viewYear, viewMonth);
-    for (let i = 0; i < offset; i++) grid.appendChild(document.createElement('div'));
-
-    for (let i = 1; i <= days; i++) {
-      const isFuture    = td ? i > td : false;
-      const isToday     = td ? i === td : false;
-      const allowance   = dailyAllowance(i, days, viewYear, viewMonth);
-      const actualSpend = spentOnDay(i, history);
-
-      let cls = 'cal-cell';
-      if (isFuture)        cls += ' future';
-      else                 cls += actualSpend <= allowance ? ' green' : ' red';
-      if (isToday)         cls += ' today';
-
-      const cell = document.createElement('div');
-      cell.className = cls;
-      const margin = allowance - actualSpend;
-      const sign   = margin >= 0 ? '£' : '-£';
-      cell.innerHTML = isFuture
-        ? `<span class="cal-num">${i}</span><span class="cal-val">£${Math.max(0,allowance).toFixed(0)}</span>`
-        : `<span class="cal-num">${i}</span><span class="cal-val">${sign}${Math.abs(margin).toFixed(0)}</span>`;
+  { // CALENDAR
+    $('calMonthLabel').textContent=formatMonth(viewYear,viewMonth);
+    const grid=$('calGrid'); grid.innerHTML='';
+    const off=monthStartOffset(viewYear,viewMonth);
+    for(let i=0;i<off;i++) grid.appendChild(document.createElement('div'));
+    for(let i=1;i<=days;i++){
+      const fut=td?i>td:false, isT=td?i===td:false;
+      const allow=dailyAllowance(i,days,viewYear,viewMonth), spent=spentOnDay(i,history);
+      let cls='cal-cell'; if(fut)cls+=' future';else cls+=spent<=allow?' green':' red'; if(isT)cls+=' today';
+      const cell=document.createElement('div'); cell.className=cls;
+      cell.style.animationDelay=`${(i-1)*0.02}s`;
+      const margin=allow-spent, sign=margin>=0?'£':'-£';
+      cell.innerHTML=fut?`<span class="cal-num">${i}</span><span class="cal-val">£${Math.max(0,allow).toFixed(0)}</span>`
+        :`<span class="cal-num">${i}</span><span class="cal-val">${sign}${Math.abs(margin).toFixed(0)}</span>`;
       grid.appendChild(cell);
     }
   }
 
-  {  // OVERVIEW
-    $('logDateLabel').textContent = formatMonth(viewYear, viewMonth);
-
-    const td2 = todayDateFor(viewYear, viewMonth);
-    const elapsedDays = td2 ? td2 : days;
-
-    const flatDaily = days > 0 ? budget / days : 0;
-    const expectedByNow = flatDaily * elapsedDays;
-    const actualByNow   = spentUpToDay(elapsedDays, history);
-    const diff = actualByNow - expectedByNow;
-
-    const statusEl = $('statStatus');
-    const labelEl  = $('statStatusLabel');
-    if (diff > 0.005) {
-      labelEl.textContent = 'Overspent so far';
-      statusEl.textContent = fmt(diff);
-      statusEl.style.color = '#ef9a9a';
-    } else if (diff < -0.005) {
-      labelEl.textContent = 'Underspent so far';
-      statusEl.textContent = fmt(diff);
-      statusEl.style.color = 'var(--green)';
-    } else {
-      labelEl.textContent = 'Right on track';
-      statusEl.textContent = '£0.00';
-      statusEl.style.color = 'var(--text)';
-    }
-
-    const monthLeft = remainingAfter(days, viewYear, viewMonth);
-    const daysFromTomorrow = td2 ? Math.max(0, days - td2) : 0;
-    const dailyFwdEl = $('statDailyFwd');
-    if (daysFromTomorrow > 0) {
-      const perDay = monthLeft / daysFromTomorrow;
-      dailyFwdEl.textContent = fmt(perDay);
-      dailyFwdEl.style.color = perDay >= 0 ? 'var(--text)' : '#ef9a9a';
-    } else {
-      dailyFwdEl.textContent = fmt(monthLeft);
-      dailyFwdEl.style.color = 'var(--text)';
-    }
-
-    $('statMonthLeft').textContent = fmt(monthLeft);
-    $('statBudget').textContent    = fmt(budget);
-
-    // Projection banner — projects average daily underspend across the month
-    const banner = $('projectionBanner');
-    if (elapsedDays >= 2 && actualByNow > 0) {
-      banner.style.display = 'block';
-      const dailyUnderspend = (expectedByNow - actualByNow) / elapsedDays;
-      const projectedSaving = dailyUnderspend * days;
-      if (projectedSaving >= 0.005) {
-        banner.innerHTML = `Based on previous days, you're <span class="on">On</span><span class="track">Track</span> to save <strong style="color:var(--green)">£${projectedSaving.toFixed(2)}</strong> this month`;
-        banner.style.borderColor = 'var(--green-deep)';
-      } else if (projectedSaving <= -0.005) {
-        banner.innerHTML = `Based on previous days, you'll be over budget by <strong style="color:#ef9a9a">£${Math.abs(projectedSaving).toFixed(2)}</strong> this month`;
-        banner.style.borderColor = 'var(--red)';
-      } else {
-        banner.innerHTML = `Based on previous days, you're <span class="on">On</span><span class="track">Track</span> — spending exactly on budget`;
-        banner.style.borderColor = 'var(--green-deep)';
-      }
-    } else {
-      banner.style.display = 'none';
-    }
+  { // OVERVIEW
+    $('logDateLabel').textContent=formatMonth(viewYear,viewMonth);
+    const td2=todayDateFor(viewYear,viewMonth), elapsed=td2?td2:days;
+    const flat=days>0?budget/days:0, expected=flat*elapsed, actual=spentUpToDay(elapsed,history);
+    const saved=expected-actual;
+    const banner=$('projectionBanner');
+    if(actual>0||elapsed>1){
+      banner.style.display='block';
+      banner.classList.remove('ahead','behind');
+      if(saved>=0.005){ banner.classList.add('ahead'); banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">£${saved.toFixed(2)} ahead</strong>`; }
+      else if(saved<=-0.005){ banner.classList.add('behind'); banner.innerHTML=`You're<strong style="color:#ef9a9a">£${Math.abs(saved).toFixed(2)} behind</strong>`; }
+      else { banner.classList.add('ahead'); banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`; }
+    } else { banner.style.display='none'; }
+    const mLeft=remainingAfter(days,viewYear,viewMonth), dFwd=td2?Math.max(0,days-td2):0, dfEl=$('statDailyFwd');
+    if(dFwd>0){const p=mLeft/dFwd;dfEl.textContent=fmt(p);dfEl.style.color=p>=0?'var(--text)':'#ef9a9a';}
+    else{dfEl.textContent=fmt(mLeft);dfEl.style.color='var(--text)';}
+    $('statBudget').textContent=fmt(budget);
   }
 }
 
-/* Press Enter to submit */
-document.getElementById('budgetInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); setBudget(); }
-});
-document.getElementById('spendInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); addSpend(); }
-});
-
-try { render(); } catch(e) { console.error(e); }
+document.getElementById('budgetInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setBudget();}});
+document.getElementById('spendInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSpend();}});
+try{render();}catch(e){console.error(e);}
 </script>
 </body>
 </html>
+```
+
+Go get it live! 🚀
