@@ -39,6 +39,7 @@ html, body {
   margin: 0 auto;
 }
 
+/* ── HEADER ── */
 .app-header {
   display: flex;
   align-items: center;
@@ -52,6 +53,7 @@ html, body {
 .wordmark .wm-on    { color: #ffffff; }
 .wordmark .wm-track { color: var(--green); }
 
+/* ── SCREENS with fade ── */
 .screen {
   display: none;
   flex: 1;
@@ -69,6 +71,7 @@ html, body {
 
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
+/* ── BOTTOM NAV — frosted glass ── */
 .nav {
   display: flex;
   background: rgba(17,17,17,0.75);
@@ -88,12 +91,13 @@ html, body {
 .nav-btn.active { color: var(--green); border-top-color: var(--green); }
 .nav-btn.active svg { transform: scale(1.1); }
 
+/* ── HOME ── */
 .home-top { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px 12px; gap: 14px; }
 
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow {
   background: var(--glass); border: 1px solid var(--border); color: var(--text);
-  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px;
+  width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 26px;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s, transform 0.1s; flex-shrink: 0;
 }
@@ -103,20 +107,22 @@ html, body {
 .date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
-.ring-wrap { position: relative; width: 256px; height: 256px; margin: 4px 0; }
+/* Ring */
+.ring-wrap { position: relative; width: 290px; height: 290px; margin: 4px 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
 .ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
 .ring-fill.glow { filter: drop-shadow(0 0 8px rgba(33,194,90,0.5)); }
-.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-.ring-amount { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; transition: color 0.6s; }
-.ring-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-.ring-status { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; transition: color 0.4s; }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
+.ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.ring-status { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; transition: color 0.4s; }
 
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 @keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
 
+/* View tabs — pill shaped */
 .view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
 .view-tab {
   flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px;
@@ -126,6 +132,7 @@ html, body {
 }
 .view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
 
+/* Spend area */
 .spend-area { padding: 8px 24px 0; display: flex; flex-direction: column; gap: 8px; }
 .input-row { display: flex; gap: 8px; }
 .input-wrap {
@@ -162,6 +169,34 @@ html, body {
 .toast { text-align: center; font-size: 13px; font-weight: 600; color: var(--green); padding: 6px 0; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
 .toast.show { opacity: 1; height: auto; }
 
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.overlay.show { display: flex; }
+.overlay-card {
+  background: #222;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  max-width: 340px;
+  text-align: center;
+}
+.overlay-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* Budget setup */
 .budget-setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
 .budget-setup h2 { font-size: 21px; font-weight: 700; }
 .budget-setup h2 .g { color: var(--green); }
@@ -176,6 +211,7 @@ html, body {
 }
 .btn-set:hover { background: var(--green-bright); }
 
+/* ── CALENDAR — larger ── */
 .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 12px 10px; }
 .cal-header h2 { font-size: 17px; font-weight: 700; }
 .cal-nav-btn {
@@ -206,6 +242,7 @@ html, body {
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* ── OVERVIEW ── */
 .log-header { padding: 18px 24px 8px; }
 .log-header h2 { font-size: 17px; font-weight: 700; }
 .log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -228,6 +265,7 @@ html, body {
 .projection .on { color: #ffffff; }
 .projection .track { color: var(--green); }
 
+/* Glass stat cards */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 20px; }
 .stat-card {
   background: var(--glass);
@@ -259,11 +297,12 @@ html, body {
     <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
   </header>
 
+  <!-- HOME -->
   <div class="screen active" id="homeScreen">
     <div class="budget-setup" id="budgetSetup">
       <h2>Welcome to On<span class="g">Track</span></h2>
       <p style="font-size:15px; color:var(--text); margin-bottom:4px;">Know exactly what you can spend today.</p>
-      <p>Set your monthly budget once. Log what you spend each day. OnTrack works out what's safe to spend — and rolls any savings forward.</p>
+      <p>Set your monthly budget. Log your spending. Stay On<span class="g">Track</span>.</p>
       <form onsubmit="event.preventDefault(); setBudget();">
         <div class="input-wrap">
           <span>£</span>
@@ -281,9 +320,9 @@ html, body {
         <button class="day-arrow" id="dayNext" onclick="shiftDay(1)">&#8250;</button>
       </div>
       <div class="ring-wrap" id="ringWrap">
-        <svg viewBox="0 0 256 256">
-          <circle class="ring-track" cx="128" cy="128" r="112"/>
-          <circle class="ring-fill" id="ringFill" cx="128" cy="128" r="112"/>
+        <svg viewBox="0 0 290 290">
+          <circle class="ring-track" cx="145" cy="145" r="126"/>
+          <circle class="ring-fill" id="ringFill" cx="145" cy="145" r="126"/>
         </svg>
         <div class="ring-center">
           <div class="ring-amount" id="ringAmount">—</div>
@@ -292,9 +331,9 @@ html, body {
         </div>
       </div>
       <div class="view-tabs">
-        <button class="view-tab active" id="tabDay" onclick="setView('day')">Day</button>
-        <button class="view-tab" id="tabWeek" onclick="setView('week')">Week</button>
-        <button class="view-tab" id="tabMonth" onclick="setView('month')">Month</button>
+        <button class="view-tab active" id="tabDay"   onclick="setView('day')">Day</button>
+        <button class="view-tab"        id="tabWeek"  onclick="setView('week')">Week</button>
+        <button class="view-tab"        id="tabMonth" onclick="setView('month')">Month</button>
       </div>
     </div>
 
@@ -311,15 +350,26 @@ html, body {
       <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
+
+    <!-- Onboarding overlay -->
+    <div class="overlay" id="onboardOverlay">
+      <div class="overlay-card">
+        <p class="overlay-text" id="onboardText"></p>
+        <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
+      </div>
+    </div>
+    </div>
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
+  <!-- CALENDAR -->
   <div class="screen" id="calScreen">
     <div class="cal-header">
       <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
       <h2 id="calMonthLabel">—</h2>
       <button class="cal-nav-btn" onclick="nextMonth()">&#8250;</button>
     </div>
+    <p style="text-align:center; font-size:12px; color:var(--muted); padding:0 0 8px;">Your month at a glance</p>
     <div class="cal-day-labels">
       <div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div><div class="cal-day-label">We</div>
       <div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div>
@@ -329,6 +379,7 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
+  <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
       <h2>Overview</h2>
@@ -350,6 +401,7 @@ html, body {
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
+  <!-- BOTTOM NAV -->
   <nav class="nav">
     <button class="nav-btn active" id="navHome" onclick="goTab('home')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -402,7 +454,14 @@ function ringColor(r) { if(r<=0)return'#b71c1c';if(r<.25)return'#c62828';if(r<.5
 function setBudget() {
   const v=parseFloat($('budgetInput').value); if(isNaN(v)||v<=0){alert('Please enter a valid budget.');return;}
   const d=getData(viewYear,viewMonth); d.budget=v; saveData(d,viewYear,viewMonth); render();
+  // Show onboarding if past day 1
+  if(todayDate()>1){
+    const overlay=$('onboardOverlay');
+    $('onboardText').innerHTML=`You're on day ${todayDate()} of the month.<br><br>Use the <strong>‹ ›</strong> arrows to go back and log what you've already spent.`;
+    overlay.classList.add('show');
+  }
 }
+function dismissOnboard(){ $('onboardOverlay').classList.remove('show'); }
 function shiftDay(dir) { const n=selectedDay+dir; if(n<1||n>todayDate())return; selectedDay=n; render(); }
 function addSpend() {
   const raw=parseFloat($('spendInput').value); if(isNaN(raw)||raw<0){alert('Please enter a valid amount.');return;}
@@ -451,7 +510,7 @@ function render() {
       if(view==='day'){ const a=dailyAllowance(selectedDay,days,viewYear,viewMonth),s=spentOnDay(selectedDay,history); amount=a-s;total=a; }
       else if(view==='week'){ const end=Math.min(selectedDay+6,days);let b=0,s=0;for(let i=selectedDay;i<=end;i++){b+=dailyAllowance(i,days,viewYear,viewMonth);s+=spentOnDay(i,history);}amount=b-s;total=b; }
       else { amount=remainingAfter(days,viewYear,viewMonth);total=budget; }
-      const circ=2*Math.PI*112, ratio=total>0?Math.max(0,amount)/total:0, off=circ*(1-Math.min(1,ratio)), col=ringColor(ratio);
+      const circ=2*Math.PI*126, ratio=total>0?Math.max(0,amount)/total:0, off=circ*(1-Math.min(1,ratio)), col=ringColor(ratio);
       const fill=$('ringFill'); fill.style.strokeDasharray=circ; fill.style.strokeDashoffset=off; fill.style.stroke=col;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
       $('ringWrap').classList.toggle('over',amount<0);
@@ -460,7 +519,7 @@ function render() {
       $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
       $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
       $('ringLabel').textContent=view==='day'?'left to spend today':view==='week'?'left this week':'left this month';
-      $('btnClear').style.display=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'block':'none';
+      $('btnClear').style.visibility=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
     }
   }
 
@@ -492,22 +551,33 @@ function render() {
       banner.style.display='block';
       banner.classList.remove('ahead','behind');
       if(saved>=0.005){ banner.classList.add('ahead'); banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">£${saved.toFixed(2)} ahead</strong>`; }
-      else if(saved<=-0.005){ banner.classList.add('behind'); banner.innerHTML=`You're<strong style="color:#ef9a9a">£${Math.abs(saved).toFixed(2)} behind</strong>`; }
+      else if(saved<=-0.005){ banner.classList.add('behind'); banner.innerHTML=`You're <strong style="color:#ef9a9a">£${Math.abs(saved).toFixed(2)} behind</strong>`; }
       else { banner.classList.add('ahead'); banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`; }
     } else { banner.style.display='none'; }
     const mLeft=remainingAfter(days,viewYear,viewMonth), dFwd=td2?Math.max(0,days-td2):0, dfEl=$('statDailyFwd');
     if(dFwd>0){const p=mLeft/dFwd;dfEl.textContent=fmt(p);dfEl.style.color=p>=0?'var(--text)':'#ef9a9a';}
-    else{dfEl.textContent=fmt(mLeft);dfEl.style.color='var(--text)';}
+    else{dfEl.textContent='—';dfEl.style.color='var(--muted)';}
     $('statBudget').textContent=fmt(budget);
   }
 }
 
 document.getElementById('budgetInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();setBudget();}});
 document.getElementById('spendInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSpend();}});
+
+// Swipe to change day
+let touchStartX=0, touchStartY=0;
+const homeTop=$('homeMain');
+homeTop.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
+homeTop.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5){
+    if(dx>0) shiftDay(-1); // swipe right = previous day
+    else shiftDay(1);      // swipe left = next day
+  }
+},{passive:true});
+
 try{render();}catch(e){console.error(e);}
 </script>
 </body>
 </html>
-```
-
-Go paste it! 🚀
