@@ -163,7 +163,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display:none">Log out</button>
   </header>
 
-  <!-- AUTH -->
+  <!-- INSTALL BANNER -->
+  <div id="installBanner" style="display:none; position:fixed; bottom:80px; left:16px; right:16px; background:#222; border:1px solid var(--border); border-radius:16px; padding:16px 20px; z-index:200; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px;">Add OnTrack to your home screen</div>
+        <div style="font-size:12px; color:var(--muted)" id="installMsg">Tap Share then "Add to Home Screen"</div>
+      </div>
+      <button onclick="dismissInstall()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;">×</button>
+    </div>
+    <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
+  </div>
   <div class="auth-screen" id="authScreen" style="display:none">
     <h2>Welcome to On<span class="g">Track</span></h2>
     <p style="font-size:17px; color:var(--text); font-weight:500;">Set your monthly budget. Log your spending. Stay On<span style="color:var(--green)">Track</span>.</p>
@@ -518,6 +528,35 @@ function render(){
     } else { showAuth(); }
   } catch(e) { showAuth(); }
 })();
+
+// Install banner
+let deferredPrompt = null;
+function dismissInstall() {
+  $('installBanner').style.display = 'none';
+  localStorage.setItem('installDismissed', '1');
+}
+function nativeInstall() {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; dismissInstall(); }
+}
+function showInstallBanner() {
+  if (localStorage.getItem('installDismissed')) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return; // already installed
+  $('installBanner').style.display = 'block';
+}
+
+// Android — catch native install prompt
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('installMsg').textContent = 'Install OnTrack as an app on your device';
+  $('installBtn').style.display = 'block';
+  setTimeout(showInstallBanner, 3000);
+});
+
+// iOS — show manual instructions
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandalone = window.matchMedia('(display-mode: standalone)').matches;
+if (isIOS && !isInStandalone) setTimeout(showInstallBanner, 3000);
 
 // Register service worker
 if ('serviceWorker' in navigator) {
