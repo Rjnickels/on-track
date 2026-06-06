@@ -522,46 +522,17 @@ function showApp() {
   $('logoutBtn').style.display = 'block';
 }
 
-/* ═══ DATA — Cloud with local cache ═══ */
-function monthKey(y, m) { return `${y}-${String(m+1).padStart(2,'0')}`; }
+/* ═══ DATA — localStorage ═══ */
+function monthKey(y, m) { return `gt_${y}-${String(m+1).padStart(2,'0')}`; }
 
-async function loadMonth(y, m) {
-  const key = monthKey(y, m);
-  if (cachedData[key]) return cachedData[key];
-  try {
-    const { data, error } = await sb.from('user_budgets').select('*')
-      .eq('user_id', currentUser.id).eq('month_key', key).maybeSingle();
-    if (error) throw error;
-    const result = data ? { budget: Number(data.budget)||0, history: data.history||[] } : { budget:0, history:[] };
-    cachedData[key] = result;
-    return result;
-  } catch(e) {
-    // Fall back to localStorage if Supabase fails
-    try {
-      const local = JSON.parse(localStorage.getItem(`gt_${key}`)) || { budget:0, history:[] };
-      cachedData[key] = local;
-      return local;
-    } catch(e2) {
-      return { budget:0, history:[] };
-    }
-  }
+function loadMonthLocal(y, m) {
+  try { return JSON.parse(localStorage.getItem(monthKey(y,m))) || {budget:0,history:[]}; }
+  catch(e) { return {budget:0,history:[]}; }
 }
 
-async function saveMonth(y, m, d) {
-  const key = monthKey(y, m);
-  cachedData[key] = d;
-  // Always save to localStorage as backup
-  try { localStorage.setItem(`gt_${key}`, JSON.stringify(d)); } catch(e) {}
-  // Try Supabase
-  try {
-    const { error } = await sb.from('user_budgets').upsert({
-      user_id: currentUser.id,
-      month_key: key,
-      budget: d.budget,
-      history: d.history
-    }, { onConflict: 'user_id,month_key' });
-    if (error) console.error('Supabase save failed:', error);
-  } catch(e) { console.error('Save failed:', e); }
+function saveMonthLocal(y, m, d) {
+  try { localStorage.setItem(monthKey(y,m), JSON.stringify(d)); }
+  catch(e) { console.error('Save failed', e); }
 }
 
 /* ═══ STATE ═══ */
@@ -601,7 +572,7 @@ async function setBudget() {
   const v = parseFloat($('budgetInput').value);
   if (isNaN(v)||v<=0) { alert('Please enter a valid budget.'); return; }
   monthData.budget = v;
-  await saveMonth(viewYear, viewMonth, monthData);
+  saveMonthLocal(viewYear, viewMonth, monthData);
   render();
   if (todayDate()>1) {
     $('onboardText').innerHTML = `You're on day <span style="color:var(--green);font-size:22px;font-weight:700">${todayDate()}</span> of the month.<br><br>Swipe or use the <strong>‹ ›</strong> arrows to go day to day and log what you've spent.`;
@@ -634,7 +605,7 @@ async function addSpend() {
   if (isNaN(raw)||raw<0) { alert('Please enter a valid amount.'); return; }
   if (!monthData.history) monthData.history = [];
   monthData.history.push({ day:selectedDay, amount:raw, id:Date.now() });
-  await saveMonth(viewYear, viewMonth, monthData);
+  saveMonthLocal(viewYear, viewMonth, monthData);
   $('spendInput').value = '';
   const t = $('spendToast'); t.textContent = `£${raw.toFixed(2)} added ✓`; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 1800);
@@ -644,14 +615,14 @@ async function addSpend() {
 async function clearSelectedDay() {
   if (!confirm(`Clear all entries for ${formatDay(selectedDay,viewYear,viewMonth)}?`)) return;
   monthData.history = (monthData.history||[]).filter(h=>h&&h.day!==selectedDay);
-  await saveMonth(viewYear, viewMonth, monthData);
+  saveMonthLocal(viewYear, viewMonth, monthData);
   render();
 }
 
 async function resetMonth() {
   if (!confirm('Reset the whole month? All data will be lost.')) return;
   monthData = { budget:0, history:[] };
-  await saveMonth(viewYear, viewMonth, monthData);
+  saveMonthLocal(viewYear, viewMonth, monthData);
   viewYear=todayYear(); viewMonth=todayMonth(); selectedDay=todayDate(); view='day';
   goTab('home');
 }
@@ -664,7 +635,7 @@ function setView(v) {
 
 async function goTab(tab) {
   activeTab = tab;
-  monthData = await loadMonth(viewYear, viewMonth);
+  monthData = loadMonthLocal(viewYear, viewMonth);
   ['home','cal','log'].forEach(t=>{
     $(`${t}Screen`).classList.toggle('active', t===tab);
     $(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active', t===tab);
@@ -672,8 +643,8 @@ async function goTab(tab) {
   render();
 }
 
-async function prevMonth() { if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--; selectedDay=1; monthData=await loadMonth(viewYear,viewMonth); render(); }
-async function nextMonth() { if(viewMonth===11){viewMonth=0;viewYear++;}else viewMonth++; selectedDay=1; monthData=await loadMonth(viewYear,viewMonth); render(); }
+function prevMonth() { if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--; selectedDay=1; monthData=loadMonthLocal(viewYear,viewMonth); render(); }
+function nextMonth() { if(viewMonth===11){viewMonth=0;viewYear++;}else viewMonth++; selectedDay=1; monthData=loadMonthLocal(viewYear,viewMonth); render(); }
 
 /* ═══ RENDER ═══ */
 function render() {
@@ -751,17 +722,9 @@ function render() {
 
 /* ═══ INIT ═══ */
 async function initApp() {
-  try {
-    monthData = await loadMonth(viewYear, viewMonth);
-  } catch(e) {
-    monthData = { budget:0, history:[] };
-  }
+  monthData = loadMonthLocal(viewYear, viewMonth);
   showApp();
-  try {
-    render();
-  } catch(e) {
-    console.error('Render error:', e);
-  }
+  render();
 }
 
 // Check if already logged in
