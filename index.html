@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.0/dist/umd/supabase.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 form { margin: 0; padding: 0; }
@@ -529,27 +529,39 @@ async function loadMonth(y, m) {
   const key = monthKey(y, m);
   if (cachedData[key]) return cachedData[key];
   try {
-    const { data } = await sb.from('user_budgets').select('*')
+    const { data, error } = await sb.from('user_budgets').select('*')
       .eq('user_id', currentUser.id).eq('month_key', key).maybeSingle();
+    if (error) throw error;
     const result = data ? { budget: Number(data.budget)||0, history: data.history||[] } : { budget:0, history:[] };
     cachedData[key] = result;
     return result;
   } catch(e) {
-    return { budget:0, history:[] };
+    // Fall back to localStorage if Supabase fails
+    try {
+      const local = JSON.parse(localStorage.getItem(`gt_${key}`)) || { budget:0, history:[] };
+      cachedData[key] = local;
+      return local;
+    } catch(e2) {
+      return { budget:0, history:[] };
+    }
   }
 }
 
 async function saveMonth(y, m, d) {
   const key = monthKey(y, m);
   cachedData[key] = d;
+  // Always save to localStorage as backup
+  try { localStorage.setItem(`gt_${key}`, JSON.stringify(d)); } catch(e) {}
+  // Try Supabase
   try {
-    await sb.from('user_budgets').upsert({
+    const { error } = await sb.from('user_budgets').upsert({
       user_id: currentUser.id,
       month_key: key,
       budget: d.budget,
       history: d.history
     }, { onConflict: 'user_id,month_key' });
-  } catch(e) { console.error('Save failed', e); }
+    if (error) console.error('Supabase save failed:', error);
+  } catch(e) { console.error('Save failed:', e); }
 }
 
 /* ═══ STATE ═══ */
@@ -748,8 +760,7 @@ async function initApp() {
   try {
     render();
   } catch(e) {
-    $('budgetSetup').style.display = 'flex';
-    $('budgetSetup').innerHTML = `<p style="color:#ef9a9a">Error: ${e.message}</p>`;
+    console.error('Render error:', e);
   }
 }
 
