@@ -474,7 +474,8 @@ function render(){
       $('ringAmount').style.color=col;
       $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
       $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
-      $('ringLabel').textContent=view==='day'?'left to spend today':view==='week'?'left this week':'left this month';
+      const isViewingToday = selectedDay===todayDate()&&isCurrentMonth();
+      $('ringLabel').textContent=view==='day'?(isViewingToday?'left to spend today':'left to spend'):view==='week'?'left this week':'left this month';
       $('btnClear').style.visibility=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
       const streakEl=$('streak');let streak=0;
       for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
