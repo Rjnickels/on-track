@@ -527,22 +527,28 @@ function monthKey(y, m) { return `${y}-${String(m+1).padStart(2,'0')}`; }
 async function loadMonth(y, m) {
   const key = monthKey(y, m);
   if (cachedData[key]) return cachedData[key];
-  const { data } = await sb.from('user_budgets').select('*')
-    .eq('user_id', currentUser.id).eq('month_key', key).single();
-  const result = data ? { budget: Number(data.budget)||0, history: data.history||[] } : { budget:0, history:[] };
-  cachedData[key] = result;
-  return result;
+  try {
+    const { data } = await sb.from('user_budgets').select('*')
+      .eq('user_id', currentUser.id).eq('month_key', key).maybeSingle();
+    const result = data ? { budget: Number(data.budget)||0, history: data.history||[] } : { budget:0, history:[] };
+    cachedData[key] = result;
+    return result;
+  } catch(e) {
+    return { budget:0, history:[] };
+  }
 }
 
 async function saveMonth(y, m, d) {
   const key = monthKey(y, m);
   cachedData[key] = d;
-  await sb.from('user_budgets').upsert({
-    user_id: currentUser.id,
-    month_key: key,
-    budget: d.budget,
-    history: d.history
-  }, { onConflict: 'user_id,month_key' });
+  try {
+    await sb.from('user_budgets').upsert({
+      user_id: currentUser.id,
+      month_key: key,
+      budget: d.budget,
+      history: d.history
+    }, { onConflict: 'user_id,month_key' });
+  } catch(e) { console.error('Save failed', e); }
 }
 
 /* ═══ STATE ═══ */
@@ -732,7 +738,11 @@ function render() {
 
 /* ═══ INIT ═══ */
 async function initApp() {
-  monthData = await loadMonth(viewYear, viewMonth);
+  try {
+    monthData = await loadMonth(viewYear, viewMonth);
+  } catch(e) {
+    monthData = { budget:0, history:[] };
+  }
   showApp();
   render();
 }
