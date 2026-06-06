@@ -514,7 +514,10 @@ function showAuth() {
 
 function showApp() {
   $('authScreen').style.display = 'none';
-  $('homeScreen').classList.add('active');
+  $('homeScreen').style.display = 'flex';
+  $('homeScreen').style.flexDirection = 'column';
+  $('homeScreen').style.flex = '1';
+  $('homeScreen').style.overflowY = 'auto';
   $('mainNav').style.display = 'flex';
   $('logoutBtn').style.display = 'block';
 }
@@ -742,7 +745,12 @@ async function initApp() {
     monthData = { budget:0, history:[] };
   }
   showApp();
-  render();
+  try {
+    render();
+  } catch(e) {
+    $('budgetSetup').style.display = 'flex';
+    $('budgetSetup').innerHTML = `<p style="color:#ef9a9a">Error: ${e.message}</p>`;
+  }
 }
 
 // Check if already logged in
