@@ -166,16 +166,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <!-- AUTH -->
   <div class="auth-screen" id="authScreen" style="display:none">
     <h2>Welcome to On<span class="g">Track</span></h2>
-    <p style="font-size:15px; color:var(--text); margin-bottom:4px;">Know exactly what you can spend today.</p>
-    <p>Set your monthly budget. Log your spending. Stay On<span class="g">Track</span>.</p>
+    <p style="font-size:17px; color:var(--text); font-weight:500;">Set your monthly budget. Log your spending. Stay On<span style="color:var(--green)">Track</span>.</p>
     <div class="auth-form">
       <form id="authForm" onsubmit="event.preventDefault(); handleAuth();">
         <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email"/>
         <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password"/>
         <div class="auth-error" id="authError"></div>
-        <button type="submit" class="btn-auth" id="authBtn">Sign Up</button>
+        <button type="submit" class="btn-auth" id="authBtn">Log In</button>
       </form>
-      <button type="button" class="auth-toggle" id="authToggle" onclick="toggleAuth()">Already have an account? Log in</button>
+      <button type="button" class="auth-toggle" id="authToggle" onclick="toggleAuth()">Need an account? Sign up</button>
     </div>
     <div class="credit">Created by Robert Nickels</div>
   </div>
@@ -282,7 +281,7 @@ const SUPABASE_URL = 'https://zkdgnhojdednasrosebv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGduaG9qZGVkbmFzcm9zZWJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MTIyNDUsImV4cCI6MjA5NjI4ODI0NX0.FFV0hvChJ01KfQwLC-0AlZqEUN39midvKY6no9saDQQ';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
-let isSignUp = true;
+let isSignUp = false;
 
 /* ══ AUTH ══ */
 function toggleAuth() {
@@ -519,6 +518,11 @@ function render(){
     } else { showAuth(); }
   } catch(e) { showAuth(); }
 })();
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
 
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
