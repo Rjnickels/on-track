@@ -724,7 +724,11 @@ function render() {
 async function initApp() {
   monthData = loadMonthLocal(viewYear, viewMonth);
   showApp();
-  render();
+  try {
+    render();
+  } catch(e) {
+    alert('Render error: ' + e.message + ' | ' + e.stack);
+  }
 }
 
 // Check if already logged in
