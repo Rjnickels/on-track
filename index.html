@@ -505,9 +505,9 @@ async function logout() {
 
 function showAuth() {
   $('authScreen').style.display = 'flex';
-  $('homeScreen').classList.remove('active');
-  $('calScreen').classList.remove('active');
-  $('logScreen').classList.remove('active');
+  $('homeScreen').style.display = 'none';
+  $('calScreen').style.display = 'none';
+  $('logScreen').style.display = 'none';
   $('mainNav').style.display = 'none';
   $('logoutBtn').style.display = 'none';
 }
@@ -729,11 +729,18 @@ async function initApp() {
 
 // Check if already logged in
 (async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    await initApp();
-  } else {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      monthData = loadMonthLocal(viewYear, viewMonth);
+      showApp();
+      render();
+    } else {
+      showAuth();
+    }
+  } catch(e) {
+    // Supabase unreachable — show login
     showAuth();
   }
 })();
