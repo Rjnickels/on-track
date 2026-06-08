@@ -153,6 +153,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .divider { height: 1px; background: var(--border); margin: 10px 24px; }
 .reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
+
+.currency-btn {
+  flex: 1; padding: 7px 4px; border: 1px solid var(--border); border-radius: 50px;
+  font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;
+  background: var(--glass); color: var(--muted); cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.currency-btn.active { background: var(--green); color: #06220f; border-color: var(--green); }
 </style>
 </head>
 <body>
@@ -174,19 +182,168 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
-  <div class="auth-screen" id="authScreen" style="display:none">
-    <h2>Welcome to On<span class="g">Track</span></h2>
-    <p style="font-size:17px; color:var(--text); font-weight:500;">Set your monthly budget. Log your spending. Stay On<span style="color:var(--green)">Track</span>.</p>
-    <div class="auth-form">
-      <form id="authForm" onsubmit="event.preventDefault(); handleAuth();">
-        <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email"/>
-        <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password"/>
-        <div class="auth-error" id="authError"></div>
-        <button type="submit" class="btn-auth" id="authBtn">Log In</button>
-      </form>
-      <button type="button" class="auth-toggle" id="authToggle" onclick="toggleAuth()">Need an account? Sign up</button>
+  <!-- WELCOME SCREEN -->
+  <div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:200;background:#000;flex-direction:column;align-items:center;overflow:hidden;">
+
+    <!-- iPhone mockup — top portion visible, fades into black -->
+    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:24px;">
+
+      <!-- iPhone frame -->
+      <div style="
+        width:272px;
+        background:#0a0a0a;
+        border-radius:52px;
+        border:2px solid rgba(255,255,255,0.18);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.06),
+          0 30px 80px rgba(0,0,0,0.8),
+          inset 0 0 0 2px rgba(255,255,255,0.04);
+        overflow:hidden;
+        position:relative;
+        flex-shrink:0;
+      ">
+        <!-- Side buttons (left) -->
+        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <!-- Side button (right) -->
+        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:#1a1a1a;border-radius:0 2px 2px 0;"></div>
+
+        <!-- Screen content -->
+        <div style="background:#1a1a1a;border-radius:50px;overflow:hidden;">
+
+          <!-- Status bar + Dynamic Island -->
+          <div style="height:52px;background:#111;display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
+            <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
+            <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="14" height="11" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.4"/></svg>
+              <svg width="15" height="11" viewBox="0 0 16 12" fill="white"><path d="M8 2.4C5.6 2.4 3.5 3.4 2 5L0 3C2.1 1.1 4.9 0 8 0s5.9 1.1 8 3l-2 2C12.5 3.4 10.4 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.6c-1.5 0-2.9.6-3.9 1.6L2 5.1C3.5 3.8 5.6 3 8 3s4.5.8 6 2.1L12 7.2C11 6.2 9.6 5.6 8 5.6z" opacity="0.7"/><path d="M8 8.8c-.8 0-1.6.3-2.1.9L8 12l2.1-2.3C9.6 9.1 8.8 8.8 8 8.8z"/></svg>
+              <div style="width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.4);border-radius:3px;position:relative;display:flex;align-items:center;padding:0 2px;"><div style="width:70%;height:6px;background:#fff;border-radius:1.5px;"></div><div style="position:absolute;right:-4px;width:3px;height:5px;background:rgba(255,255,255,0.4);border-radius:0 1.5px 1.5px 0;"></div></div>
+            </div>
+          </div>
+
+          <!-- App header -->
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:#1a1a1a;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
+          </div>
+
+          <!-- Ring -->
+          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:#1a1a1a;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
+              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">‹</span></div>
+              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#f0f0f0;font-family:'Inter',sans-serif;">Today</span>
+              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">›</span></div>
+            </div>
+            <div style="position:relative;width:210px;height:210px;">
+              <svg viewBox="0 0 210 210" style="width:210px;height:210px;transform:rotate(-90deg);">
+                <circle cx="105" cy="105" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+                <circle cx="105" cy="105" r="88" fill="none" stroke="#21c25a" stroke-width="12" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="138"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+                <span style="font-size:42px;font-weight:700;color:#21c25a;letter-spacing:-3px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
+                <span style="font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">left to spend today</span>
+                <span style="font-size:11px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Gradient fade — phone fades into black -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.6) 50%,#000 100%);pointer-events:none;border-radius:0 0 52px 52px;"></div>
+
     </div>
-    <div class="credit">Created by Robert Nickels</div>
+
+    <!-- Welcome content -->
+    <div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:18px;width:100%;max-width:480px;">
+      <div>
+        <div style="font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;">Know exactly what<br>you can <span style="color:#21c25a;">spend today.</span></div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-top:10px;line-height:1.7;font-family:'Inter',sans-serif;">Set your monthly budget. Log your spending.<br>Stay OnTrack.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="startWelcome(false)" style="width:100%;height:54px;background:#21c25a;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Inter',sans-serif;color:#06220f;cursor:pointer;box-shadow:0 4px 24px rgba(33,194,90,0.25);">Get Started — It's Free</button>
+        <button onclick="startWelcome(true)" style="width:100%;height:50px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">Sign In</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="authScreen" style="display:none;position:fixed;inset:0;z-index:190;background:#000;flex-direction:column;align-items:center;overflow-y:auto;">
+
+    <!-- iPhone mockup — same as welcome -->
+    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:24px;">
+      <div style="width:272px;background:#0a0a0a;border-radius:52px;border:2px solid rgba(255,255,255,0.18);box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 30px 80px rgba(0,0,0,0.8);overflow:hidden;position:relative;flex-shrink:0;">
+        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:#1a1a1a;border-radius:0 2px 2px 0;"></div>
+        <div style="background:#1a1a1a;border-radius:50px;overflow:hidden;">
+          <div style="height:52px;background:#111;display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
+            <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
+            <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="14" height="11" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.4"/></svg>
+              <svg width="15" height="11" viewBox="0 0 16 12" fill="white"><path d="M8 2.4C5.6 2.4 3.5 3.4 2 5L0 3C2.1 1.1 4.9 0 8 0s5.9 1.1 8 3l-2 2C12.5 3.4 10.4 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.6c-1.5 0-2.9.6-3.9 1.6L2 5.1C3.5 3.8 5.6 3 8 3s4.5.8 6 2.1L12 7.2C11 6.2 9.6 5.6 8 5.6z" opacity="0.7"/><path d="M8 8.8c-.8 0-1.6.3-2.1.9L8 12l2.1-2.3C9.6 9.1 8.8 8.8 8 8.8z"/></svg>
+              <div style="width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.4);border-radius:3px;display:flex;align-items:center;padding:0 2px;position:relative;"><div style="width:70%;height:6px;background:#fff;border-radius:1.5px;"></div><div style="position:absolute;right:-4px;width:3px;height:5px;background:rgba(255,255,255,0.4);border-radius:0 1.5px 1.5px 0;"></div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:#1a1a1a;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:#1a1a1a;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
+              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">‹</span></div>
+              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#f0f0f0;font-family:'Inter',sans-serif;">Today</span>
+              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">›</span></div>
+            </div>
+            <div style="position:relative;width:210px;height:210px;">
+              <svg viewBox="0 0 210 210" style="width:210px;height:210px;transform:rotate(-90deg);">
+                <circle cx="105" cy="105" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+                <circle cx="105" cy="105" r="88" fill="none" stroke="#21c25a" stroke-width="12" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="138"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
+                <span style="font-size:42px;font-weight:700;color:#21c25a;letter-spacing:-3px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
+                <span style="font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">left to spend today</span>
+                <span style="font-size:11px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.6) 50%,#000 100%);pointer-events:none;border-radius:0 0 52px 52px;"></div>
+    </div>
+
+    <!-- Auth form -->
+    <div style="padding:20px 28px 48px;width:100%;max-width:480px;">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;" id="authWelcomeTitle">Welcome back</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-top:6px;font-family:'Inter',sans-serif;" id="authWelcomeSub">Sign in to your account</div>
+      </div>
+      <div id="loginForm">
+        <form id="authForm" onsubmit="event.preventDefault(); handleAuth();" style="display:flex;flex-direction:column;gap:10px;">
+          <input class="auth-input" id="authName" type="text" placeholder="First name" autocomplete="given-name" style="display:none;"/>
+          <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email"/>
+          <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password"/>
+          <div class="auth-error" id="authError"></div>
+          <button type="submit" class="btn-auth" id="authBtn" style="margin-top:4px;">Log In</button>
+        </form>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+          <button type="button" id="authToggle" onclick="toggleAuth()" style="width:100%;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:50px;background:transparent;color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">Need an account? Sign up</button>
+          <button type="button" id="forgotBtn" onclick="showForgot()" style="width:100%;height:44px;border:none;border-radius:50px;background:transparent;color:rgba(255,255,255,0.35);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">Forgot password?</button>
+        </div>
+      </div>
+      <div id="forgotForm" style="display:none;width:100%;">
+        <form onsubmit="event.preventDefault(); sendReset();" style="display:flex;flex-direction:column;gap:10px;">
+          <input class="auth-input" id="resetEmail" type="email" placeholder="Email address" autocomplete="email"/>
+          <div class="auth-error" id="resetMsg"></div>
+          <button type="submit" class="btn-auth">Send reset link</button>
+        </form>
+        <button type="button" onclick="hideForgot()" style="width:100%;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:50px;background:transparent;color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:12px;">Back to login</button>
+      </div>
+    </div>
+
   </div>
 
   <!-- HOME -->
@@ -195,7 +352,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <h2>Let's get started</h2>
       <p>How much do you have to spend this month?</p>
       <form onsubmit="event.preventDefault(); setBudget();">
-        <div class="input-wrap"><span>£</span><input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/></div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;width:100%;">
+          <button type="button" class="currency-btn active" onclick="setCurrency(this,'£')">£ GBP</button>
+          <button type="button" class="currency-btn" onclick="setCurrency(this,'$')">$ USD</button>
+          <button type="button" class="currency-btn" onclick="setCurrency(this,'€')">€ EUR</button>
+          <button type="button" class="currency-btn" onclick="setCurrency(this,'A$')">A$ AUD</button>
+          <button type="button" class="currency-btn" onclick="setCurrency(this,'C$')">C$ CAD</button>
+        </div>
+        <div class="input-wrap"><span id="currencySymbol">£</span><input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/></div>
         <p style="font-size:11px; opacity:0.5; margin-top:6px; margin-bottom:12px;">What's left once your bills are paid</p>
         <button type="submit" class="btn-set">Get Started</button>
       </form>
@@ -215,6 +379,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <div class="ring-amount" id="ringAmount">—</div>
           <div class="ring-label" id="ringLabel">left to spend today</div>
           <div class="ring-status" id="ringStatus">—</div>
+          <div id="ringBudget" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;letter-spacing:0.5px;"></div>
         </div>
       </div>
       <div class="streak" id="streak"></div>
@@ -227,14 +392,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="spend-area" id="spendArea" style="display:none">
       <form onsubmit="event.preventDefault(); addSpend();">
         <div class="input-row">
-          <div class="input-wrap"><span>£</span><input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/></div>
+          <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/></div>
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
+      <div id="lastWeekCard" style="display:none;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Last week</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);" id="lastWeekText">—</div>
+      </div>
       <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
-    <div class="overlay" id="onboardOverlay">
+    <div class="overlay" id="nameOverlay">
+      <div class="overlay-card" style="width:100%;">
+        <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick thing 👋</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">What should we call you?</p>
+        <input class="auth-input" id="nameInput" type="text" placeholder="First name" autocomplete="given-name" style="border-bottom:2px solid var(--border);margin-bottom:16px;"/>
+        <button class="btn-set" onclick="saveName()">Let's go</button>
+      </div>
+    </div>
       <div class="overlay-card">
         <p class="overlay-text" id="onboardText"></p>
         <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
@@ -261,12 +437,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
   <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
-    <div class="log-header"><h2>Overview</h2><p id="logDateLabel">—</p></div>
+    <div class="log-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+        <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
+        <h2 id="overviewTitle">Overview</h2>
+        <button class="cal-nav-btn" id="overviewNextBtn" onclick="nextMonth()">&#8250;</button>
+      </div>
+      <p id="logDateLabel" style="text-align:center;">—</p>
+    </div>
     <div class="projection" id="projectionBanner">—</div>
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-label">Tomorrow you can spend</div><div class="stat-val" id="statDailyFwd">—</div></div>
       <div class="stat-card"><div class="stat-label">Your monthly budget</div><div class="stat-val" id="statBudget">—</div></div>
     </div>
+
+    <!-- Progress bar -->
+    <div style="margin:8px 20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);">Month progress</span>
+        <span style="font-size:10px;font-weight:600;color:var(--muted);" id="daysLeftLabel">—</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;">
+        <div id="monthProgressBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.3);">1st</span>
+        <span style="font-size:10px;color:rgba(255,255,255,0.3);" id="lastDayLabel">—</span>
+      </div>
+    </div>
+
+    <!-- Most expensive day -->
+    <div style="margin:4px 20px 8px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;" id="biggestDayCard" style="display:none;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:6px;">Biggest spend this month</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);" id="biggestDayText">—</div>
+      </div>
+    </div>
+
     <div class="divider"></div>
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     <div class="credit">Created by Robert Nickels</div>
@@ -293,13 +500,74 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let isSignUp = false;
 
+/* ══ CURRENCY ══ */
+function getCurrency(){ return localStorage.getItem('ot_currency')||'£'; }
+function getName(){ return localStorage.getItem('ot_name')||''; }
+
+/* ══ WELCOME ══ */
+function showWelcome(){
+  if(!localStorage.getItem('ot_welcomed')){
+    $('welcomeScreen').style.display='flex';
+    $('welcomeScreen').style.flexDirection='column';
+  } else {
+    showAuth();
+  }
+}
+function startWelcome(isLogin){
+  localStorage.setItem('ot_welcomed','1');
+  $('welcomeScreen').style.display='none';
+  isSignUp=!isLogin;
+  $('authBtn').textContent=isLogin?'Log In':'Sign Up';
+  $('authToggle').textContent=isLogin?'Need an account? Sign up':'Already have an account? Log in';
+  $('authName').style.display=isLogin?'none':'block';
+  $('forgotBtn').style.display=isLogin?'block':'none';
+  if($('authWelcomeTitle')) $('authWelcomeTitle').textContent=isLogin?'Welcome back':'Create account';
+  if($('authWelcomeSub')) $('authWelcomeSub').textContent=isLogin?'Sign in to your account':'Start tracking your spending today';
+  showAuth();
+}
+function saveName(){
+  const n=$('nameInput').value.trim().split(' ')[0];
+  if(n){ localStorage.setItem('ot_name',n); }
+  $('nameOverlay').classList.remove('show');
+  render();
+}
+function checkName(){ if(!getName()) $('nameOverlay').classList.add('show'); }
+function setCurrency(btn, symbol){
+  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('ot_currency', symbol);
+  $('currencySymbol').textContent = symbol;
+}
+
+/* ══ FORGOT PASSWORD ══ */
+function showForgot(){ $('loginForm').style.display='none'; $('forgotForm').style.display='block'; $('authError').textContent=''; }
+function hideForgot(){ $('forgotForm').style.display='none'; $('loginForm').style.display='block'; }
+async function sendReset(){
+  const email=$('resetEmail').value.trim(), msg=$('resetMsg');
+  if(!email){msg.textContent='Please enter your email';return;}
+  msg.textContent='Sending...';msg.style.color='var(--muted)';
+  try{
+    const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://ontrackapp.co.uk'});
+    if(error)throw error;
+    msg.textContent='Check your email for a reset link';
+    msg.style.color='var(--green)';
+  }catch(e){
+    msg.textContent=e.message||'Something went wrong';
+    msg.style.color='#ef9a9a';
+  }
+}
+
 /* ══ AUTH ══ */
 function toggleAuth() {
   isSignUp = !isSignUp;
   $('authBtn').textContent = isSignUp ? 'Sign Up' : 'Log In';
   $('authToggle').textContent = isSignUp ? 'Already have an account? Log in' : 'Need an account? Sign up';
   $('authPass').autocomplete = isSignUp ? 'new-password' : 'current-password';
+  $('authName').style.display = isSignUp ? 'block' : 'none';
+  $('forgotBtn').style.display = isSignUp ? 'none' : 'block';
   $('authError').textContent = '';
+  if($('authWelcomeTitle')) $('authWelcomeTitle').textContent = isSignUp ? 'Create account' : 'Welcome back';
+  if($('authWelcomeSub')) $('authWelcomeSub').textContent = isSignUp ? 'Start tracking your spending today' : 'Sign in to your account';
 }
 
 async function handleAuth() {
@@ -322,6 +590,12 @@ async function handleAuth() {
       errEl.style.color = 'var(--green)';
     } else {
       currentUser = data.user;
+    if(isSignUp && $('authName').value.trim()) {
+      localStorage.setItem('ot_name', $('authName').value.trim().split(' ')[0]);
+    }
+    await loadFromCloud(viewYear, viewMonth);
+    showApp(); render();
+    if(!isSignUp) checkName();
       await loadFromCloud(viewYear, viewMonth);
       showApp();
       render();
@@ -341,12 +615,14 @@ async function logout() {
 }
 
 function showAuth() {
-  $('authScreen').style.display = 'flex';
+  $('authScreen').style.display='flex';
+  $('authScreen').style.flexDirection='column';
+  $('authScreen').style.alignItems='center';
   $('homeScreen').classList.remove('active');
   $('calScreen').classList.remove('active');
   $('logScreen').classList.remove('active');
-  $('mainNav').style.display = 'none';
-  $('logoutBtn').style.display = 'none';
+  $('mainNav').style.display='none';
+  $('logoutBtn').style.display='none';
 }
 
 function showApp() {
@@ -394,7 +670,7 @@ let view='day', viewYear=new Date().getFullYear(), viewMonth=new Date().getMonth
 let selectedDay=new Date().getDate(), activeTab='home';
 
 const $=id=>document.getElementById(id);
-const fmt=n=>'£'+Math.abs(n).toFixed(2);
+const fmt=n=>getCurrency()+Math.abs(n).toFixed(2);
 function todayDate(){return new Date().getDate();}
 function todayYear(){return new Date().getFullYear();}
 function todayMonth(){return new Date().getMonth();}
@@ -429,7 +705,7 @@ function addSpend(){
   const d=getData(viewYear,viewMonth);if(!d.history)d.history=[];
   d.history.push({day:selectedDay,amount:raw,id:Date.now()});saveData(d,viewYear,viewMonth);
   $('spendInput').value='';
-  const t=$('spendToast');t.textContent=`£${raw.toFixed(2)} added ✓`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);render();
+  const t=$('spendToast');t.textContent=`${getCurrency()}${raw.toFixed(2)} added ✓`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);render();
 }
 function clearSelectedDay(){
   if(!confirm(`Clear all entries for ${formatDay(selectedDay,viewYear,viewMonth)}?`))return;
@@ -462,21 +738,60 @@ function render(){
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');dl.textContent=formatDay(selectedDay,viewYear,viewMonth);dl.classList.toggle('is-today',isToday);
       $('dayPrev').disabled=selectedDay<=1;$('dayNext').disabled=isToday;
-      let amount=0,total=0;
-      if(view==='day'){const a=dailyAllowance(selectedDay,days,viewYear,viewMonth),s=spentOnDay(selectedDay,history);amount=a-s;total=a;}
-      else if(view==='week'){const end=Math.min(selectedDay+6,days);let b=0,s=0;for(let i=selectedDay;i<=end;i++){b+=dailyAllowance(i,days,viewYear,viewMonth);s+=spentOnDay(i,history);}amount=b-s;total=b;}
-      else{amount=remainingAfter(days,viewYear,viewMonth);total=budget;}
+      let amount=0,total=0,dailyBudget=0;
+      if(view==='day'){
+        const a=dailyAllowance(selectedDay,days,viewYear,viewMonth),s=spentOnDay(selectedDay,history);
+        amount=a-s;total=a;dailyBudget=a;
+      } else if(view==='week'){
+        const end=Math.min(selectedDay+6,days);
+        let b=0,s=0;
+        for(let i=selectedDay;i<=end;i++){b+=dailyAllowance(i,days,viewYear,viewMonth);s+=spentOnDay(i,history);}
+        amount=b-s;total=b;
+      } else {
+        amount=remainingAfter(days,viewYear,viewMonth);total=budget;
+      }
       const circ=2*Math.PI*126,ratio=total>0?Math.max(0,amount)/total:0,off=circ*(1-Math.min(1,ratio)),col=ringColor(ratio);
       const fill=$('ringFill');fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=off;fill.style.stroke=col;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
       $('ringWrap').classList.toggle('over',amount<0);
-      $('ringAmount').textContent=amount>=0?`£${amount.toFixed(2)}`:`-£${Math.abs(amount).toFixed(2)}`;
+      $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
       $('ringAmount').style.color=col;
       $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
       $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
-      const isViewingToday = selectedDay===todayDate()&&isCurrentMonth();
-      $('ringLabel').textContent=view==='day'?(isViewingToday?'left to spend today':'left to spend'):view==='week'?'left this week':'left this month';
+
+      // Bug 4: show daily budget below ring only once spending logged
+      const rb=$('ringBudget');
+      const daySpend=spentOnDay(selectedDay,history);
+      if(view==='day'&&dailyBudget>0&&daySpend>0){
+        rb.textContent=`Daily budget: ${getCurrency()}${dailyBudget.toFixed(2)}`;
+      } else { rb.textContent=''; }
+
+      // Bug 1 & 2: week label + past week detection
+      const isViewingToday=selectedDay===todayDate()&&isCurrentMonth();
+      const weekEnd=Math.min(selectedDay+6,days);
+      const isPastWeek=!isCurrentMonth()||(td&&weekEnd<td);
+      const isCurrentWeek=td&&selectedDay<=td&&td<=weekEnd;
+      if(amount<0){
+        $('ringLabel').textContent=view==='day'?'overspent today':view==='week'?(isPastWeek?'overspent last week':'overspent this week'):'overspent this month';
+      } else {
+        $('ringLabel').textContent=view==='day'?(isViewingToday?'left to spend today':'left to spend'):view==='week'?(isPastWeek?'left last week':isCurrentWeek?'left this week':'left this week'):'left this month';
+      }
+
+      $('spendCurrencySymbol').textContent=getCurrency();
       $('btnClear').style.visibility=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
+
+      // Bug 1: last week summary card on week view
+      const lwCard=$('lastWeekCard');
+      if(view==='week'&&isPastWeek){
+        const weekSpent=history.filter(h=>h&&h.day>=selectedDay&&h.day<=weekEnd).reduce((s,h)=>s+(h.amount||0),0);
+        const weekBudget=Array.from({length:weekEnd-selectedDay+1},(_,i)=>dailyAllowance(selectedDay+i,days,viewYear,viewMonth)).reduce((a,b)=>a+b,0);
+        const diff=weekBudget-weekSpent;
+        const sign=diff>=0?'ahead':'over';
+        $('lastWeekText').textContent=`${getCurrency()}${weekSpent.toFixed(2)} spent — ${getCurrency()}${Math.abs(diff).toFixed(2)} ${sign} budget`;
+        $('lastWeekText').style.color=diff>=0?'var(--green-soft)':'#ef9a9a';
+        lwCard.style.display='block';
+      } else { lwCard.style.display='none'; }
+
       const streakEl=$('streak');let streak=0;
       for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
       streakEl.textContent=streak>=2?`${streak} day streak`:'';
@@ -493,28 +808,59 @@ function render(){
       let cls='cal-cell';if(fut)cls+=' future';else cls+=spent<=allow?' green':' red';if(isT)cls+=' today';
       const cell=document.createElement('div');cell.className=cls;
       cell.style.animationDelay=`${(i-1)*0.02}s`;
-      const margin=allow-spent,sign=margin>=0?'£':'-£';
-      cell.innerHTML=fut?`<span class="cal-num">${i}</span><span class="cal-val">£${Math.max(0,allow).toFixed(0)}</span>`:`<span class="cal-num">${i}</span><span class="cal-val">${sign}${Math.abs(margin).toFixed(0)}</span>`;
+      const margin=allow-spent,sign=margin>=0?getCurrency():'-'+getCurrency();
+      const spentStr=spent>0?`${getCurrency()}${spent.toFixed(0)}`:'£0';
+      cell.innerHTML=fut
+        ?`<span class="cal-num">${i}</span><span class="cal-val">${getCurrency()}${Math.max(0,allow).toFixed(0)}</span>`
+        :`<span class="cal-num">${i}</span><span class="cal-val">${spentStr}</span>`;
       if(!fut){const day=i;cell.onclick=()=>{selectedDay=day;goTab('home');};}
       grid.appendChild(cell);
     }
   }
   {
+    // Personalised title
+    const name = getName();
+    $('overviewTitle').textContent = name ? `Hi ${name}` : 'Overview';
+    if($('overviewNextBtn')) $('overviewNextBtn').style.opacity = isCurrentMonth() ? '0.25' : '1';
+
     $('logDateLabel').textContent=formatMonth(viewYear,viewMonth);
     const elapsed=td?td:days;
     const flat=days>0?budget/days:0,expected=flat*elapsed,actual=spentUpToDay(elapsed,history);
     const saved=expected-actual;
+    const cur=getCurrency();
     const banner=$('projectionBanner');
     if(actual>0||elapsed>1){
       banner.style.display='block';banner.classList.remove('ahead','behind');
-      if(saved>=0.005){banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">£${saved.toFixed(2)} ahead</strong>`;}
-      else if(saved<=-0.005){banner.classList.add('behind');banner.innerHTML=`You're <strong style="color:#ef9a9a">£${Math.abs(saved).toFixed(2)} behind</strong>`;}
+      if(saved>=0.005){banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">${cur}${saved.toFixed(2)} ahead this month</strong>`;}
+      else if(saved<=-0.005){banner.classList.add('behind');banner.innerHTML=`You're <strong style="color:#ef9a9a">${cur}${Math.abs(saved).toFixed(2)} behind this month</strong>`;}
       else{banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`;}
     }else{banner.style.display='none';}
+
     const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0,dfEl=$('statDailyFwd');
     if(dFwd>0){const p=mLeft/dFwd;dfEl.textContent=fmt(p);dfEl.style.color=p>=0?'var(--text)':'#ef9a9a';}
     else{dfEl.textContent='—';dfEl.style.color='var(--muted)';}
     $('statBudget').textContent=fmt(budget);
+
+    // Progress bar
+    const pct=Math.round((elapsed/days)*100);
+    $('monthProgressBar').style.width=pct+'%';
+    $('monthProgressBar').style.background=pct>80?'var(--green-bright)':'var(--green)';
+    const daysLeft=days-elapsed;
+    $('daysLeftLabel').textContent=daysLeft>0?`${daysLeft} day${daysLeft!==1?'s':''} left`:'Last day!';
+    $('lastDayLabel').textContent=days+'th';
+
+    // Biggest spend day
+    const dayTotals={};
+    (history||[]).forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
+    const bigDay=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1])[0];
+    if(bigDay){
+      const d=new Date(viewYear,viewMonth,parseInt(bigDay[0]));
+      const dayName=d.toLocaleDateString('default',{weekday:'long',day:'numeric',month:'long'});
+      $('biggestDayText').textContent=`${dayName} — ${cur}${bigDay[1].toFixed(2)}`;
+      $('biggestDayCard').style.display='block';
+    } else {
+      $('biggestDayCard').style.display='none';
+    }
   }
 }
 
@@ -526,11 +872,39 @@ function render(){
       currentUser=session.user;
       await loadFromCloud(viewYear,viewMonth);
       showApp(); render();
-    } else { showAuth(); }
+      checkName();
+    } else { showWelcome(); }
   } catch(e) { showAuth(); }
 })();
 
-// Install banner
+// Handle email confirmation redirect and auth state changes
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    const newPass = prompt('Enter your new password (min 6 characters):');
+    if (newPass && newPass.length >= 6) {
+      const { error } = await sb.auth.updateUser({ password: newPass });
+      if (error) { alert('Error: ' + error.message); }
+      else { alert('Password updated! You can now log in.'); window.history.replaceState(null,'',window.location.pathname); }
+    }
+    return;
+  }
+  if (event === 'SIGNED_IN' && session && !currentUser) {
+    currentUser = session.user;
+    if (event === 'SIGNED_IN' && window.location.hash.includes('access_token')) {
+      // Coming from email confirmation link
+      window.history.replaceState(null, '', window.location.pathname);
+      await loadFromCloud(viewYear, viewMonth);
+      showApp();
+      render();
+      // Show confirmation toast
+      const toast = document.createElement('div');
+      toast.textContent = '✓ Email confirmed — welcome to OnTrack!';
+      toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#21c25a;color:#06220f;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;font-family:Inter,sans-serif;z-index:999;white-space:nowrap;';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+  }
+});
 let deferredPrompt = null;
 function dismissInstall() {
   $('installBanner').style.display = 'none';
