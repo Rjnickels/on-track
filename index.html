@@ -425,7 +425,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
-      <div id="overviewTitle" style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:10px;"></div>
+      <div id="overviewTitle" style="font-size:28px;font-weight:400;color:var(--text);margin-bottom:10px;letter-spacing:-0.5px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
         <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
         <h2 style="font-size:16px;font-weight:600;" id="overviewMonthLabel">—</h2>
@@ -831,7 +831,9 @@ function render(){
   {
     // Personalised title
     const name = getName();
-    $('overviewTitle').innerHTML = name ? `Hi <strong>${name}</strong>,` : 'Overview';
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    $('overviewTitle').innerHTML = name ? `${greeting}, <strong>${name}</strong>` : greeting;
     if($('overviewNextBtn')) $('overviewNextBtn').style.opacity = isCurrentMonth() ? '0.25' : '1';
     $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
     $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
@@ -867,7 +869,7 @@ function render(){
     if(bigDay){
       const d=new Date(viewYear,viewMonth,parseInt(bigDay[0]));
       const dayName=d.toLocaleDateString('default',{weekday:'long',day:'numeric',month:'long'});
-      $('biggestDayText').textContent=`${dayName} — ${cur}${bigDay[1].toFixed(2)}`;
+      $('biggestDayText').innerHTML=`${dayName}<br><span style="color:#f0f0f0;font-size:20px;font-weight:700;letter-spacing:-0.5px;">${cur}${bigDay[1].toFixed(2)}</span>`;
       $('biggestDayCard').style.display='block';
     } else {
       $('biggestDayCard').style.display='none';
