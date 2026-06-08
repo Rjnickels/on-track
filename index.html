@@ -425,12 +425,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <!-- OVERVIEW -->
   <div class="screen" id="logScreen">
     <div class="log-header">
+      <div id="overviewTitle" style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:10px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
         <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
-        <h2 id="overviewTitle">Overview</h2>
+        <h2 style="font-size:16px;font-weight:600;" id="overviewMonthLabel">—</h2>
         <button class="cal-nav-btn" id="overviewNextBtn" onclick="nextMonth()">&#8250;</button>
       </div>
-      <p id="logDateLabel" style="text-align:center;">—</p>
+      <p id="logDateLabel" style="display:none;">—</p>
     </div>
     <div class="projection" id="projectionBanner">—</div>
     <div class="stats-grid">
@@ -776,24 +777,30 @@ function render(){
       const isPastWeek=!isCurrentMonth()||(td&&weekEnd<td);
       const isCurrentWeek=td&&selectedDay<=td&&td<=weekEnd;
       if(amount<0){
-        $('ringLabel').textContent=view==='day'?'overspent today':view==='week'?(isPastWeek?'overspent last week':'overspent this week'):'overspent this month';
+        $('ringLabel').textContent=view==='day'?(isViewingToday?'overspent today':'overspent'):view==='week'?(isPastWeek?'overspent last week':'overspent this week'):'overspent this month';
       } else {
-        $('ringLabel').textContent=view==='day'?(isViewingToday?'left to spend today':'left to spend'):view==='week'?(isPastWeek?'left last week':isCurrentWeek?'left this week':'left this week'):'left this month';
+        $('ringLabel').textContent=view==='day'?(isViewingToday?'left to spend today':'left to spend'):view==='week'?(isPastWeek?'left last week':'left this week'):'left this month';
       }
 
       $('spendCurrencySymbol').textContent=getCurrency();
       $('btnClear').style.visibility=(view==='day'&&history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
 
-      // Bug 1: last week summary card on week view
+      // Last week summary — always show on week view if previous days exist
       const lwCard=$('lastWeekCard');
-      if(view==='week'&&isPastWeek){
-        const weekSpent=history.filter(h=>h&&h.day>=selectedDay&&h.day<=weekEnd).reduce((s,h)=>s+(h.amount||0),0);
-        const weekBudget=Array.from({length:weekEnd-selectedDay+1},(_,i)=>dailyAllowance(selectedDay+i,days,viewYear,viewMonth)).reduce((a,b)=>a+b,0);
-        const diff=weekBudget-weekSpent;
-        const sign=diff>=0?'ahead':'over';
-        $('lastWeekText').textContent=`${getCurrency()}${weekSpent.toFixed(2)} spent — ${getCurrency()}${Math.abs(diff).toFixed(2)} ${sign} budget`;
-        $('lastWeekText').style.color=diff>=0?'var(--green-soft)':'#ef9a9a';
-        lwCard.style.display='block';
+      if(view==='week'){
+        const prevStart=Math.max(1,selectedDay-7);
+        const prevEnd=selectedDay-1;
+        if(prevEnd>=1){
+          const prevSpent=history.filter(h=>h&&h.day>=prevStart&&h.day<=prevEnd).reduce((s,h)=>s+(h.amount||0),0);
+          const prevBudget=Array.from({length:prevEnd-prevStart+1},(_,i)=>dailyAllowance(prevStart+i,days,viewYear,viewMonth)).reduce((a,b)=>a+b,0);
+          const diff=prevBudget-prevSpent;
+          const over=diff<0;
+          $('lastWeekText').textContent=over
+            ?`You overspent ${getCurrency()}${Math.abs(diff).toFixed(2)} last week`
+            :`You were ${getCurrency()}${diff.toFixed(2)} ahead last week`;
+          $('lastWeekText').style.color=over?'#ef9a9a':'var(--green-soft)';
+          lwCard.style.display='block';
+        } else { lwCard.style.display='none'; }
       } else { lwCard.style.display='none'; }
 
       const streakEl=$('streak');let streak=0;
@@ -824,10 +831,10 @@ function render(){
   {
     // Personalised title
     const name = getName();
-    $('overviewTitle').textContent = name ? `Hi ${name}` : 'Overview';
+    $('overviewTitle').innerHTML = name ? `Hi <strong>${name}</strong>,` : 'Overview';
     if($('overviewNextBtn')) $('overviewNextBtn').style.opacity = isCurrentMonth() ? '0.25' : '1';
-
-    $('logDateLabel').textContent=formatMonth(viewYear,viewMonth);
+    $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
+    $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
     const elapsed=td?td:days;
     const flat=days>0?budget/days:0,expected=flat*elapsed,actual=spentUpToDay(elapsed,history);
     const saved=expected-actual;
