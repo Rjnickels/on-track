@@ -403,19 +403,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
-    <div class="overlay" id="nameOverlay">
-      <div class="overlay-card" style="width:100%;">
-        <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick thing 👋</p>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">What should we call you?</p>
-        <input class="auth-input" id="nameInput" type="text" placeholder="First name" autocomplete="given-name" style="border-bottom:2px solid var(--border);margin-bottom:16px;"/>
-        <button class="btn-set" onclick="saveName()">Let's go</button>
-      </div>
-    </div>
-      <div class="overlay-card">
-        <p class="overlay-text" id="onboardText"></p>
-        <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
-      </div>
-    </div>
     <div class="credit">Created by Robert Nickels</div>
   </div>
 
@@ -477,6 +464,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="divider"></div>
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     <div class="credit">Created by Robert Nickels</div>
+  </div>
+
+  <!-- OVERLAYS — app level so fixed positioning works correctly -->
+  <div class="overlay" id="nameOverlay">
+    <div class="overlay-card" style="width:100%;">
+      <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick thing 👋</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">What should we call you?</p>
+      <input class="auth-input" id="nameInput" type="text" placeholder="First name" autocomplete="given-name" style="border-bottom:2px solid var(--border);margin-bottom:16px;"/>
+      <button class="btn-set" onclick="saveName()">Let's go</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="onboardOverlay">
+    <div class="overlay-card">
+      <p class="overlay-text" id="onboardText"></p>
+      <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
+    </div>
   </div>
 
   <nav class="nav" id="mainNav" style="display:none">
