@@ -423,46 +423,46 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
 
   <!-- OVERVIEW -->
-  <div class="screen" id="logScreen">
-    <div class="log-header">
-      <div id="overviewTitle" style="font-size:28px;font-weight:400;color:var(--text);margin-bottom:10px;letter-spacing:-0.5px;"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+  <div class="screen" id="logScreen" style="overflow-y:hidden;">
+    <div class="log-header" style="padding:14px 24px 6px;">
+      <div id="overviewTitle" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
         <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
-        <h2 style="font-size:16px;font-weight:600;" id="overviewMonthLabel">—</h2>
+        <h2 style="font-size:15px;font-weight:600;" id="overviewMonthLabel">—</h2>
         <button class="cal-nav-btn" id="overviewNextBtn" onclick="nextMonth()">&#8250;</button>
       </div>
       <p id="logDateLabel" style="display:none;">—</p>
     </div>
-    <div class="projection" id="projectionBanner">—</div>
-    <div class="stats-grid">
+    <div class="projection" id="projectionBanner" style="margin:6px 20px 6px;">—</div>
+    <div class="stats-grid" style="padding:4px 20px;">
       <div class="stat-card"><div class="stat-label">Tomorrow you can spend</div><div class="stat-val" id="statDailyFwd">—</div></div>
       <div class="stat-card"><div class="stat-label">Your monthly budget</div><div class="stat-val" id="statBudget">—</div></div>
     </div>
 
     <!-- Progress bar -->
-    <div style="margin:8px 20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div style="margin:6px 20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);">Month progress</span>
         <span style="font-size:10px;font-weight:600;color:var(--muted);" id="daysLeftLabel">—</span>
       </div>
-      <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;">
+      <div style="height:14px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;">
         <div id="monthProgressBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-top:5px;">
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
         <span style="font-size:10px;color:rgba(255,255,255,0.3);">1st</span>
         <span style="font-size:10px;color:rgba(255,255,255,0.3);" id="lastDayLabel">—</span>
       </div>
     </div>
 
     <!-- Most expensive day -->
-    <div style="margin:4px 20px 8px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;" id="biggestDayCard" style="display:none;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:6px;">Biggest spend this month</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);" id="biggestDayText">—</div>
+    <div style="margin:4px 20px 6px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:12px 16px;" id="biggestDayCard">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:5px;">Biggest spend this month</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);" id="biggestDayText">—</div>
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider" style="margin:6px 24px;"></div>
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     <div class="credit">Created by Robert Nickels</div>
   </div>
@@ -833,7 +833,7 @@ function render(){
     const name = getName();
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    $('overviewTitle').innerHTML = name ? `${greeting}, <strong>${name}</strong>` : greeting;
+    $('overviewTitle').innerHTML = name ? `${greeting}, ${name}` : greeting;
     if($('overviewNextBtn')) $('overviewNextBtn').style.opacity = isCurrentMonth() ? '0.25' : '1';
     $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
     $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
