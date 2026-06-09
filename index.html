@@ -265,6 +265,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button onclick="startWelcome(false)" style="width:100%;height:54px;background:#21c25a;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Inter',sans-serif;color:#06220f;cursor:pointer;box-shadow:0 4px 24px rgba(33,194,90,0.25);">Get Started — It's Free</button>
         <button onclick="startWelcome(true)" style="width:100%;height:50px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">Sign In</button>
+        <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:4px;">Privacy Policy</a>
       </div>
     </div>
 
@@ -327,6 +328,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email"/>
           <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password"/>
           <div class="auth-error" id="authError"></div>
+          <div id="privacyCheck" style="display:none;align-items:flex-start;gap:10px;margin-top:4px;">
+            <input type="checkbox" id="privacyBox" style="margin-top:3px;accent-color:#21c25a;width:16px;height:16px;flex-shrink:0;cursor:pointer;"/>
+            <label for="privacyBox" style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;cursor:pointer;">I have read and agree to the <a href="/privacy.html" target="_blank" style="color:#21c25a;text-decoration:none;">Privacy Policy</a></label>
+          </div>
           <button type="submit" class="btn-auth" id="authBtn" style="margin-top:4px;">Log In</button>
         </form>
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
@@ -342,6 +347,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </form>
         <button type="button" onclick="hideForgot()" style="width:100%;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:50px;background:transparent;color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:12px;">Back to login</button>
       </div>
+      <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:8px 0 0;display:block;">Privacy Policy</a>
     </div>
 
   </div>
@@ -526,6 +532,7 @@ function startWelcome(isLogin){
   $('authToggle').textContent=isLogin?'Need an account? Sign up':'Already have an account? Log in';
   $('authName').style.display=isLogin?'none':'block';
   $('forgotBtn').style.display=isLogin?'block':'none';
+  $('privacyCheck').style.display=isLogin?'none':'flex';
   if($('authWelcomeTitle')) $('authWelcomeTitle').textContent=isLogin?'Welcome back':'Create account';
   if($('authWelcomeSub')) $('authWelcomeSub').textContent=isLogin?'Sign in to your account':'Start tracking your spending today';
   showAuth();
@@ -570,6 +577,7 @@ function toggleAuth() {
   $('authPass').autocomplete = isSignUp ? 'new-password' : 'current-password';
   $('authName').style.display = isSignUp ? 'block' : 'none';
   $('forgotBtn').style.display = isSignUp ? 'none' : 'block';
+  $('privacyCheck').style.display = isSignUp ? 'flex' : 'none';
   $('authError').textContent = '';
   if($('authWelcomeTitle')) $('authWelcomeTitle').textContent = isSignUp ? 'Create account' : 'Welcome back';
   if($('authWelcomeSub')) $('authWelcomeSub').textContent = isSignUp ? 'Start tracking your spending today' : 'Sign in to your account';
@@ -582,6 +590,7 @@ async function handleAuth() {
   const btn   = $('authBtn');
   if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
   if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+  if (isSignUp && !$('privacyBox').checked) { errEl.textContent = 'Please agree to the Privacy Policy to continue'; return; }
   errEl.textContent = '';
   btn.disabled = true;
   btn.textContent = isSignUp ? 'Creating account...' : 'Logging in...';
