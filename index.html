@@ -495,7 +495,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <!-- OVERVIEW -->
   <div class="screen" id="logScreen" style="overflow-y:hidden;">
     <div style="padding:10px 20px 4px;">
-      <div id="overviewTitle" style="font-size:22px;font-weight:600;color:var(--text);margin-bottom:6px;letter-spacing:-0.5px;"></div>
+      <div id="overviewTitle" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:-0.5px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
         <h2 style="font-size:14px;font-weight:600;" id="overviewMonthLabel">—</h2>
@@ -506,33 +506,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
     <div class="projection" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
 
-    <!-- Option D: Days left ring + remaining budget -->
-    <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
-        <!-- Days left ring -->
-        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
-          <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
-            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
-            <circle id="daysRingFill" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="50"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
-            <span id="daysLeftNum" style="font-size:20px;font-weight:700;color:var(--text);line-height:1;font-family:'Inter',sans-serif;">—</span>
-            <span style="font-size:7px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.3px;">days left</span>
-          </div>
-        </div>
-        <!-- Budget info -->
-        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;font-family:'Inter',sans-serif;">—</div>
-          <div style="font-size:11px;color:var(--muted);">remaining to spend</div>
-          <div id="budgetBaseLabel" style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;">Based on a £500 budget</div>
-          <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-top:2px;">
-            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Get back on track / savings card -->
+    <!-- Get back on track / savings — directly below banner -->
     <div id="onTrackCard" style="display:none;margin:4px 16px;">
       <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:12px;padding:10px 14px;">
         <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(239,154,154,0.7);margin-bottom:4px;">How to get back on track</div>
@@ -543,6 +517,30 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:10px 14px;">
         <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Savings projection</div>
         <div style="font-size:13px;font-weight:600;color:#f0f0f0;line-height:1.5;" id="savingsText">—</div>
+      </div>
+    </div>
+
+    <!-- Option D: Days left ring + remaining budget -->
+    <div style="margin:4px 16px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
+          <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
+            <circle id="daysRingFill" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="50"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
+            <span id="daysLeftNum" style="font-size:20px;font-weight:700;color:var(--text);line-height:1;font-family:'Inter',sans-serif;">—</span>
+            <span style="font-size:7px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.3px;">days left</span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;font-family:'Inter',sans-serif;">—</div>
+          <div style="font-size:11px;color:var(--muted);">remaining to spend</div>
+          <div id="budgetBaseLabel" style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;">Based on a £500 budget</div>
+          <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-top:2px;">
+            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
