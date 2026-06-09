@@ -183,6 +183,33 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
   <!-- WELCOME SCREEN -->
+  <!-- INTRO ANIMATION -->
+  <div id="introScreen" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column;">
+    <style>
+      @keyframes ringFadeIn  { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+      @keyframes ringSpinFade { 0%{opacity:1;transform:rotate(0deg) scale(1)} 70%{opacity:1;transform:rotate(540deg) scale(1.05)} 100%{opacity:0;transform:rotate(720deg) scale(0.8)} }
+      @keyframes wordmarkGlow { 0%{opacity:0;filter:blur(8px) drop-shadow(0 0 0px #21c25a)} 40%{opacity:1;filter:blur(0px) drop-shadow(0 0 24px #21c25a) drop-shadow(0 0 60px rgba(33,194,90,0.5))} 80%{filter:blur(0px) drop-shadow(0 0 16px #21c25a) drop-shadow(0 0 40px rgba(33,194,90,0.3))} 100%{opacity:1;filter:blur(0px) drop-shadow(0 0 6px #21c25a)} }
+      @keyframes introFadeOut { from{opacity:1} to{opacity:0} }
+      @keyframes floorPulse { 0%,100%{opacity:0.2;transform:translateX(-50%) scaleX(0.6)} 50%{opacity:0.6;transform:translateX(-50%) scaleX(1)} }
+    </style>
+
+    <!-- Thick ring — matches home screen ring -->
+    <div id="introRingWrap" style="position:relative;width:240px;height:240px;">
+      <svg id="introRing" viewBox="0 0 240 240" width="240" height="240" style="opacity:0;animation:ringFadeIn 0.8s ease 0.2s forwards;filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.4));">
+        <circle cx="120" cy="120" r="100" fill="none" stroke="#21c25a" stroke-width="13" stroke-linecap="round"
+          stroke-dasharray="628" stroke-dashoffset="157"/>
+      </svg>
+    </div>
+
+    <!-- OnTrack wordmark — hidden initially -->
+    <div id="introWordmark" style="display:none;position:absolute;">
+      <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
+    </div>
+
+    <!-- Floor glow -->
+    <div style="position:absolute;bottom:30%;left:50%;transform:translateX(-50%) scaleX(0.6);width:220px;height:6px;background:radial-gradient(ellipse,rgba(33,194,90,0.5) 0%,transparent 70%);border-radius:50%;animation:floorPulse 2s ease-in-out infinite;"></div>
+  </div>
+
   <div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:200;background:#000;flex-direction:column;align-items:center;overflow:hidden;justify-content:space-between;">
 
     <!-- iPhone mockup — top portion visible, fades into black -->
@@ -534,6 +561,38 @@ function getCurrency(){ return localStorage.getItem('ot_currency')||'£'; }
 function getName(){ return localStorage.getItem('ot_name')||''; }
 
 /* ══ WELCOME ══ */
+/* ══ INTRO ANIMATION ══ */
+function playIntro(){
+  const intro=$('introScreen');
+  intro.style.display='flex';
+  const ring=$('introRing');
+  const wm=$('introWordmark');
+
+  // Step 1: Ring fades in (CSS animation handles this)
+  // Step 2: Ring spins and fades out
+  setTimeout(()=>{
+    ring.style.animation='ringSpinFade 1.4s cubic-bezier(0.4,0,0.2,1) forwards';
+  },1200);
+
+  // Step 3: OnTrack glows in as ring fades
+  setTimeout(()=>{
+    wm.style.display='block';
+    wm.style.animation='wordmarkGlow 1.2s ease forwards';
+  },2000);
+
+  // Step 4: Fade whole screen out
+  setTimeout(()=>{
+    intro.style.transition='opacity 0.7s ease';
+    intro.style.opacity='0';
+  },3600);
+
+  setTimeout(()=>{
+    intro.style.display='none';
+    intro.style.opacity='1';
+    showWelcome();
+  },4300);
+}
+
 function showWelcome(){
   if(!localStorage.getItem('ot_welcomed')){
     $('welcomeScreen').style.display='flex';
@@ -961,7 +1020,13 @@ function render(){
       await loadFromCloud(viewYear,viewMonth);
       showApp(); render();
       checkName();
-    } else { showWelcome(); }
+    } else {
+      if(!localStorage.getItem('ot_welcomed')){
+        playIntro();
+      } else {
+        showAuth();
+      }
+    }
   } catch(e) { showAuth(); }
 })();
 
