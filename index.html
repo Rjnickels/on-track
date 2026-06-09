@@ -184,18 +184,18 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
   <!-- WELCOME SCREEN -->
   <!-- OUTRO ANIMATION (post-login) -->
-  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:#1a1a1a;align-items:center;justify-content:center;flex-direction:column;pointer-events:none;">
+  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:#1a1a1a;flex-direction:column;pointer-events:none;">
     <style>
       @keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
       @keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
       @keyframes outroRingIn { from{opacity:0;transform:rotate(-180deg) scale(0.4)} to{opacity:1;transform:rotate(0deg) scale(1)} }
-      @keyframes outroFade  { from{opacity:1} to{opacity:0} }
     </style>
-    <div id="outroWordmark" style="position:absolute;opacity:0;">
+    <div id="outroWordmark" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;">
       <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
     </div>
-    <div id="outroRingWrap" style="position:absolute;display:none;">
-      <div id="outroRing" style="transform:translate(-50%,-50%);opacity:0;">
+    <div id="outroHeaderSpacer"></div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+      <div id="outroRing" style="opacity:0;">
         <svg viewBox="0 0 320 320" width="320" height="320" style="filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.3));">
           <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
           <circle cx="160" cy="160" r="140" fill="none" stroke="#21c25a" stroke-width="14" stroke-linecap="round"
@@ -203,6 +203,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </svg>
       </div>
     </div>
+    <div id="outroBottomSpacer"></div>
   </div>
   <div id="introScreen" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column;">
     <style>
@@ -604,44 +605,36 @@ function getName(){ return localStorage.getItem('ot_name')||''; }
 function playOutro(){
   const outro=$('outroScreen');
   const wm=$('outroWordmark');
-  const ringWrap=$('outroRingWrap');
   const ring=$('outroRing');
 
-  // Small timeout guarantees the home screen has fully painted before we measure
+  // Mirror the home screen layout so ring sits in exact same position
+  // Measure the actual header and nav heights
+  const appHeader=document.querySelector('.app-header');
+  const nav=document.querySelector('.nav');
+  const spendArea=$('spendArea');
+  if(appHeader) $('outroHeaderSpacer').style.height=appHeader.getBoundingClientRect().height+'px';
+  const bottomH=(nav?nav.getBoundingClientRect().height:0)+(spendArea?spendArea.getBoundingClientRect().height:0);
+  $('outroBottomSpacer').style.height=bottomH+'px';
+
+  // Reset
+  outro.style.display='flex';
+  outro.style.opacity='1';
+  wm.style.opacity='0';
+  wm.style.animation='';
+  wm.style.transform='';
+  ring.style.opacity='0';
+  ring.style.animation='';
+  void outro.offsetWidth;
+
+  setTimeout(()=>{ wm.style.animation='outroWmIn 0.7s ease forwards'; },100);
+  setTimeout(()=>{ wm.style.animation='outroWmOut 0.5s ease forwards'; },1100);
+  setTimeout(()=>{ ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards'; },1500);
+  setTimeout(()=>{ outro.style.transition='opacity 0.6s ease'; outro.style.opacity='0'; },2600);
   setTimeout(()=>{
-    const homeRing=$('ringWrap');
-    const rect=homeRing.getBoundingClientRect();
-    const cx=rect.left+rect.width/2;
-    const cy=rect.top+rect.height/2;
-
-    // position:fixed = always viewport-relative, no parent interference
-    ringWrap.style.position='fixed';
-    ringWrap.style.left=cx+'px';
-    ringWrap.style.top=cy+'px';
-    ringWrap.style.display='block';
-
-    // Reset
-    outro.style.display='flex';
+    outro.style.display='none';
     outro.style.opacity='1';
-    wm.style.opacity='0';
-    wm.style.animation='';
-    wm.style.transform='';
-    ring.style.opacity='0';
-    ring.style.animation='';
-    void outro.offsetWidth;
-
-    setTimeout(()=>{ wm.style.animation='outroWmIn 0.7s ease forwards'; },100);
-    setTimeout(()=>{ wm.style.animation='outroWmOut 0.5s ease forwards'; },1100);
-    setTimeout(()=>{ ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards'; },1500);
-    setTimeout(()=>{ outro.style.transition='opacity 0.6s ease'; outro.style.opacity='0'; },2600);
-    setTimeout(()=>{
-      outro.style.display='none';
-      outro.style.opacity='1';
-      outro.style.transition='';
-      ringWrap.style.display='none';
-    },3200);
-
-  },80);
+    outro.style.transition='';
+  },3200);
 }
 function playIntro(){
   const intro=$('introScreen');
