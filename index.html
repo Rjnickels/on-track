@@ -403,12 +403,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
-      <div id="lastWeekCard" style="display:none;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Last week</div>
-        <div style="font-size:14px;font-weight:700;color:var(--text);" id="lastWeekText">—</div>
-      </div>
       <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
+    </div>
+
+    <!-- Last week card — outside spendArea so it doesn't affect layout -->
+    <div id="lastWeekCard" style="display:none;margin:0 24px;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Last week</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);" id="lastWeekText">—</div>
     </div>
     
   </div>
@@ -724,7 +726,10 @@ function setBudget(){
 }
 function dismissOnboard(){$('onboardOverlay').classList.remove('show');}
 function shiftDay(dir){
-  const n=selectedDay+dir;if(n<1||n>todayDate())return;
+  if(view==='month'){ if(dir>0)nextMonth(); else prevMonth(); return; }
+  const step=view==='week'?7:1;
+  const n=selectedDay+(dir*step);
+  if(n<1||n>todayDate())return;
   const ring=$('ringWrap');
   const slideOut=dir>0?'slide-left':'slide-right', slideIn=dir>0?'slide-right':'slide-left';
   ring.classList.add(slideOut);
@@ -763,12 +768,7 @@ function render(){
     const has=budget>0;
     $('budgetSetup').style.display=has?'none':'flex';
     $('homeMain').style.display=has?'flex':'none';
-    if(has){
-      $('spendArea').style.display='flex';
-      $('spendArea').style.visibility=(view==='day')?'visible':'hidden';
-    } else {
-      $('spendArea').style.display='none';
-    }
+    $('spendArea').style.display=(has&&view==='day')?'flex':'none';
     if(has){
       const isToday = selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
