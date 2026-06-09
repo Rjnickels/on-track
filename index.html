@@ -183,10 +183,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
   <!-- WELCOME SCREEN -->
-  <div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:200;background:#000;flex-direction:column;align-items:center;overflow:hidden;">
+  <div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:200;background:#000;flex-direction:column;align-items:center;overflow:hidden;justify-content:space-between;">
 
     <!-- iPhone mockup — top portion visible, fades into black -->
-    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:24px;">
+    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:16px;">
 
       <!-- iPhone frame -->
       <div style="
@@ -229,21 +229,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           </div>
 
           <!-- Ring -->
-          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:#1a1a1a;">
+          <div style="display:flex;flex-direction:column;align-items:center;padding:14px 24px 18px;gap:8px;background:#1a1a1a;">
             <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
-              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">‹</span></div>
+              <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.4);font-size:18px;">‹</span></div>
               <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#f0f0f0;font-family:'Inter',sans-serif;">Today</span>
-              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.4);font-size:20px;">›</span></div>
+              <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.4);font-size:18px;">›</span></div>
             </div>
-            <div style="position:relative;width:210px;height:210px;">
-              <svg viewBox="0 0 210 210" style="width:210px;height:210px;transform:rotate(-90deg);">
-                <circle cx="105" cy="105" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
-                <circle cx="105" cy="105" r="88" fill="none" stroke="#21c25a" stroke-width="12" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="138"/>
+            <div style="position:relative;width:170px;height:170px;">
+              <svg viewBox="0 0 170 170" style="width:170px;height:170px;transform:rotate(-90deg);">
+                <circle cx="85" cy="85" r="70" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="11"/>
+                <circle cx="85" cy="85" r="70" fill="none" stroke="#21c25a" stroke-width="11" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="109.9"/>
               </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
-                <span style="font-size:42px;font-weight:700;color:#21c25a;letter-spacing:-3px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
-                <span style="font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">left to spend today</span>
-                <span style="font-size:11px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+                <span style="font-size:34px;font-weight:700;color:#21c25a;letter-spacing:-2.5px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
+                <span style="font-size:8px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">left to spend today</span>
+                <span style="font-size:10px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
               </div>
             </div>
           </div>
@@ -257,15 +257,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
 
     <!-- Welcome content -->
-    <div style="padding:24px 28px 48px;display:flex;flex-direction:column;gap:18px;width:100%;max-width:480px;">
+    <div style="padding:16px 28px 36px;display:flex;flex-direction:column;gap:14px;width:100%;max-width:480px;">
       <div>
-        <div style="font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;">Know exactly what<br>you can <span style="color:#21c25a;">spend today.</span></div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-top:10px;line-height:1.7;font-family:'Inter',sans-serif;">Set your monthly budget. Log your spending.<br>Stay OnTrack.</div>
+        <div style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;">Know exactly what you can <span style="color:#21c25a;">spend today.</span></div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.7;font-family:'Inter',sans-serif;">OnTrack is a free app that turns your monthly budget into a live daily spend limit.</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.6;font-family:'Inter',sans-serif;">Set your budget. Log spending. Stay <span style="color:#21c25a;">OnTrack</span>.</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <button onclick="startWelcome(false)" style="width:100%;height:54px;background:#21c25a;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Inter',sans-serif;color:#06220f;cursor:pointer;box-shadow:0 4px 24px rgba(33,194,90,0.25);">Get Started — It's Free</button>
-        <button onclick="startWelcome(true)" style="width:100%;height:50px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">Sign In</button>
-        <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:4px;">Privacy Policy</a>
+        <button onclick="startWelcome(false)" style="width:100%;height:54px;background:#21c25a;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Inter',sans-serif;color:#e8f8ed;cursor:pointer;box-shadow:0 4px 24px rgba(33,194,90,0.25);">Get Started — It's Free</button>
+        <button onclick="startWelcome(true)" style="width:100%;height:50px;background:transparent;border:1.5px solid rgba(255,255,255,0.5);border-radius:50px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;color:#ffffff;cursor:pointer;">Sign In</button>
+        <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.6);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:4px;">Privacy Policy</a>
       </div>
     </div>
 
@@ -409,7 +410,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
-    <div class="credit">Created by Robert Nickels</div>
+    
   </div>
 
   <!-- CALENDAR -->
@@ -425,7 +426,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div><div class="cal-day-label">Su</div>
     </div>
     <div class="cal-grid" id="calGrid"></div>
-    <div class="credit">Created by Robert Nickels</div>
+    
   </div>
 
   <!-- OVERVIEW -->
@@ -443,6 +444,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="stats-grid" style="padding:4px 20px;">
       <div class="stat-card"><div class="stat-label">Tomorrow you can spend</div><div class="stat-val" id="statDailyFwd">—</div></div>
       <div class="stat-card"><div class="stat-label">Your monthly budget</div><div class="stat-val" id="statBudget">—</div></div>
+    </div>
+
+    <!-- Get back on track card -->
+    <div id="onTrackCard" style="display:none;margin:4px 20px;">
+      <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:14px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(239,154,154,0.7);margin-bottom:5px;">How to get back on track</div>
+        <div style="font-size:14px;font-weight:600;color:#f0f0f0;line-height:1.5;" id="onTrackText">—</div>
+      </div>
+    </div>
+
+    <!-- Savings projection card -->
+    <div id="savingsCard" style="display:none;margin:4px 20px;">
+      <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:14px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:5px;">Savings projection</div>
+        <div style="font-size:14px;font-weight:600;color:#f0f0f0;line-height:1.5;" id="savingsText">—</div>
+      </div>
     </div>
 
     <!-- Progress bar -->
@@ -470,7 +487,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
     <div class="divider" style="margin:6px 24px;"></div>
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
-    <div class="credit">Created by Robert Nickels</div>
+    
   </div>
 
   <!-- OVERLAYS — app level so fixed positioning works correctly -->
@@ -747,7 +764,7 @@ function render(){
     const has=budget>0;
     $('budgetSetup').style.display=has?'none':'flex';
     $('homeMain').style.display=has?'flex':'none';
-    $('spendArea').style.display=has?'flex':'none';
+    $('spendArea').style.display=(has&&view==='day')?'flex':'none';
     if(has){
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');dl.textContent=formatDay(selectedDay,viewYear,viewMonth);dl.classList.toggle('is-today',isToday);
@@ -859,9 +876,38 @@ function render(){
     }else{banner.style.display='none';}
 
     const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0,dfEl=$('statDailyFwd');
-    if(dFwd>0){const p=mLeft/dFwd;dfEl.textContent=fmt(p);dfEl.style.color=p>=0?'var(--text)':'#ef9a9a';}
-    else{dfEl.textContent='—';dfEl.style.color='var(--muted)';}
+    if(dFwd>0){
+      const tmrw=td&&td<days?dailyAllowance(td+1,days,viewYear,viewMonth):0;
+      dfEl.textContent=fmt(tmrw);dfEl.style.color=tmrw>=0?'var(--text)':'#ef9a9a';
+    } else{dfEl.textContent='—';dfEl.style.color='var(--muted)';}
     $('statBudget').textContent=fmt(budget);
+
+    // Get back on track card — when behind
+    const otCard=$('onTrackCard');
+    if(saved<=-0.005&&dFwd>0&&budget>0){
+      const remaining=remainingAfter(days,viewYear,viewMonth);
+      const newDaily=remaining/dFwd;
+      const cur=getCurrency();
+      if(newDaily>0){
+        $('onTrackText').textContent=`Spend no more than ${cur}${newDaily.toFixed(2)} per day for the next ${dFwd} day${dFwd!==1?'s':''} to finish the month on budget.`;
+      } else {
+        $('onTrackText').textContent=`You've exceeded your budget for this month. Try to minimise spending for the remaining ${dFwd} day${dFwd!==1?'s':''}.`;
+      }
+      otCard.style.display='block';
+    } else { otCard.style.display='none'; }
+
+    // Savings projection card — when ahead
+    const savCard=$('savingsCard');
+    if(saved>=0.005&&elapsed>1&&dFwd>0&&budget>0){
+      const avgDaily=actual/elapsed;
+      const projectedTotal=actual+(avgDaily*dFwd);
+      const projectedSaving=budget-projectedTotal;
+      const cur=getCurrency();
+      if(projectedSaving>0.5){
+        $('savingsText').textContent=`Keep this up and you'll have ${cur}${projectedSaving.toFixed(2)} to put into savings this month. 🎉`;
+        savCard.style.display='block';
+      } else { savCard.style.display='none'; }
+    } else { savCard.style.display='none'; }
 
     // Progress bar
     const pct=Math.round((elapsed/days)*100);
