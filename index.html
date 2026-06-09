@@ -607,60 +607,41 @@ function playOutro(){
   const ringWrap=$('outroRingWrap');
   const ring=$('outroRing');
 
-  // Wait one frame so the app has fully laid out before measuring
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      // Measure home screen ring exact centre
-      const homeRing=$('ringWrap');
-      const rect=homeRing.getBoundingClientRect();
-      const cx=rect.left+rect.width/2;
-      const cy=rect.top+rect.height/2;
+  // Small timeout guarantees the home screen has fully painted before we measure
+  setTimeout(()=>{
+    const homeRing=$('ringWrap');
+    const rect=homeRing.getBoundingClientRect();
+    const cx=rect.left+rect.width/2;
+    const cy=rect.top+rect.height/2;
 
-      // Position the wrapper at the ring's centre
-      ringWrap.style.position='absolute';
-      ringWrap.style.left=cx+'px';
-      ringWrap.style.top=cy+'px';
-      ringWrap.style.display='block';
+    // position:fixed = always viewport-relative, no parent interference
+    ringWrap.style.position='fixed';
+    ringWrap.style.left=cx+'px';
+    ringWrap.style.top=cy+'px';
+    ringWrap.style.display='block';
 
-      // Reset
-      outro.style.display='flex';
+    // Reset
+    outro.style.display='flex';
+    outro.style.opacity='1';
+    wm.style.opacity='0';
+    wm.style.animation='';
+    wm.style.transform='';
+    ring.style.opacity='0';
+    ring.style.animation='';
+    void outro.offsetWidth;
+
+    setTimeout(()=>{ wm.style.animation='outroWmIn 0.7s ease forwards'; },100);
+    setTimeout(()=>{ wm.style.animation='outroWmOut 0.5s ease forwards'; },1100);
+    setTimeout(()=>{ ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards'; },1500);
+    setTimeout(()=>{ outro.style.transition='opacity 0.6s ease'; outro.style.opacity='0'; },2600);
+    setTimeout(()=>{
+      outro.style.display='none';
       outro.style.opacity='1';
-      wm.style.opacity='0';
-      wm.style.animation='';
-      wm.style.transform='';
-      ring.style.opacity='0';
-      ring.style.animation='';
-      void outro.offsetWidth;
+      outro.style.transition='';
+      ringWrap.style.display='none';
+    },3200);
 
-      // Step 1: OnTrack glows in
-      setTimeout(()=>{
-        wm.style.animation='outroWmIn 0.7s ease forwards';
-      },100);
-
-      // Step 2: OnTrack fades out
-      setTimeout(()=>{
-        wm.style.animation='outroWmOut 0.5s ease forwards';
-      },1100);
-
-      // Step 3: Ring spins in — wrapper is already at correct position
-      setTimeout(()=>{
-        ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards';
-      },1500);
-
-      // Step 4: Overlay fades, home screen ring underneath matches exactly
-      setTimeout(()=>{
-        outro.style.transition='opacity 0.6s ease';
-        outro.style.opacity='0';
-      },2600);
-
-      setTimeout(()=>{
-        outro.style.display='none';
-        outro.style.opacity='1';
-        outro.style.transition='';
-        ringWrap.style.display='none';
-      },3200);
-    });
-  });
+  },80);
 }
 function playIntro(){
   const intro=$('introScreen');
