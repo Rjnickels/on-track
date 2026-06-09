@@ -36,7 +36,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
 .logout-btn:hover { color: var(--text); }
 
-.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 0 8px; }
+.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; }
 .screen.active { display: flex; flex-direction: column; }
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
@@ -194,12 +194,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div id="outroWordmark" style="position:absolute;opacity:0;">
       <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
     </div>
-    <div id="outroRing" style="opacity:0;position:absolute;">
-      <svg viewBox="0 0 320 320" width="320" height="320" style="filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.3));">
-        <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
-        <circle cx="160" cy="160" r="140" fill="none" stroke="#21c25a" stroke-width="14" stroke-linecap="round"
-          stroke-dasharray="879.6" stroke-dashoffset="219.9"/>
-      </svg>
+    <div id="outroRingWrap" style="position:absolute;display:none;">
+      <div id="outroRing" style="transform:translate(-50%,-50%);opacity:0;">
+        <svg viewBox="0 0 320 320" width="320" height="320" style="filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.3));">
+          <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
+          <circle cx="160" cy="160" r="140" fill="none" stroke="#21c25a" stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="879.6" stroke-dashoffset="219.9"/>
+        </svg>
+      </div>
     </div>
   </div>
   <div id="introScreen" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column;">
@@ -463,7 +465,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
-      <div id="undoBar" style="display:none;justify-content:space-between;align-items:center;padding:6px 2px;">
+      <div id="undoBar" style="display:flex;visibility:hidden;justify-content:space-between;align-items:center;padding:4px 2px;min-height:28px;">
         <span id="undoLabel" style="font-size:12px;color:rgba(255,255,255,0.45);"></span>
         <button onclick="undoLastEntry()" style="background:none;border:none;font-size:12px;font-weight:600;color:var(--green);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;">Undo</button>
       </div>
@@ -602,54 +604,63 @@ function getName(){ return localStorage.getItem('ot_name')||''; }
 function playOutro(){
   const outro=$('outroScreen');
   const wm=$('outroWordmark');
+  const ringWrap=$('outroRingWrap');
   const ring=$('outroRing');
 
-  // Measure exactly where the home screen ring sits
-  const homeRing=$('ringWrap');
-  const rect=homeRing.getBoundingClientRect();
-  const cx=rect.left+rect.width/2;
-  const cy=rect.top+rect.height/2;
-  ring.style.position='absolute';
-  ring.style.left=cx+'px';
-  ring.style.top=cy+'px';
-  ring.style.transform='translate(-50%,-50%)';
+  // Wait one frame so the app has fully laid out before measuring
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      // Measure home screen ring exact centre
+      const homeRing=$('ringWrap');
+      const rect=homeRing.getBoundingClientRect();
+      const cx=rect.left+rect.width/2;
+      const cy=rect.top+rect.height/2;
 
-  // Reset
-  outro.style.display='flex';
-  outro.style.opacity='1';
-  wm.style.opacity='0';
-  wm.style.animation='';
-  wm.style.transform='';
-  ring.style.opacity='0';
-  ring.style.animation='';
-  void outro.offsetWidth;
+      // Position the wrapper at the ring's centre
+      ringWrap.style.position='absolute';
+      ringWrap.style.left=cx+'px';
+      ringWrap.style.top=cy+'px';
+      ringWrap.style.display='block';
 
-  // Step 1: OnTrack glows in
-  setTimeout(()=>{
-    wm.style.animation='outroWmIn 0.7s ease forwards';
-  },100);
+      // Reset
+      outro.style.display='flex';
+      outro.style.opacity='1';
+      wm.style.opacity='0';
+      wm.style.animation='';
+      wm.style.transform='';
+      ring.style.opacity='0';
+      ring.style.animation='';
+      void outro.offsetWidth;
 
-  // Step 2: OnTrack fades out
-  setTimeout(()=>{
-    wm.style.animation='outroWmOut 0.5s ease forwards';
-  },1100);
+      // Step 1: OnTrack glows in
+      setTimeout(()=>{
+        wm.style.animation='outroWmIn 0.7s ease forwards';
+      },100);
 
-  // Step 3: Ring spins in at exact home screen position
-  setTimeout(()=>{
-    ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards';
-  },1500);
+      // Step 2: OnTrack fades out
+      setTimeout(()=>{
+        wm.style.animation='outroWmOut 0.5s ease forwards';
+      },1100);
 
-  // Step 4: Overlay fades, home screen ring underneath matches perfectly
-  setTimeout(()=>{
-    outro.style.transition='opacity 0.6s ease';
-    outro.style.opacity='0';
-  },2600);
+      // Step 3: Ring spins in — wrapper is already at correct position
+      setTimeout(()=>{
+        ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards';
+      },1500);
 
-  setTimeout(()=>{
-    outro.style.display='none';
-    outro.style.opacity='1';
-    outro.style.transition='';
-  },3200);
+      // Step 4: Overlay fades, home screen ring underneath matches exactly
+      setTimeout(()=>{
+        outro.style.transition='opacity 0.6s ease';
+        outro.style.opacity='0';
+      },2600);
+
+      setTimeout(()=>{
+        outro.style.display='none';
+        outro.style.opacity='1';
+        outro.style.transition='';
+        ringWrap.style.display='none';
+      },3200);
+    });
+  });
 }
 function playIntro(){
   const intro=$('introScreen');
@@ -813,7 +824,7 @@ async function logout() {
   $('logScreen').classList.remove('active');
   $('mainNav').style.display='none';
   $('logoutBtn').style.display='none';
-  playIntro();
+  showAuth();
 }
 
 function showAuth() {
@@ -898,7 +909,7 @@ function dismissOnboard(){$('onboardOverlay').classList.remove('show');}
 function shiftDay(dir){
   const n=selectedDay+dir;
   if(n<1||n>todayDate())return;
-  $('undoBar').style.display='none';
+  $('undoBar').style.visibility='hidden';
   const ring=$('ringWrap');
   const slideOut=dir>0?'slide-left':'slide-right', slideIn=dir>0?'slide-right':'slide-left';
   ring.classList.add(slideOut);
@@ -912,7 +923,7 @@ function addSpend(){
   $('spendInput').value='';
   const t=$('spendToast');t.textContent=`${getCurrency()}${raw.toFixed(2)} added ✓`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
   $('undoLabel').textContent=`Last entry: ${getCurrency()}${raw.toFixed(2)}`;
-  $('undoBar').style.display='flex';
+  $('undoBar').style.visibility='visible';
   render();
 }
 function undoLastEntry(){
@@ -922,7 +933,7 @@ function undoLastEntry(){
   const last=dayEntries[dayEntries.length-1];
   d.history=d.history.filter(h=>h.id!==last.id);
   saveData(d,viewYear,viewMonth);
-  $('undoBar').style.display='none';
+  $('undoBar').style.visibility='hidden';
   render();
 }
 function clearSelectedDay(){
