@@ -396,21 +396,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <button class="view-tab" id="tabMonth" onclick="setView('month')">Month</button>
       </div>
     </div>
-    <div class="spend-area" id="spendArea" style="display:none">
-      <form onsubmit="event.preventDefault(); addSpend();">
-        <div class="input-row">
-          <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/></div>
-          <button type="submit" class="btn-add">Add</button>
-        </div>
-      </form>
-      <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
-      <div class="toast" id="spendToast"></div>
-    </div>
-
-    <!-- Last week card — outside spendArea so it doesn't affect layout -->
-    <div id="lastWeekCard" style="display:none;margin:0 24px;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Last week</div>
-      <div style="font-size:14px;font-weight:700;color:var(--text);" id="lastWeekText">—</div>
+    <div class="spend-area" id="spendArea" style="display:none;min-height:110px;">
+      <div id="daySpendContent">
+        <form onsubmit="event.preventDefault(); addSpend();">
+          <div class="input-row">
+            <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/></div>
+            <button type="submit" class="btn-add">Add</button>
+          </div>
+        </form>
+        <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
+        <div class="toast" id="spendToast"></div>
+      </div>
+      <div id="lastWeekCard" style="display:none;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Last week</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);" id="lastWeekText">—</div>
+      </div>
     </div>
     
   </div>
@@ -768,7 +768,12 @@ function render(){
     const has=budget>0;
     $('budgetSetup').style.display=has?'none':'flex';
     $('homeMain').style.display=has?'flex':'none';
-    $('spendArea').style.display=(has&&view==='day')?'flex':'none';
+    $('spendArea').style.display=has?'flex':'none';
+    if(has){
+      $('daySpendContent').style.display=(view==='day')?'flex':'none';
+      $('daySpendContent').style.flexDirection='column';
+      $('daySpendContent').style.gap='8px';
+    }
     if(has){
       const isToday = selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
@@ -863,7 +868,7 @@ function render(){
       const margin=allow-spent,sign=margin>=0?getCurrency():'-'+getCurrency();
       const spentStr=spent>0?`${getCurrency()}${spent.toFixed(0)}`:'£0';
       cell.innerHTML=fut
-        ?`<span class="cal-num">${i}</span><span class="cal-val">${getCurrency()}${Math.max(0,allow).toFixed(0)}</span>`
+        ?`<span class="cal-num">${i}</span><span class="cal-val">${getCurrency()}${Math.floor(Math.max(0,allow))}</span>`
         :`<span class="cal-num">${i}</span><span class="cal-val">${spentStr}</span>`;
       if(!fut){const day=i;cell.onclick=()=>{selectedDay=day;goTab('home');};}
       grid.appendChild(cell);
