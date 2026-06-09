@@ -183,7 +183,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
   <!-- WELCOME SCREEN -->
-  <!-- INTRO ANIMATION -->
+  <!-- OUTRO ANIMATION (post-login) -->
+  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:#1a1a1a;align-items:center;justify-content:center;flex-direction:column;pointer-events:none;">
+    <style>
+      @keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
+      @keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
+      @keyframes outroRingIn { from{opacity:0;transform:rotate(-180deg) scale(0.4)} to{opacity:1;transform:rotate(0deg) scale(1)} }
+      @keyframes outroFade  { from{opacity:1} to{opacity:0} }
+    </style>
+    <div id="outroWordmark" style="position:absolute;opacity:0;">
+      <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
+    </div>
+    <div id="outroRing" style="opacity:0;position:absolute;">
+      <svg viewBox="0 0 290 290" width="290" height="290" style="filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.3));">
+        <circle cx="145" cy="145" r="126" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="13"/>
+        <circle cx="145" cy="145" r="126" fill="none" stroke="#21c25a" stroke-width="13" stroke-linecap="round"
+          stroke-dasharray="791.7" stroke-dashoffset="197.9"/>
+      </svg>
+    </div>
+  </div>
   <div id="introScreen" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column;">
     <style>
       @keyframes ringFadeIn  { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
@@ -417,6 +435,26 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </div>
       </div>
       <div class="streak" id="streak"></div>
+
+      <!-- Spend pace meter — only shows on today when spending logged -->
+      <div id="spendPace" style="display:none;width:100%;padding:0 24px;margin-top:4px;">
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:12px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
+            <span id="paceLabel" style="font-size:11px;font-weight:600;color:var(--green);">On pace</span>
+          </div>
+          <!-- Meter bar -->
+          <div style="position:relative;height:6px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:visible;">
+            <div id="paceFill" style="height:100%;border-radius:50px;transition:width 0.6s ease,background 0.4s ease;width:50%;background:var(--green);"></div>
+            <!-- Time of day marker -->
+            <div id="paceMarker" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:2px;height:12px;background:rgba(255,255,255,0.3);border-radius:2px;transition:left 0.6s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px;">
+            <span style="font-size:9px;color:rgba(255,255,255,0.25);">Under</span>
+            <span style="font-size:9px;color:rgba(255,255,255,0.25);">Over</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="spend-area" id="spendArea" style="display:none;">
       <form onsubmit="event.preventDefault(); addSpend();">
@@ -461,9 +499,30 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
     <div class="projection" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
 
-    <div class="stats-grid" style="padding:4px 16px;gap:8px;">
-      <div class="stat-card" style="padding:12px;"><div class="stat-label">Tomorrow you can spend</div><div class="stat-val" style="font-size:17px;" id="statDailyFwd">—</div></div>
-      <div class="stat-card" style="padding:12px;"><div class="stat-label">Your monthly budget</div><div class="stat-val" style="font-size:17px;" id="statBudget">—</div></div>
+    <!-- Option D: Days left ring + remaining budget -->
+    <div style="margin:4px 16px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+        <!-- Days left ring -->
+        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
+          <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
+            <circle id="daysRingFill" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="50"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
+            <span id="daysLeftNum" style="font-size:20px;font-weight:700;color:var(--text);line-height:1;font-family:'Inter',sans-serif;">—</span>
+            <span style="font-size:7px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.3px;">days left</span>
+          </div>
+        </div>
+        <!-- Budget info -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;font-family:'Inter',sans-serif;">—</div>
+          <div style="font-size:11px;color:var(--muted);">remaining to spend</div>
+          <div id="budgetBaseLabel" style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;">Based on a £500 budget</div>
+          <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-top:2px;">
+            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Get back on track / savings card -->
@@ -550,12 +609,64 @@ function getCurrency(){ return localStorage.getItem('ot_currency')||'£'; }
 function getName(){ return localStorage.getItem('ot_name')||''; }
 
 /* ══ WELCOME ══ */
-/* ══ INTRO ANIMATION ══ */
+/* ══ OUTRO ANIMATION (post-login) ══ */
+function playOutro(callback){
+  const outro=$('outroScreen');
+  const wm=$('outroWordmark');
+  const ring=$('outroRing');
+
+  // Reset
+  outro.style.display='flex';
+  outro.style.opacity='1';
+  wm.style.opacity='0';
+  wm.style.animation='';
+  wm.style.transform='';
+  ring.style.opacity='0';
+  ring.style.animation='';
+  void outro.offsetWidth;
+
+  // Step 1: OnTrack glows in
+  setTimeout(()=>{
+    wm.style.animation='outroWmIn 0.7s ease forwards';
+  },100);
+
+  // Step 2: OnTrack fades out
+  setTimeout(()=>{
+    wm.style.animation='outroWmOut 0.5s ease forwards';
+  },1100);
+
+  // Step 3: Ring spins in — same size as home screen ring
+  setTimeout(()=>{
+    ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards';
+  },1500);
+
+  // Step 4: Overlay fades out, home screen ring takes over seamlessly
+  setTimeout(()=>{
+    outro.style.transition='opacity 0.6s ease';
+    outro.style.opacity='0';
+  },2600);
+
+  setTimeout(()=>{
+    outro.style.display='none';
+    outro.style.opacity='1';
+    outro.style.transition='';
+    if(callback) callback();
+  },3200);
+}
 function playIntro(){
   const intro=$('introScreen');
   intro.style.display='flex';
+  intro.style.opacity='1';
   const ring=$('introRing');
   const wm=$('introWordmark');
+
+  // Reset state
+  ring.style.animation='';
+  ring.style.display='block';
+  ring.style.opacity='1';
+  wm.style.display='none';
+  wm.style.animation='';
+  void ring.offsetWidth; // force reflow
 
   // Step 1: Ring fades in (CSS animation handles this)
   // Step 2: Ring spins and fades out
@@ -676,6 +787,7 @@ async function handleAuth() {
     await loadFromCloud(viewYear, viewMonth);
     showApp(); render();
     if(!isSignUp) checkName();
+    playOutro();
       await loadFromCloud(viewYear, viewMonth);
       showApp();
       render();
@@ -691,7 +803,12 @@ async function handleAuth() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null;
-  showAuth();
+  $('homeScreen').classList.remove('active');
+  $('calScreen').classList.remove('active');
+  $('logScreen').classList.remove('active');
+  $('mainNav').style.display='none';
+  $('logoutBtn').style.display='none';
+  playIntro();
 }
 
 function showAuth() {
@@ -839,7 +956,27 @@ function render(){
       const rb=$('ringBudget');
       rb.textContent=(a>0&&s>0)?`Daily budget: ${getCurrency()}${a.toFixed(2)}`:'';
 
-      $('spendCurrencySymbol').textContent=getCurrency();
+      // Spend pace meter
+      const paceEl=$('spendPace');
+      if(isToday&&s>0&&a>0){
+        const hr=new Date().getHours()+new Date().getMinutes()/60;
+        const dayPct=Math.max(0.01,hr/24);
+        const spentPct=s/a;
+        const ratio=spentPct/dayPct;
+        const fillPct=Math.min(100,Math.max(0,spentPct*100));
+        const markerPct=Math.min(98,Math.max(2,dayPct*100));
+        $('paceFill').style.width=fillPct+'%';
+        $('paceMarker').style.left=markerPct+'%';
+        let paceColor,paceText;
+        if(ratio<0.7){paceColor='var(--green)';paceText='Under pace ↓';}
+        else if(ratio<1.25){paceColor='var(--green)';paceText='On pace';}
+        else if(ratio<1.75){paceColor='#f0a500';paceText='Slightly ahead';}
+        else{paceColor='#ef9a9a';paceText='Spending fast';}
+        $('paceFill').style.background=paceColor;
+        $('paceLabel').style.color=paceColor;
+        $('paceLabel').textContent=paceText;
+        paceEl.style.display='block';
+      } else { paceEl.style.display='none'; }
       $('btnClear').style.visibility=(history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
 
       const streakEl=$('streak');let streak=0;
@@ -889,19 +1026,25 @@ function render(){
       else{banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`;}
     }else{banner.style.display='none';}
 
-    const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0,dfEl=$('statDailyFwd');
-    if(dFwd>0){
-      const tmrw=td&&td<days?dailyAllowance(td+1,days,viewYear,viewMonth):0;
-      dfEl.textContent=fmt(tmrw);dfEl.style.color=tmrw>=0?'var(--text)':'#ef9a9a';
-    } else{dfEl.textContent='—';dfEl.style.color='var(--muted)';}
-    $('statBudget').textContent=fmt(budget);
+    const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0;
+
+    // Option D graphic
+    const daysLeft=dFwd;
+    const pct=Math.max(0,Math.min(100,daysLeft/days*100));
+    const circ=188.5;
+    $('daysRingFill').style.strokeDashoffset=circ*(1-(pct/100));
+    $('daysLeftNum').textContent=daysLeft>0?daysLeft:'0';
+    const remaining=Math.max(0,mLeft);
+    $('budgetRemainingAmt').textContent=`${cur}${remaining.toFixed(2)}`;
+    $('budgetBaseLabel').textContent=`Based on a ${cur}${budget.toFixed(0)} budget`;
+    const usedPct=budget>0?Math.min(100,Math.max(0,((budget-remaining)/budget)*100)):0;
+    $('budgetUsedBar').style.width=usedPct+'%';
+    $('budgetUsedBar').style.background=remaining>=0?'var(--green)':'#ef9a9a';
 
     // Get back on track card — when behind
     const otCard=$('onTrackCard');
     if(saved<=-0.005&&dFwd>0&&budget>0){
-      const remaining=remainingAfter(days,viewYear,viewMonth);
-      const newDaily=remaining/dFwd;
-      const cur=getCurrency();
+      const newDaily=mLeft/dFwd;
       if(newDaily>0){
         $('onTrackText').textContent=`Spend no more than ${cur}${newDaily.toFixed(2)} per day for the next ${dFwd} day${dFwd!==1?'s':''} to finish the month on budget.`;
       } else {
@@ -916,7 +1059,6 @@ function render(){
       const avgDaily=actual/elapsed;
       const projectedTotal=actual+(avgDaily*dFwd);
       const projectedSaving=budget-projectedTotal;
-      const cur=getCurrency();
       if(projectedSaving>0.5){
         $('savingsText').textContent=`Keep this up and you'll have ${cur}${projectedSaving.toFixed(2)} to put into savings this month. 🎉`;
         savCard.style.display='block';
@@ -924,11 +1066,11 @@ function render(){
     } else { savCard.style.display='none'; }
 
     // Progress bar
-    const pct=Math.round((elapsed/days)*100);
-    $('monthProgressBar').style.width=pct+'%';
-    $('monthProgressBar').style.background=pct>80?'var(--green-bright)':'var(--green)';
-    const daysLeft=days-elapsed;
-    $('daysLeftLabel').textContent=daysLeft>0?`${daysLeft} day${daysLeft!==1?'s':''} left`:'Last day!';
+    const barPct=Math.round((elapsed/days)*100);
+    $('monthProgressBar').style.width=barPct+'%';
+    $('monthProgressBar').style.background=barPct>80?'var(--green-bright)':'var(--green)';
+    const daysRemLabel=days-elapsed;
+    $('daysLeftLabel').textContent=daysRemLabel>0?`${daysRemLabel} day${daysRemLabel!==1?'s':''} left`:'Last day!';
     $('lastDayLabel').textContent=days+'th';
 
     // Biggest spend day
@@ -955,6 +1097,7 @@ function render(){
       await loadFromCloud(viewYear,viewMonth);
       showApp(); render();
       checkName();
+      playOutro();
     } else {
       if(!localStorage.getItem('ot_welcomed')){
         playIntro();
