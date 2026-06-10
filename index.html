@@ -36,8 +36,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
 .logout-btn:hover { color: var(--text); }
 
-.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; position: relative; }
+.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; }
 .screen.active { display: flex; flex-direction: column; }
+#homeScreen { position: relative; }
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
 .nav { display: flex; background: rgba(17,17,17,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
