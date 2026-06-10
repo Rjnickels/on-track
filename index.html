@@ -70,16 +70,18 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .date-label.is-today { color: var(--text); }
 
 .ring-wrap { position: relative; width: 320px; height: 320px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
+.ring-glow { position:absolute; width:320px; height:320px; border-radius:50%; top:0; left:0; pointer-events:none; opacity:0; transition:opacity 0.6s ease; }
+.ring-glow.active { opacity:1; animation:ringGlowPulse 3s ease-in-out infinite; }
+@keyframes ringGlowPulse {
+  0%,100% { box-shadow: 0 0 40px 8px rgba(33,194,90,0.35), 0 0 80px 20px rgba(33,194,90,0.18), 0 0 120px 40px rgba(33,194,90,0.08); }
+  50%      { box-shadow: 0 0 60px 16px rgba(33,194,90,0.55), 0 0 110px 35px rgba(33,194,90,0.28), 0 0 180px 60px rgba(33,194,90,0.12); }
+}
 .ring-wrap.slide-left  { transform: translateX(-60px); opacity: 0; }
 .ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
-.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; filter: drop-shadow(0 0 12px rgba(33,194,90,0.8)) drop-shadow(0 0 32px rgba(33,194,90,0.45)); }
-.ring-fill.glow { animation: ringPulseGlow 3s ease-in-out infinite; }
-@keyframes ringPulseGlow {
-  0%,100% { filter: drop-shadow(0 0 14px rgba(33,194,90,0.9)) drop-shadow(0 0 36px rgba(33,194,90,0.55)) drop-shadow(0 0 70px rgba(33,194,90,0.25)); }
-  50%      { filter: drop-shadow(0 0 22px rgba(33,194,90,1.0)) drop-shadow(0 0 55px rgba(33,194,90,0.75)) drop-shadow(0 0 100px rgba(33,194,90,0.35)); }
-}
+.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; }
+.ring-fill.glow { }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
 .ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -94,7 +96,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .view-tab { flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; background: var(--glass); color: var(--muted); cursor: pointer; transition: all 0.25s ease; text-align: center; }
 .view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
 
-.spend-area { padding: 8px 24px 0; display: flex; flex-direction: column; gap: 8px; }
+.spend-area { padding: 4px 24px 4px; display: flex; flex-direction: column; gap: 4px; }
 .input-row { display: flex; gap: 8px; }
 .input-wrap { flex: 1; display: flex; align-items: center; height: 48px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; background: transparent; padding-left: 4px; transition: border-color 0.2s; }
 .input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
@@ -498,6 +500,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <button class="day-arrow" id="dayNext" onclick="shiftDay(1)">&#8250;</button>
       </div>
       <div class="ring-wrap" id="ringWrap">
+        <div class="ring-glow" id="ringGlow"></div>
         <svg viewBox="0 0 320 320" style="overflow:visible;">
           <circle class="ring-track" cx="160" cy="160" r="140"/>
           <circle class="ring-fill" id="ringFill" cx="160" cy="160" r="140"/>
@@ -1256,10 +1259,11 @@ function render(){
       const circ=2*Math.PI*140,ratio=a>0?Math.max(0,amount)/a:0,off=circ*(1-Math.min(1,ratio)),col=ringColor(ratio);
       const fill=$('ringFill');fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=off;fill.style.stroke=col;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
-      if(amount<0){
-        fill.style.setProperty('filter','drop-shadow(0 0 12px rgba(239,154,154,0.8)) drop-shadow(0 0 32px rgba(239,154,154,0.4))');
-      } else {
-        fill.style.removeProperty('filter');
+      fill.style.removeProperty('filter');
+      const glowDiv=$('ringGlow');
+      if(glowDiv){
+        glowDiv.classList.toggle('active',amount>=0&&ratio>=0.5);
+        glowDiv.style.boxShadow=amount<0?'0 0 40px 8px rgba(239,154,154,0.3), 0 0 80px 20px rgba(239,154,154,0.15)':'';
       }
       $('ringWrap').classList.toggle('over',amount<0);
       $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
