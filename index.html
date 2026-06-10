@@ -162,7 +162,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
 
 /* ── OnTrack Orb ── */
-.orb-wrap { position:fixed; bottom:80px; right:-200px; display:flex; align-items:flex-end; gap:8px; z-index:180; transition:right 0.55s cubic-bezier(0.34,1.2,0.64,1); pointer-events:none; }
+.orb-wrap { position:absolute; bottom:calc(var(--spend-area-h, 120px) + 4px); right:-200px; display:flex; align-items:flex-end; gap:8px; z-index:50; transition:right 0.55s cubic-bezier(0.34,1.2,0.64,1); pointer-events:none; }
 .orb-wrap.orb-show { right:12px; }
 .orb-wrap.orb-hide { right:-200px; transition:right 0.35s ease-in; }
 .orb-bubble { background:#fff; color:#111; border-radius:14px 14px 4px 14px; padding:10px 13px 8px; max-width:140px; box-shadow:0 4px 20px rgba(0,0,0,0.4); opacity:0; transform:scale(0.85) translateY(6px); transition:all 0.3s ease 0.35s; flex-shrink:0; display:flex; flex-direction:column; gap:5px; }
@@ -567,6 +567,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </div>
       <div class="toast" id="spendToast"></div>
     </div>
+
+    <!-- ONTRACK ORB — lives inside homeScreen, slides in from right -->
+    <div class="orb-wrap" id="orbWrap">
+      <div class="orb-bubble">
+        <div class="orb-bubble-msg" id="orbMsg">Good. Keep going.</div>
+        <div class="orb-bubble-sig">OnTrack Orb</div>
+      </div>
+      <div class="orb-col">
+        <div class="orb-char orb-happy" id="orbChar">
+          <svg width="64" height="84" viewBox="0 0 64 84">
+            <ellipse cx="32" cy="81" rx="12" ry="3" fill="rgba(33,194,90,0.15)"/>
+            <rect x="21" y="63" width="8" height="14" rx="4" fill="#18a84a"/>
+            <rect x="35" y="63" width="8" height="14" rx="4" fill="#18a84a"/>
+            <ellipse cx="25" cy="77" rx="7" ry="4" fill="#0f7a35"/>
+            <ellipse cx="39" cy="77" rx="7" ry="4" fill="#0f7a35"/>
+            <ellipse cx="32" cy="38" rx="24" ry="26" fill="#18a84a"/>
+            <ellipse cx="32" cy="36" rx="22" ry="24" fill="#21c25a" id="orbBody"/>
+            <ellipse cx="22" cy="22" rx="9" ry="6" fill="rgba(255,255,255,0.2)" transform="rotate(-20 22 22)"/>
+            <path id="orbArmL" d="M9 44 Q3 32 6 24" stroke="#18a84a" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <ellipse id="orbHandL" cx="5" cy="22" rx="5.5" ry="5.5" fill="#18a84a"/>
+            <path id="orbArmR" d="M55 44 Q61 32 58 24" stroke="#18a84a" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <ellipse id="orbHandR" cx="59" cy="22" rx="5.5" ry="5.5" fill="#18a84a"/>
+            <circle cx="24" cy="32" r="6" fill="white"/>
+            <circle cx="40" cy="32" r="6" fill="white"/>
+            <circle id="orbEL" cx="25" cy="31" r="3" fill="#0a3d1e"/>
+            <circle id="orbER" cx="41" cy="31" r="3" fill="#0a3d1e"/>
+            <circle cx="26" cy="29.5" r="1.2" fill="white"/>
+            <circle cx="42" cy="29.5" r="1.2" fill="white"/>
+            <path id="orbBrowL" d="M18 24 Q24 22 30 24" stroke="#0a6e2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="orbBrowR" d="M34 24 Q40 22 46 24" stroke="#0a6e2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path id="orbMouth" d="M22 44 Q32 52 42 44" stroke="#0f7a35" stroke-width="2.2" fill="rgba(255,255,255,0.1)" stroke-linecap="round"/>
+            <ellipse cx="17" cy="41" rx="4" ry="3" fill="#0f7a35" opacity="0.4"/>
+            <ellipse cx="47" cy="41" rx="4" ry="3" fill="#0f7a35" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
     
   </div>
 
@@ -667,8 +704,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
   </div>
 
-  <!-- ONTRACK ORB -->
-  <div class="orb-wrap" id="orbWrap">
+  <!-- OVERLAYS — app level so fixed positioning works correctly -->
     <div class="orb-bubble">
       <div class="orb-bubble-msg" id="orbMsg">Good. Keep going.</div>
       <div class="orb-bubble-sig">OnTrack Orb</div>
@@ -875,9 +911,10 @@ const orbClose=['Put it back.','Go home.','Bold timing.','The budget is watching
 const orbSad=['Oh.','Right.','Again.','Expensive day.','Tomorrow exists.','Bold. Very bold.','I updated the numbers.','I\'m not counting. I am.'];
 const orbLogged=['Noted.','Another one.','That went quickly.','Logged.'];
 const orbNoSpend=['The shops missed you today.','Didn\'t think you had it in you.','Not a penny. Remarkable.'];
-let orbTimer;
+let orbTimer, orbInterval;
 function showOrb(msg,state){
   if(document.activeElement===$('spendInput'))return;
+  if(activeTab!=='home')return;
   clearTimeout(orbTimer);
   const body=$('orbBody'),mouth=$('orbMouth'),el=$('orbEL'),er=$('orbER');
   const armL=$('orbArmL'),armR=$('orbArmR'),handL=$('orbHandL'),handR=$('orbHandR');
@@ -913,25 +950,38 @@ function showOrb(msg,state){
   orbTimer=setTimeout(()=>{ $('orbWrap').className='orb-wrap orb-hide'; },3800);
 }
 function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
-function triggerOrb(context){
-  if(document.activeElement===$('spendInput'))return;
-  const d=getData(viewYear,viewMonth),history=d.history||[],budget=d.budget||0;
+
+function getOrbState(){
+  const d=getData(viewYear,viewMonth),history=d.history||[];
   const days=daysInMonth(viewYear,viewMonth);
   const a=dailyAllowance(selectedDay,days,viewYear,viewMonth);
   const s=spentOnDay(selectedDay,history);
   const ratio=a>0?(a-s)/a:0;
-  if(context==='noSpend'){setTimeout(()=>showOrb(rand(orbNoSpend),'happy'),800);return;}
-  if(context==='spend'){
-    const state=ratio<0?'sad':ratio<0.3?'close':'happy';
-    const msg=ratio<0?rand(orbSad):ratio<0.3?rand(orbClose):rand(orbLogged);
-    setTimeout(()=>showOrb(msg,state),1600);return;
-  }
-  if(context==='open'){
-    const state=ratio<0?'sad':ratio<0.25?'close':'happy';
-    const msg=ratio<0?rand(orbSad):ratio<0.25?rand(orbClose):rand(orbHappy);
-    setTimeout(()=>showOrb(msg,state),2000);
-  }
+  return ratio<0?'sad':ratio<0.25?'close':'happy';
 }
+function getOrbMsg(state, pool){
+  if(pool==='logged') return state==='sad'?rand(orbSad):state==='close'?rand(orbClose):rand(orbLogged);
+  return state==='sad'?rand(orbSad):state==='close'?rand(orbClose):rand(orbHappy);
+}
+
+function triggerOrb(context){
+  if(document.activeElement===$('spendInput'))return;
+  if(context==='noSpend'){setTimeout(()=>showOrb(rand(orbNoSpend),'happy'),800);return;}
+  const state=getOrbState();
+  if(context==='spend'){setTimeout(()=>showOrb(getOrbMsg(state,'logged'),state),1600);return;}
+  if(context==='open'){setTimeout(()=>showOrb(getOrbMsg(state,'open'),state),4500);return;}
+  if(context==='random'){showOrb(getOrbMsg(state,'open'),state);}
+}
+
+function startOrbInterval(){
+  clearInterval(orbInterval);
+  orbInterval=setInterval(()=>{
+    if(activeTab==='home'&&document.activeElement!==$('spendInput')){
+      triggerOrb('random');
+    }
+  },10000);
+}
+function stopOrbInterval(){ clearInterval(orbInterval); }
 
 function saveName(){
   const n=$('nameInput').value.trim().split(' ')[0];
@@ -1348,6 +1398,7 @@ function resetMonth(){
 function goTab(tab){
   activeTab=tab;
   ['home','cal','log'].forEach(t=>{$(`${t}Screen`).classList.toggle('active',t===tab);$(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active',t===tab);});
+  if(tab==='home') startOrbInterval(); else stopOrbInterval();
   render();
 }
 function prevMonth(){if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--;selectedDay=1;loadFromCloud(viewYear,viewMonth).then(()=>render());}
@@ -1424,7 +1475,7 @@ function render(){
 
       const streakEl=$('streak');let streak=0;
       for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
-      if(streak>=2){streakEl.textContent=`${streak} day streak`;streakEl.style.visibility='visible';}
+      if(streak>=2&&isToday){streakEl.textContent=`${streak} day streak`;streakEl.style.visibility='visible';}
       else{streakEl.textContent=`0 day streak`;streakEl.style.visibility='hidden';}
     }
   }
@@ -1553,7 +1604,7 @@ function render(){
       showApp(); render();
       checkName();
       checkMonthPrompts();
-      triggerOrb("open"); playOutro();
+      triggerOrb('open'); playOutro(); startOrbInterval();
     } else {
       if(!localStorage.getItem('ot_welcomed')){
         playIntro();
