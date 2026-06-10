@@ -133,6 +133,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .cal-cell .cal-val { font-size: 11px; opacity: 0.9; margin-top: 2px; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
+.cal-cell.empty  { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.45); }
 .cal-cell.future { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
 .cal-cell.today  { outline: 2px solid var(--green); outline-offset: 2px; }
 @keyframes cellFade { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
@@ -153,6 +154,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .divider { height: 1px; background: var(--border); margin: 10px 24px; }
 .reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
+.calc-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.calc-row label { font-size:13px; color:var(--muted); flex:1; }
+.calc-input-wrap { display:flex; align-items:center; gap:4px; background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:6px 10px; width:110px; flex-shrink:0; }
+.calc-input-wrap span { font-size:13px; font-weight:600; color:var(--muted); }
+.calc-input { background:none; border:none; outline:none; font-size:13px; font-weight:600; color:var(--text); font-family:'Inter',sans-serif; width:100%; text-align:right; }
+.calc-sym { font-size:13px; font-weight:600; color:var(--muted); }
 
 .currency-btn {
   flex: 1; padding: 7px 4px; border: 1px solid var(--border); border-radius: 50px;
@@ -403,6 +410,67 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
   <!-- HOME -->
   <div class="screen" id="homeScreen">
+
+    <!-- Disposable income overlay — shows once for new users before budget setup -->
+    <div class="overlay" id="incomeOverlay">
+      <div class="overlay-card" style="width:100%;max-height:90vh;overflow-y:auto;">
+
+        <!-- Question screen -->
+        <div id="incomeQuestion">
+          <p style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick question</p>
+          <p style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;">Do you know your monthly disposable income — what's left after all your bills are paid?</p>
+          <button class="btn-set" onclick="incomeYes()" style="margin-bottom:10px;">Yes, I know it</button>
+          <button onclick="incomeNo()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">No, help me work it out</button>
+        </div>
+
+        <!-- Calculator screen -->
+        <div id="incomeCalc" style="display:none;">
+          <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Let's work it out</p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Fill in what you can — we'll calculate what's left.</p>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+            <div class="calc-row">
+              <label>Monthly take-home pay</label>
+              <div class="calc-input-wrap"><span id="calcSym1">£</span><input class="calc-input" id="ci_income" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+            <p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Monthly outgoings</p>
+            <div class="calc-row">
+              <label>Rent / mortgage</label>
+              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_rent" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+            <div class="calc-row">
+              <label>Food &amp; groceries</label>
+              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_food" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+            <div class="calc-row">
+              <label>Bills &amp; subscriptions</label>
+              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_bills" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+            <div class="calc-row">
+              <label>Transport</label>
+              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_transport" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+            <div class="calc-row">
+              <label>Other fixed costs</label>
+              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_other" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
+            </div>
+
+            <!-- Result -->
+            <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:14px 16px;margin-top:4px;">
+              <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Your disposable income</div>
+              <div id="calcResult" style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:-1px;">£0.00</div>
+              <div id="calcNote" style="font-size:11px;color:var(--muted);margin-top:3px;">per month after outgoings</div>
+            </div>
+          </div>
+
+          <button class="btn-set" id="useCalcBtn" onclick="useCalculatedBudget()" style="margin-bottom:10px;" disabled>Use this as my budget</button>
+          <button onclick="incomeYes()" style="width:100%;height:44px;background:transparent;border:none;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.35);cursor:pointer;">I'll enter it manually instead</button>
+        </div>
+
+      </div>
+    </div>
+
     <div class="budget-setup" id="budgetSetup">
       <h2>Let's get started</h2>
       <p>How much do you have to spend this month?</p>
@@ -440,7 +508,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="streak" id="streak"></div>
 
       <!-- Spend pace meter — only shows on today when spending logged -->
-      <div id="spendPace" style="display:none;width:100%;padding:0 24px;margin-top:4px;">
+      <div id="spendPace" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
         <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:12px 16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
@@ -489,6 +557,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div><div class="cal-day-label">Su</div>
     </div>
     <div class="cal-grid" id="calGrid"></div>
+
+    <!-- Legend -->
+    <div style="display:flex;justify-content:center;gap:16px;padding:12px 0 4px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:3px;background:var(--green-deep);"></div>
+        <span style="font-size:10px;color:var(--muted);">On track</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:3px;background:var(--red);"></div>
+        <span style="font-size:10px;color:var(--muted);">Over budget</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:3px;border:1.5px solid rgba(255,255,255,0.2);"></div>
+        <span style="font-size:10px;color:var(--muted);">Not logged</span>
+      </div>
+    </div>
     
   </div>
 
@@ -553,6 +637,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
 
     <div class="divider" style="margin:6px 20px;"></div>
+    <button id="viewSummaryBtn" style="display:none;width:calc(100% - 32px);margin:0 16px 6px;height:44px;background:var(--glass);border:1px solid var(--border);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;" onclick="viewMonthlySummary()">View summary</button>
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
   </div>
 
@@ -570,6 +655,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <div class="overlay-card">
       <p class="overlay-text" id="onboardText"></p>
       <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
+    </div>
+  </div>
+
+  <!-- END OF MONTH SUMMARY -->
+  <div class="overlay" id="eomOverlay" style="align-items:flex-end;padding:0;">
+    <div style="background:#1a1a1a;border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:28px 24px 40px;max-height:92vh;overflow-y:auto;">
+      <div id="eomContent"></div>
+    </div>
+  </div>
+
+  <!-- NEW MONTH PROMPT -->
+  <div class="overlay" id="newMonthOverlay">
+    <div class="overlay-card" style="width:100%;">
+      <div style="font-size:32px;margin-bottom:8px;">🗓️</div>
+      <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;">New month!</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.6;">Keep the same budget as last month?</p>
+      <p id="newMonthAmt" style="font-size:28px;font-weight:700;color:var(--green);margin-bottom:20px;letter-spacing:-1px;">£500</p>
+      <button class="btn-set" onclick="keepMonthBudget()" style="margin-bottom:10px;">Keep this budget</button>
+      <button onclick="changeMonthBudget()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">Change it</button>
     </div>
   </div>
 
@@ -716,7 +820,193 @@ function setCurrency(btn, symbol){
   $('currencySymbol').textContent = symbol;
 }
 
-/* ══ FORGOT PASSWORD ══ */
+/* ══ END OF MONTH & NEW MONTH ══ */
+function checkMonthPrompts(){
+  const now=new Date();
+  const y=now.getFullYear(),m=now.getMonth();
+  const today=now.getDate();
+  const lastDay=daysInMonth(y,m);
+  const cur=getCurrency();
+
+  // Last day of month — show summary (once)
+  const eomKey=`ot_eom_${y}_${m}`;
+  if(today===lastDay&&!localStorage.getItem(eomKey)){
+    const d=getData(y,m);
+    if(d.budget>0){
+      localStorage.setItem(eomKey,'1');
+      showEOM(d,y,m);
+      return;
+    }
+  }
+
+  // First day of month — ask about budget (once)
+  const newKey=`ot_newmonth_${y}_${m}`;
+  if(today===1&&!localStorage.getItem(newKey)){
+    // Get last month's budget
+    const lm=m===0?11:m-1, ly=m===0?y-1:y;
+    const prev=getData(ly,lm);
+    const curBudget=getData(y,m);
+    if(prev.budget>0&&!curBudget.budget){
+      localStorage.setItem(newKey,'1');
+      $('newMonthAmt').textContent=`${cur}${prev.budget.toFixed(0)}`;
+      $('newMonthOverlay').classList.add('show');
+      $('newMonthOverlay').dataset.prevBudget=prev.budget;
+    }
+  }
+}
+
+function keepMonthBudget(){
+  const budget=parseFloat($('newMonthOverlay').dataset.prevBudget);
+  if(budget>0){
+    const now=new Date();
+    const d=getData(now.getFullYear(),now.getMonth());
+    d.budget=budget;
+    saveData(d,now.getFullYear(),now.getMonth());
+    syncToCloud(now.getFullYear(),now.getMonth());
+  }
+  $('newMonthOverlay').classList.remove('show');
+  render();
+}
+
+function changeMonthBudget(){
+  $('newMonthOverlay').classList.remove('show');
+  // Budget setup will show naturally since no budget set
+}
+
+function showEOM(d,y,m){
+  const history=d.history||[], budget=d.budget, cur=getCurrency();
+  const days=daysInMonth(y,m);
+  const monthName=new Date(y,m,1).toLocaleString('default',{month:'long'});
+
+  // Calculate insights
+  const totalSpent=history.reduce((s,h)=>s+(h.amount||0),0);
+  const saved=budget-totalSpent;
+  const avgDaily=days>0?totalSpent/days:0;
+
+  // Days on track
+  let onTrack=0,bestStreak=0,curStreak=0;
+  for(let i=1;i<=days;i++){
+    const spent=history.filter(h=>h&&h.day===i).reduce((s,h)=>s+(h.amount||0),0);
+    const allow=dailyAllowance(i,days,y,m);
+    if(spent<=allow){onTrack++;curStreak++;bestStreak=Math.max(bestStreak,curStreak);}
+    else curStreak=0;
+  }
+
+  // Day totals
+  const dayTotals={};
+  history.forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
+  const sortedDays=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1]);
+  const biggestDay=sortedDays[0];
+  const bestDay=sortedDays[sortedDays.length-1];
+
+  // Day of week analysis
+  const dowTotals={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  const dowCounts={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  history.forEach(h=>{
+    if(h&&h.day){
+      const dow=new Date(y,m,h.day).getDay();
+      dowTotals[dow]+=h.amount||0;dowCounts[dow]++;
+    }
+  });
+  const dowNames=['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'];
+  const dowAvgs=Object.keys(dowTotals).map(d=>({day:parseInt(d),avg:dowCounts[d]>0?dowTotals[d]/dowCounts[d]:0}));
+  const priciest=dowAvgs.sort((a,b)=>b.avg-a.avg)[0];
+
+  // First half vs second half
+  const firstHalf=history.filter(h=>h&&h.day<=15).reduce((s,h)=>s+(h.amount||0),0);
+  const secondHalf=history.filter(h=>h&&h.day>15).reduce((s,h)=>s+(h.amount||0),0);
+  const halfNote=firstHalf>secondHalf?'You tend to spend more in the first half of the month':'You tend to spend more towards the end of the month';
+
+  const html=`
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:36px;margin-bottom:8px;">${saved>=0?'🎉':'📊'}</div>
+      <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;">${monthName} wrapped up</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Here's how your month looked</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
+        <div style="font-size:18px;font-weight:700;color:${saved>=0?'var(--green)':'#ef9a9a'};letter-spacing:-0.5px;">${saved>=0?cur+Math.abs(saved).toFixed(0):'-'+cur+Math.abs(saved).toFixed(0)}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">${saved>=0?'Saved':'Over'}</div>
+      </div>
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
+        <div style="font-size:18px;font-weight:700;color:var(--text);">${onTrack}<span style="font-size:11px;color:var(--muted);">/${days}</span></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">On track</div>
+      </div>
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
+        <div style="font-size:18px;font-weight:700;color:var(--green);">${bestStreak}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">Best streak</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:13px;color:var(--text);">📅 ${dowNames[priciest.day]} were your most expensive days on average</div>
+      </div>
+      ${biggestDay?`<div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:13px;color:var(--text);">💸 Biggest day was the ${biggestDay[0]}${ordinal(parseInt(biggestDay[0]))} — ${cur}${parseFloat(biggestDay[1]).toFixed(2)} spent</div>
+      </div>`:''}
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:13px;color:var(--text);">📊 ${halfNote}</div>
+      </div>
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:13px;color:var(--text);">📈 Average daily spend was ${cur}${avgDaily.toFixed(2)}</div>
+      </div>
+      ${bestDay&&parseFloat(bestDay[1])>0?`<div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:13px;color:var(--text);">💚 Best day was the ${bestDay[0]}${ordinal(parseInt(bestDay[0]))} — only ${cur}${parseFloat(bestDay[1]).toFixed(2)} spent</div>
+      </div>`:''}
+    </div>
+
+    <button class="btn-set" onclick="$('eomOverlay').classList.remove('show')">On to ${new Date(y,m+1,1).toLocaleString('default',{month:'long'})} →</button>
+  `;
+  $('eomContent').innerHTML=html;
+  $('eomOverlay').classList.add('show');
+}
+
+function viewMonthlySummary(){
+  const d=getData(viewYear,viewMonth);
+  if(d.budget>0) showEOM(d,viewYear,viewMonth);
+}
+function ordinal(n){const s=['th','st','nd','rd'],v=n%100;return s[(v-20)%10]||s[v]||s[0];}
+
+function showIncomeOverlay(){
+  if(!localStorage.getItem('ot_income_asked')){
+    $('incomeOverlay').classList.add('show');
+    // Update currency symbols in calculator
+    const sym=getCurrency();
+    document.querySelectorAll('.calc-sym').forEach(el=>el.textContent=sym);
+    if($('calcSym1')) $('calcSym1').textContent=sym;
+  }
+}
+function incomeYes(){
+  localStorage.setItem('ot_income_asked','1');
+  $('incomeOverlay').classList.remove('show');
+}
+function incomeNo(){
+  $('incomeQuestion').style.display='none';
+  $('incomeCalc').style.display='block';
+}
+function calcDisposable(){
+  const v=id=>parseFloat($(id).value)||0;
+  const income=v('ci_income');
+  const out=v('ci_rent')+v('ci_food')+v('ci_bills')+v('ci_transport')+v('ci_other');
+  const result=income-out;
+  const sym=getCurrency();
+  $('calcResult').textContent=`${sym}${Math.max(0,result).toFixed(2)}`;
+  $('calcResult').style.color=result>0?'var(--green)':'#ef9a9a';
+  $('calcNote').textContent=result>0?'per month after outgoings':result<0?'⚠ outgoings exceed income':'enter your income above';
+  $('useCalcBtn').disabled=result<=0;
+}
+function useCalculatedBudget(){
+  const v=id=>parseFloat($(id).value)||0;
+  const income=v('ci_income');
+  const out=v('ci_rent')+v('ci_food')+v('ci_bills')+v('ci_transport')+v('ci_other');
+  const result=income-out;
+  if(result>0){
+    $('budgetInput').value=result.toFixed(2);
+    incomeYes();
+  }
+}
 function showForgot(){ $('loginForm').style.display='none'; $('forgotForm').style.display='block'; $('authError').textContent=''; }
 function hideForgot(){ $('forgotForm').style.display='none'; $('loginForm').style.display='block'; }
 async function sendReset(){
@@ -775,6 +1065,7 @@ async function handleAuth() {
     await loadFromCloud(viewYear, viewMonth);
     showApp(); render();
     if(!isSignUp) checkName();
+    if(!isSignUp) checkMonthPrompts();
     playOutro();
       await loadFromCloud(viewYear, viewMonth);
       showApp();
@@ -934,6 +1225,7 @@ function render(){
     $('budgetSetup').style.display=has?'none':'flex';
     $('homeMain').style.display=has?'flex':'none';
     $('spendArea').style.display=has?'flex':'none';
+    if(!has) showIncomeOverlay();
     if(has){
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
@@ -978,8 +1270,8 @@ function render(){
         $('paceFill').style.background=paceColor;
         $('paceLabel').style.color=paceColor;
         $('paceLabel').textContent=paceText;
-        paceEl.style.display='block';
-      } else { paceEl.style.display='none'; }
+        paceEl.style.visibility='visible';
+      } else { paceEl.style.visibility='hidden'; }
       $('btnClear').style.visibility=(history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
 
       const streakEl=$('streak');let streak=0;
@@ -996,7 +1288,11 @@ function render(){
     for(let i=1;i<=days;i++){
       const fut=td?i>td:false,isT=td?i===td:false;
       const allow=dailyAllowance(i,days,viewYear,viewMonth),spent=spentOnDay(i,history);
-      let cls='cal-cell';if(fut)cls+=' future';else cls+=spent<=allow?' green':' red';if(isT)cls+=' today';
+      let cls='cal-cell';
+      if(fut) cls+=' future';
+      else if(spent===0) cls+=' empty';
+      else cls+=spent<=allow?' green':' red';
+      if(isT) cls+=' today';
       const cell=document.createElement('div');cell.className=cls;
       cell.style.animationDelay=`${(i-1)*0.02}s`;
       const margin=allow-spent,sign=margin>=0?getCurrency():'-'+getCurrency();
@@ -1014,7 +1310,15 @@ function render(){
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     $('overviewTitle').innerHTML = name ? `${greeting}, ${name}` : greeting;
-    if($('overviewNextBtn')) $('overviewNextBtn').style.opacity = isCurrentMonth() ? '0.25' : '1';
+    // Show "View summary" button for past months with data
+    const summaryBtn=$('viewSummaryBtn');
+    const isPast=!isCurrentMonth();
+    const hasBudget=budget>0;
+    const monthLabel=new Date(viewYear,viewMonth,1).toLocaleString('default',{month:'long'});
+    if(summaryBtn){
+      summaryBtn.style.display=(isPast&&hasBudget)?'block':'none';
+      summaryBtn.textContent=`View ${monthLabel} summary`;
+    }
     $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
     $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
     const elapsed=td?td:days;
@@ -1047,9 +1351,12 @@ function render(){
     // Get back on track card — when behind
     const otCard=$('onTrackCard');
     if(saved<=-0.005&&dFwd>0&&budget>0){
-      const newDaily=mLeft/dFwd;
+      // Use same formula as calendar future cells so numbers match
+      const daysLeft=Math.max(1,days-(td||days)+1);
+      const remaining=td?remainingAfter(td-1,viewYear,viewMonth):mLeft;
+      const newDaily=remaining/daysLeft;
       if(newDaily>0){
-        $('onTrackText').textContent=`Spend no more than ${cur}${newDaily.toFixed(2)} per day for the next ${dFwd} day${dFwd!==1?'s':''} to finish the month on budget.`;
+        $('onTrackText').textContent=`Spend no more than ${cur}${Math.floor(newDaily)} per day for the next ${daysLeft} day${daysLeft!==1?'s':''} to finish the month on budget.`;
       } else {
         $('onTrackText').textContent=`You've exceeded your budget for this month. Try to minimise spending for the remaining ${dFwd} day${dFwd!==1?'s':''}.`;
       }
@@ -1096,6 +1403,7 @@ function render(){
       await loadFromCloud(viewYear,viewMonth);
       showApp(); render();
       checkName();
+      checkMonthPrompts();
       playOutro();
     } else {
       if(!localStorage.getItem('ot_welcomed')){
