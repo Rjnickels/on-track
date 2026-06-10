@@ -509,7 +509,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
       <!-- Spend pace meter — only shows on today when spending logged -->
       <div id="spendPace" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
-        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:12px 16px;">
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:8px 14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
             <span id="paceLabel" style="font-size:11px;font-weight:600;color:var(--green);">On pace</span>
@@ -534,11 +534,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
-      <div id="undoBar" style="display:flex;visibility:hidden;justify-content:space-between;align-items:center;padding:4px 2px;min-height:28px;">
-        <span id="undoLabel" style="font-size:12px;color:rgba(255,255,255,0.45);"></span>
-        <button onclick="undoLastEntry()" style="background:none;border:none;font-size:12px;font-weight:600;color:var(--green);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;">Undo</button>
+      <div id="undoBar" style="display:flex;visibility:hidden;justify-content:space-between;align-items:center;padding:4px 2px;min-height:26px;">
+        <span id="undoLabel" style="font-size:12px;color:rgba(255,255,255,0.4);"></span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button onclick="undoLastEntry()" style="background:none;border:none;font-size:12px;font-weight:600;color:var(--green);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;">Undo</button>
+          <button type="button" id="btnClear" onclick="clearSelectedDay()" style="background:none;border:none;font-size:12px;font-weight:500;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;visibility:hidden;">Clear all</button>
+        </div>
       </div>
-      <button type="button" class="btn-clear" id="btnClear" onclick="clearSelectedDay()">Clear this day's entries</button>
       <div class="toast" id="spendToast"></div>
     </div>
     
