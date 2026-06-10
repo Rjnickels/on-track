@@ -74,8 +74,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
-.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; }
-.ring-fill.glow { filter: drop-shadow(0 0 8px rgba(33,194,90,0.5)); }
+.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease, filter 0.6s ease; filter: drop-shadow(0 0 6px rgba(33,194,90,0.6)) drop-shadow(0 0 16px rgba(33,194,90,0.3)); }
+.ring-fill.glow { animation: ringPulseGlow 3s ease-in-out infinite; }
+@keyframes ringPulseGlow {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(33,194,90,0.7)) drop-shadow(0 0 20px rgba(33,194,90,0.35)) drop-shadow(0 0 40px rgba(33,194,90,0.15)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(33,194,90,1.0)) drop-shadow(0 0 36px rgba(33,194,90,0.6)) drop-shadow(0 0 70px rgba(33,194,90,0.25)); }
+}
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
 .ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -534,6 +538,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
+      <button id="noSpendBtn" onclick="logNoSpend()" style="visibility:hidden;background:none;border:none;font-size:12px;font-weight:500;color:rgba(255,255,255,0.35);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;width:100%;text-align:center;">Nothing spent today</button>
       <div id="undoBar" style="display:flex;visibility:hidden;justify-content:space-between;align-items:center;padding:4px 2px;min-height:26px;">
         <span id="undoLabel" style="font-size:12px;color:rgba(255,255,255,0.4);"></span>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -1191,6 +1196,13 @@ function addSpend(){
   $('undoBar').style.visibility='visible';
   render();
 }
+function logNoSpend(){
+  const d=getData(viewYear,viewMonth);if(!d.history)d.history=[];
+  d.history.push({day:selectedDay,amount:0,id:Date.now()});
+  saveData(d,viewYear,viewMonth);
+  const t=$('spendToast');t.textContent='Marked as no spend ✓';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
+  render();syncToCloud(viewYear,viewMonth);
+}
 function undoLastEntry(){
   const d=getData(viewYear,viewMonth);if(!d.history||!d.history.length)return;
   const dayEntries=d.history.filter(h=>h&&h.day===selectedDay);
@@ -1243,6 +1255,11 @@ function render(){
       const circ=2*Math.PI*140,ratio=a>0?Math.max(0,amount)/a:0,off=circ*(1-Math.min(1,ratio)),col=ringColor(ratio);
       const fill=$('ringFill');fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=off;fill.style.stroke=col;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
+      if(amount<0){
+        fill.style.filter='drop-shadow(0 0 8px rgba(239,154,154,0.7)) drop-shadow(0 0 20px rgba(239,154,154,0.3))';
+      } else {
+        fill.style.filter='';
+      }
       $('ringWrap').classList.toggle('over',amount<0);
       $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
       $('ringAmount').style.color=col;
@@ -1274,7 +1291,12 @@ function render(){
         $('paceLabel').textContent=paceText;
         paceEl.style.visibility='visible';
       } else { paceEl.style.visibility='hidden'; }
-      $('btnClear').style.visibility=(history.filter(h=>h&&h.day===selectedDay).length>0)?'visible':'hidden';
+      const dayHasEntries=history.filter(h=>h&&h.day===selectedDay).length>0;
+      $('btnClear').style.visibility=dayHasEntries?'visible':'hidden';
+      if($('noSpendBtn')){
+        const canMarkNoSpend=!dayHasEntries&&(isViewingToday||(selectedDay<todayDate()));
+        $('noSpendBtn').style.visibility=canMarkNoSpend?'visible':'hidden';
+      }
 
       const streakEl=$('streak');let streak=0;
       for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
@@ -1290,15 +1312,16 @@ function render(){
     for(let i=1;i<=days;i++){
       const fut=td?i>td:false,isT=td?i===td:false;
       const allow=dailyAllowance(i,days,viewYear,viewMonth),spent=spentOnDay(i,history);
+      const hasEntries=history.filter(h=>h&&h.day===i).length>0;
       let cls='cal-cell';
       if(fut) cls+=' future';
-      else if(spent===0) cls+=' empty';
+      else if(!hasEntries) cls+=' empty';
       else cls+=spent<=allow?' green':' red';
       if(isT) cls+=' today';
       const cell=document.createElement('div');cell.className=cls;
       cell.style.animationDelay=`${(i-1)*0.02}s`;
       const margin=allow-spent,sign=margin>=0?getCurrency():'-'+getCurrency();
-      const spentStr=spent>0?`${getCurrency()}${spent.toFixed(0)}`:'£0';
+      const spentStr=!hasEntries?'':spent===0?'no spend':`${getCurrency()}${spent.toFixed(0)}`;
       cell.innerHTML=fut
         ?`<span class="cal-num">${i}</span><span class="cal-val">${getCurrency()}${Math.floor(Math.max(0,allow))}</span>`
         :`<span class="cal-num">${i}</span><span class="cal-val">${spentStr}</span>`;
