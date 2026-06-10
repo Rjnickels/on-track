@@ -36,7 +36,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
 .logout-btn:hover { color: var(--text); }
 
-.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; }
+.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; position: relative; }
 .screen.active { display: flex; flex-direction: column; }
 .credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
 
@@ -913,8 +913,9 @@ const orbLogged=['Noted.','Another one.','That went quickly.','Logged.'];
 const orbNoSpend=['The shops missed you today.','Didn\'t think you had it in you.','Not a penny. Remarkable.'];
 let orbTimer, orbInterval;
 function showOrb(msg,state){
+  if(!currentUser)return;
   if(document.activeElement===$('spendInput'))return;
-  if(activeTab!=='home')return;
+  if(!$('homeScreen').classList.contains('active'))return;
   clearTimeout(orbTimer);
   const body=$('orbBody'),mouth=$('orbMouth'),el=$('orbEL'),er=$('orbER');
   const armL=$('orbArmL'),armR=$('orbArmR'),handL=$('orbHandL'),handR=$('orbHandR');
@@ -1398,7 +1399,7 @@ function resetMonth(){
 function goTab(tab){
   activeTab=tab;
   ['home','cal','log'].forEach(t=>{$(`${t}Screen`).classList.toggle('active',t===tab);$(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active',t===tab);});
-  if(tab==='home') startOrbInterval(); else stopOrbInterval();
+  if(tab==='home') startOrbInterval(); else { stopOrbInterval(); if($('orbWrap')) $('orbWrap').className='orb-wrap orb-hide'; }
   render();
 }
 function prevMonth(){if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--;selectedDay=1;loadFromCloud(viewYear,viewMonth).then(()=>render());}
