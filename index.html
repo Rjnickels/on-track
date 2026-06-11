@@ -8,6 +8,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 form { margin: 0; padding: 0; }
@@ -35,12 +36,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .wordmark .wm-track { color: var(--green); }
 .logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
 .logout-btn:hover { color: var(--text); }
+.settings-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: color 0.2s, background 0.2s; }
+.settings-btn:hover { color: var(--text); background: var(--glass); }
 
 .screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; }
 .screen.active { display: flex; flex-direction: column; }
 #homeScreen { position: relative; }
-.credit { text-align: center; font-size: 10px; color: rgba(255,255,255,0.5); padding: 12px 0 4px; letter-spacing: 0.5px; flex-shrink: 0; }
-
 .nav { display: flex; background: rgba(17,17,17,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--muted); font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
 .nav-btn svg { transition: transform 0.2s; }
@@ -82,7 +83,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: none; stroke-width: 14; }
 .ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; }
-.ring-fill.glow { }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
 .ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -92,10 +92,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 @keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
-
-.view-tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 4px; width: 100%; }
-.view-tab { flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 50px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; background: var(--glass); color: var(--muted); cursor: pointer; transition: all 0.25s ease; text-align: center; }
-.view-tab.active { background: var(--green); color: #06220f; border-color: var(--green); box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
 
 .spend-area { padding: 4px 24px 4px; display: flex; flex-direction: column; gap: 4px; }
 .input-row { display: flex; gap: 8px; }
@@ -109,8 +105,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-add:hover { background: var(--green-bright); }
 .btn-add:active { transform: scale(0.95); }
 
-.btn-clear { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s; }
-.btn-clear:hover { background: var(--glass); color: var(--text); }
 .toast { text-align: center; font-size: 13px; font-weight: 600; color: var(--green); padding: 6px 0; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
 .toast.show { opacity: 1; height: auto; }
 
@@ -145,24 +139,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .cal-cell.today  { outline: 2px solid var(--green); outline-offset: 2px; }
 @keyframes cellFade { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
 
-.log-header { padding: 18px 24px 8px; }
-.log-header h2 { font-size: 17px; font-weight: 700; }
-.log-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .projection { margin: 10px 20px 8px; padding: 28px 24px; border-radius: 16px; font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); }
 .projection.ahead { background: linear-gradient(135deg, rgba(33,194,90,0.12), rgba(33,194,90,0.03)); border-color: rgba(33,194,90,0.25); }
 .projection.behind { background: linear-gradient(135deg, rgba(183,28,28,0.12), rgba(183,28,28,0.03)); border-color: rgba(183,28,28,0.25); }
 .projection strong { font-size: 28px; display: block; margin-top: 6px; }
 .projection .on { color: #ffffff; }
 .projection .track { color: var(--green); }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 20px; }
-.stat-card { background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
-.stat-card .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; }
-.stat-card .stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
 .divider { height: 1px; background: var(--border); margin: 10px 24px; }
 .reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
-
-
 
 .calc-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .calc-row label { font-size:13px; color:var(--muted); flex:1; }
@@ -184,6 +169,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <div class="app">
 
   <header class="app-header">
+    <button class="settings-btn" id="settingsBtn" onclick="openSettings()" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
     <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display:none">Log out</button>
   </header>
@@ -199,7 +187,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
-  <!-- WELCOME SCREEN -->
   <!-- OUTRO ANIMATION (post-login) -->
   <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:#1a1a1a;flex-direction:column;pointer-events:none;">
     <style>
@@ -542,7 +529,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <button id="noSpendBtn" onclick="logNoSpend()" style="visibility:hidden;width:100%;height:38px;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.3);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#21c25a;cursor:pointer;margin-bottom:4px;">Nothing spent today</button>
       <form onsubmit="event.preventDefault(); addSpend();">
         <div class="input-row">
-          <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" placeholder="What did you spend?" inputmode="decimal"/></div>
+          <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" step="0.01" placeholder="What did you spend?" inputmode="decimal"/></div>
           <button type="submit" class="btn-add">Add</button>
         </div>
       </form>
@@ -655,6 +642,93 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
   </div>
 
+  <!-- SETTINGS -->
+  <div class="overlay" id="settingsOverlay" style="align-items:flex-end;padding:0;">
+    <div style="background:#1e1e1e;border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:0 0 40px;max-height:92vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;">
+        <span style="font-size:17px;font-weight:700;color:var(--text);">Settings</span>
+        <button onclick="closeSettings()" style="background:var(--glass);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+
+      <!-- Profile -->
+      <div style="padding:0 24px 16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Profile</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Name</label>
+            <input id="settingsName" type="text" placeholder="Your first name" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Email</label>
+            <input id="settingsEmail" type="email" placeholder="your@email.com" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Password</label>
+            <input id="settingsPass" type="password" placeholder="New password" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <button onclick="saveProfile()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Save profile</button>
+          <div id="profileMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
+
+      <!-- Budget & Currency -->
+      <div style="padding:0 24px 16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Budget & Currency</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Budget</label>
+            <input id="settingsBudget" type="number" min="1" step="1" placeholder="Monthly budget" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">Only affects today onwards — past days stay as they are.</p>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <button class="currency-btn" onclick="setCurrency(this,'£')" id="cur_gbp">🇬🇧 £</button>
+            <button class="currency-btn" onclick="setCurrency(this,'$')" id="cur_usd">🇺🇸 $</button>
+            <button class="currency-btn" onclick="setCurrency(this,'€')" id="cur_eur">🇪🇺 €</button>
+            <button class="currency-btn" onclick="setCurrency(this,'A$')" id="cur_aud">🇦🇺 A$</button>
+            <button class="currency-btn" onclick="setCurrency(this,'C$')" id="cur_cad">🇨🇦 C$</button>
+          </div>
+          <button onclick="saveBudgetSettings()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Update budget</button>
+          <div id="budgetMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
+
+      <!-- Notifications -->
+      <div style="padding:0 24px 16px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Notifications</div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Daily reminder</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">Remind me to log my spending</div>
+            </div>
+            <label style="position:relative;display:inline-block;width:44px;height:26px;cursor:pointer;">
+              <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+              <span id="notifTrack" style="position:absolute;inset:0;background:rgba(255,255,255,0.15);border-radius:50px;transition:background 0.2s;"></span>
+              <span id="notifThumb" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;"></span>
+            </label>
+          </div>
+          <div id="notifTimeRow" style="display:none;align-items:center;justify-content:space-between;">
+            <label style="font-size:13px;color:var(--muted);">Reminder time</label>
+            <input type="time" id="notifTime" value="20:00" onchange="saveNotifTime()" style="background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;cursor:pointer;"/>
+          </div>
+          <div id="notifMsg" style="font-size:11px;color:var(--muted);min-height:14px;"></div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
+
+      <!-- Danger zone -->
+      <div style="padding:0 24px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Danger Zone</div>
+        <button onclick="clearAllData()" style="width:100%;padding:11px;border:1px solid rgba(239,154,154,0.2);border-radius:50px;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;background:transparent;color:#ef9a9a;cursor:pointer;">Clear all my data</button>
+      </div>
+    </div>
+  </div>
+
   <!-- OVERLAYS -->
   <div class="overlay" id="nameOverlay">
     <div class="overlay-card" style="width:100%;">
@@ -716,8 +790,7 @@ let isSignUp = false;
 function getCurrency(){ return localStorage.getItem('ot_currency')||'£'; }
 function getName(){ return localStorage.getItem('ot_name')||''; }
 
-/* ══ WELCOME ══ */
-/* ══ OUTRO ANIMATION (post-login) ══ */
+/* ══ OUTRO ANIMATION ══ */
 function playOutro(){
   const outro=$('outroScreen');
   const wm=$('outroWordmark');
@@ -1038,7 +1111,148 @@ async function sendReset(){
   }
 }
 
-/* ══ AUTH ══ */
+/* ══ ONESIGNAL ══ */
+const OS_APP_ID = 'fd4e9adb-17df-4096-b7f8-0832c2f321c1';
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: '/sw.js' });
+});
+async function osSubscribe(){
+  return new Promise(resolve=>{
+    OneSignalDeferred.push(async function(OneSignal){
+      await OneSignal.Notifications.requestPermission();
+      resolve(OneSignal.User.PushSubscription.id);
+    });
+  });
+}
+async function osUnsubscribe(){
+  OneSignalDeferred.push(async function(OneSignal){
+    await OneSignal.User.PushSubscription.optOut();
+  });
+}
+async function osIsSubscribed(){
+  return new Promise(resolve=>{
+    OneSignalDeferred.push(function(OneSignal){
+      resolve(!!OneSignal.User.PushSubscription.id && OneSignal.User.PushSubscription.optedIn);
+    });
+  });
+}
+
+/* ══ SETTINGS ══ */
+function openSettings(){
+  // Populate fields
+  $('settingsName').value=getName()||'';
+  $('settingsEmail').value=currentUser?.email||'';
+  $('settingsPass').value='';
+  const d=getData(viewYear,viewMonth);
+  $('settingsBudget').value=d.budget>0?d.budget:'';
+  // Currency buttons
+  const cur=getCurrency();
+  ['gbp','usd','eur','aud','cad'].forEach(c=>{
+    const sym={gbp:'£',usd:'$',eur:'€',aud:'A$',cad:'C$'}[c];
+    $(`cur_${c}`).classList.toggle('active',sym===cur);
+  });
+  // Notifications
+  const notifOn=localStorage.getItem('ot_notif')==='1';
+  $('notifToggle').checked=notifOn;
+  updateNotifToggleUI(notifOn);
+  $('notifTimeRow').style.display=notifOn?'flex':'none';
+  $('notifTime').value=localStorage.getItem('ot_notif_time')||'20:00';
+  $('profileMsg').textContent='';
+  $('budgetMsg').textContent='';
+  $('notifMsg').textContent='';
+  $('settingsOverlay').classList.add('show');
+}
+function closeSettings(){ $('settingsOverlay').classList.remove('show'); }
+
+async function saveProfile(){
+  const name=$('settingsName').value.trim();
+  const email=$('settingsEmail').value.trim();
+  const pass=$('settingsPass').value;
+  const msg=$('profileMsg');
+  msg.textContent='Saving...'; msg.style.color='var(--muted)';
+  try{
+    if(name){ localStorage.setItem('ot_name',name.split(' ')[0]); render(); }
+    const updates={};
+    if(email&&email!==currentUser?.email) updates.email=email;
+    if(pass&&pass.length>=6) updates.password=pass;
+    else if(pass&&pass.length<6){ msg.textContent='Password must be at least 6 characters'; msg.style.color='#ef9a9a'; return; }
+    if(Object.keys(updates).length>0){
+      const{error}=await sb.auth.updateUser(updates);
+      if(error) throw error;
+    }
+    msg.textContent='Saved ✓'; msg.style.color='var(--green)';
+    setTimeout(()=>msg.textContent='',2000);
+  }catch(e){ msg.textContent=e.message||'Error saving'; msg.style.color='#ef9a9a'; }
+}
+
+function saveBudgetSettings(){
+  const v=parseFloat($('settingsBudget').value);
+  const msg=$('budgetMsg');
+  if(isNaN(v)||v<=0){ msg.textContent='Please enter a valid budget'; msg.style.color='#ef9a9a'; return; }
+  const d=getData(viewYear,viewMonth);
+  d.budget=v; saveData(d,viewYear,viewMonth);
+  render();
+  msg.textContent='Budget updated ✓'; msg.style.color='var(--green)';
+  setTimeout(()=>msg.textContent='',2000);
+}
+
+function updateNotifToggleUI(on){
+  $('notifTrack').style.background=on?'var(--green)':'rgba(255,255,255,0.15)';
+  $('notifThumb').style.transform=on?'translateX(18px)':'translateX(0)';
+}
+async function toggleNotifications(on){
+  updateNotifToggleUI(on);
+  $('notifTimeRow').style.display=on?'flex':'none';
+  const msg=$('notifMsg');
+  if(on){
+    msg.textContent='Requesting permission...'; msg.style.color='var(--muted)';
+    try{
+      const subId=await osSubscribe();
+      if(subId){
+        localStorage.setItem('ot_notif','1');
+        await saveNotifPrefs();
+        msg.textContent='Notifications on ✓'; msg.style.color='var(--green)';
+        setTimeout(()=>msg.textContent='',2000);
+      } else {
+        localStorage.removeItem('ot_notif');
+        $('notifToggle').checked=false;
+        updateNotifToggleUI(false);
+        $('notifTimeRow').style.display='none';
+        msg.textContent='Permission denied'; msg.style.color='#ef9a9a';
+      }
+    }catch(e){ msg.textContent='Could not enable notifications'; msg.style.color='#ef9a9a'; }
+  } else {
+    localStorage.removeItem('ot_notif');
+    await osUnsubscribe();
+    await saveNotifPrefs();
+    msg.textContent='Notifications off'; msg.style.color='var(--muted)';
+    setTimeout(()=>msg.textContent='',2000);
+  }
+}
+async function saveNotifTime(){
+  localStorage.setItem('ot_notif_time',$('notifTime').value);
+  await saveNotifPrefs();
+}
+async function saveNotifPrefs(){
+  if(!currentUser) return;
+  try{
+    await sb.from('user_budgets').upsert({
+      user_id:currentUser.id,
+      month_key:'settings',
+      budget:0,
+      history:[{notif:localStorage.getItem('ot_notif')==='1',time:localStorage.getItem('ot_notif_time')||'20:00'}]
+    },{onConflict:'user_id,month_key'});
+  }catch(e){}
+}
+
+function clearAllData(){
+  if(!confirm('This will delete all your spending data. This cannot be undone. Are you sure?'))return;
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith('gt_')||k.startsWith('ot_'));
+  keys.forEach(k=>localStorage.removeItem(k));
+  closeSettings();
+  render();
+}
 function toggleAuth() {
   isSignUp = !isSignUp;
   $('authBtn').textContent = isSignUp ? 'Sign Up' : 'Log In';
@@ -1073,17 +1287,14 @@ async function handleAuth() {
       errEl.style.color = 'var(--green)';
     } else {
       currentUser = data.user;
-    if(isSignUp && $('authName').value.trim()) {
-      localStorage.setItem('ot_name', $('authName').value.trim().split(' ')[0]);
-    }
-    await loadFromCloud(viewYear, viewMonth);
-    showApp(); render();
-    if(!isSignUp) checkName();
-    if(!isSignUp) checkMonthPrompts();
-    playOutro();
+      if (isSignUp && $('authName').value.trim()) {
+        localStorage.setItem('ot_name', $('authName').value.trim().split(' ')[0]);
+      }
       await loadFromCloud(viewYear, viewMonth);
-      showApp();
-      render();
+      showApp(); render();
+      if (!isSignUp) checkName();
+      if (!isSignUp) checkMonthPrompts();
+      playOutro();
     }
   } catch(e) {
     errEl.textContent = e.message || 'Something went wrong';
@@ -1101,6 +1312,7 @@ async function logout() {
   $('logScreen').classList.remove('active');
   $('mainNav').style.display='none';
   $('logoutBtn').style.display='none';
+  $('settingsBtn').style.display='none';
   showAuth();
 }
 
@@ -1120,6 +1332,7 @@ function showApp() {
   $('homeScreen').classList.add('active');
   $('mainNav').style.display = 'flex';
   $('logoutBtn').style.display = 'block';
+  $('settingsBtn').style.display = 'flex';
 }
 
 /* ══ DATA — localStorage + Supabase cloud sync ══ */
@@ -1228,7 +1441,7 @@ function clearSelectedDay(){
 function resetMonth(){
   if(!confirm('Reset the whole month? All data will be lost.'))return;
   localStorage.removeItem(storageKey(viewYear,viewMonth));
-  viewYear=todayYear();viewMonth=todayMonth();selectedDay=todayDate();view='day';goTab('home');
+  viewYear=todayYear();viewMonth=todayMonth();selectedDay=todayDate();goTab('home');
 }
 function goTab(tab){
   activeTab=tab;
@@ -1410,11 +1623,7 @@ function render(){
       } else { savCard.style.display='none'; }
     } else { savCard.style.display='none'; }
 
-    // Progress bar
-    const daysRemLabel=days-elapsed;
-    $('daysLeftLabel') && ($('daysLeftLabel').textContent=daysRemLabel>0?`${daysRemLabel} day${daysRemLabel!==1?'s':''} left`:'Last day!');
 
-    // Biggest spend day
     const dayTotals={};
     (history||[]).forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
     const bigDay=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1])[0];
