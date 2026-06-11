@@ -658,15 +658,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
             <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Name</label>
             <input id="settingsName" type="text" placeholder="Your first name" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Email</label>
-            <input id="settingsEmail" type="email" placeholder="your@email.com" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Password</label>
-            <input id="settingsPass" type="password" placeholder="New password" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
-          </div>
-          <button onclick="saveProfile()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Save profile</button>
+          <button onclick="saveProfile()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Save name</button>
           <div id="profileMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
         </div>
       </div>
@@ -711,8 +703,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
               <span id="notifThumb" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;"></span>
             </label>
           </div>
-          <div id="notifTimeRow" style="display:none;align-items:center;justify-content:space-between;padding-top:4px;">
-            <span style="font-size:12px;color:var(--muted);">You'll get a daily reminder at 8pm</span>
+          <div id="notifTimeRow" style="display:none;padding-top:2px;">
+            <span style="font-size:11px;color:rgba(255,255,255,0.3);">Reminders send daily at 6pm</span>
           </div>
           <div id="notifMsg" style="font-size:11px;color:var(--muted);min-height:14px;"></div>
         </div>
@@ -1150,8 +1142,6 @@ async function osIsSubscribed(){
 function openSettings(){
   // Populate fields
   $('settingsName').value=getName()||'';
-  $('settingsEmail').value=currentUser?.email||'';
-  $('settingsPass').value='';
   const d=getData(viewYear,viewMonth);
   $('settingsBudget').value=d.budget>0?d.budget:'';
   // Currency buttons
@@ -1174,23 +1164,12 @@ function closeSettings(){ $('settingsOverlay').classList.remove('show'); }
 
 async function saveProfile(){
   const name=$('settingsName').value.trim();
-  const email=$('settingsEmail').value.trim();
-  const pass=$('settingsPass').value;
   const msg=$('profileMsg');
-  msg.textContent='Saving...'; msg.style.color='var(--muted)';
-  try{
-    if(name){ localStorage.setItem('ot_name',name.split(' ')[0]); render(); }
-    const updates={};
-    if(email&&email!==currentUser?.email) updates.email=email;
-    if(pass&&pass.length>=6) updates.password=pass;
-    else if(pass&&pass.length<6){ msg.textContent='Password must be at least 6 characters'; msg.style.color='#ef9a9a'; return; }
-    if(Object.keys(updates).length>0){
-      const{error}=await sb.auth.updateUser(updates);
-      if(error) throw error;
-    }
-    msg.textContent='Saved ✓'; msg.style.color='var(--green)';
-    setTimeout(()=>msg.textContent='',2000);
-  }catch(e){ msg.textContent=e.message||'Error saving'; msg.style.color='#ef9a9a'; }
+  if(!name){ msg.textContent='Please enter a name'; msg.style.color='#ef9a9a'; return; }
+  localStorage.setItem('ot_name',name.split(' ')[0]);
+  render();
+  msg.textContent='Saved ✓'; msg.style.color='var(--green)';
+  setTimeout(()=>msg.textContent='',2000);
 }
 
 function saveBudgetSettings(){
@@ -1228,7 +1207,7 @@ async function toggleNotifications(on){
       $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
       return;
     }
-    msg.textContent='Requesting permission...'; msg.style.color='var(--muted)';
+    msg.textContent=''; msg.style.color='var(--muted)';
     try{
       const subId=await Promise.race([
         osSubscribe(),
