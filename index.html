@@ -1121,14 +1121,25 @@ async function sendReset(){
 const OS_APP_ID = 'fd4e9adb-17df-4096-b7f8-0832c2f321c1';
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: '/sw.js' });
-  window._OSReady = true;
+  try {
+    await OneSignal.init({ appId: OS_APP_ID, allowLocalhostAsSecureOrigin: true });
+    window._OSReady = true;
+  } catch(e) {
+    console.warn('OneSignal init failed:', e);
+    window._OSFailed = true;
+  }
 });
 async function waitForOS(){
-  return new Promise(resolve=>{
+  return new Promise((resolve, reject)=>{
     if(window._OSReady){ resolve(); return; }
-    const t=setInterval(()=>{ if(window._OSReady){ clearInterval(t); resolve(); } },100);
-    setTimeout(()=>{ clearInterval(t); resolve(); },5000);
+    if(window._OSFailed){ reject(new Error('OneSignal failed to load')); return; }
+    let attempts = 0;
+    const t=setInterval(()=>{
+      attempts++;
+      if(window._OSReady){ clearInterval(t); resolve(); }
+      else if(window._OSFailed){ clearInterval(t); reject(new Error('OneSignal failed to load')); }
+      else if(attempts > 60){ clearInterval(t); reject(new Error('Notification service unavailable')); }
+    },100);
   });
 }
 async function osSubscribe(){
@@ -1233,7 +1244,7 @@ async function toggleNotifications(on){
     }catch(e){
       localStorage.removeItem('ot_notif');
       $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
-      msg.textContent=e.message==='Timed out'?'Could not connect to notification service':('Could not enable: '+e.message);
+      msg.textContent=e.message||'Could not enable notifications';
       msg.style.color='#ef9a9a';
     }
   } else {
