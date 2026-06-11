@@ -1122,26 +1122,34 @@ const OS_APP_ID = 'fd4e9adb-17df-4096-b7f8-0832c2f321c1';
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
   try {
-    await OneSignal.init({ appId: OS_APP_ID, allowLocalhostAsSecureOrigin: true });
-    window._OSReady = true;
-  } catch(e) {
-    console.warn('OneSignal init failed:', e);
-    window._OSFailed = true;
-  }
+    await OneSignal.init({
+      appId: OS_APP_ID,
+      serviceWorkerPath: 'sw.js',
+      serviceWorkerParam: { scope: '/' }
+    });
+  } catch(e) { console.warn('OneSignal init error:', e); }
 });
-async function waitForOS(){
-  return new Promise((resolve, reject)=>{
-    if(window._OSReady){ resolve(); return; }
-    if(window._OSFailed){ reject(new Error('OneSignal failed to load')); return; }
-    let attempts = 0;
-    const t=setInterval(()=>{
-      attempts++;
-      if(window._OSReady){ clearInterval(t); resolve(); }
-      else if(window._OSFailed){ clearInterval(t); reject(new Error('OneSignal failed to load')); }
-      else if(attempts > 60){ clearInterval(t); reject(new Error('Notification service unavailable')); }
-    },100);
-  });
+
+async function waitForOS(ms=8000){
+  const start=Date.now();
+  while(Date.now()-start<ms){
+    if(window.OneSignal?.User?.PushSubscription!==undefined) return;
+    await new Promise(r=>setTimeout(r,200));
+  }
+  throw new Error('Notification service unavailable — try reinstalling the app');
 }
+async function osSubscribe(){
+  await waitForOS();
+  const permission=await window.OneSignal.Notifications.requestPermission();
+  if(!permission) return null;
+  return window.OneSignal.User.PushSubscription.id;
+}
+async function osUnsubscribe(){
+  if(window.OneSignal?.User?.PushSubscription){
+    await window.OneSignal.User.PushSubscription.optOut();
+  }
+}
+
 async function osSubscribe(){
   await waitForOS();
   await OneSignal.Notifications.requestPermission();
@@ -1211,17 +1219,17 @@ async function toggleNotifications(on){
   const msg=$('notifMsg');
 
   if(on){
-    // Check if notifications are supported at all
+    // Check basic notification support
     if(!('Notification' in window)){
       msg.textContent='Notifications not supported on this browser'; msg.style.color='#ef9a9a';
       $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
       return;
     }
-    // iOS Safari browser mode (not installed PWA) doesn't support push
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isStandalone=window.navigator.standalone;
-    if(isIOS&&!isStandalone){
-      msg.textContent='Add to home screen first to enable notifications'; msg.style.color='#f0a500';
+    // iOS Safari browser — only works when installed as PWA
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    const isPWA=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+    if(isIOS&&!isPWA){
+      msg.textContent='Add OnTrack to your home screen first to enable notifications'; msg.style.color='#f0a500';
       $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
       return;
     }
@@ -1229,13 +1237,13 @@ async function toggleNotifications(on){
     try{
       const subId=await Promise.race([
         osSubscribe(),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timed out')),8000))
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timed out — try again')),10000))
       ]);
       if(subId){
         localStorage.setItem('ot_notif','1');
         await saveNotifPrefs();
         msg.textContent='Notifications on ✓'; msg.style.color='var(--green)';
-        setTimeout(()=>msg.textContent='',2000);
+        setTimeout(()=>msg.textContent='',3000);
       } else {
         localStorage.removeItem('ot_notif');
         $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
