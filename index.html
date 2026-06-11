@@ -28,7 +28,7 @@ form { margin: 0; padding: 0; }
 }
 
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
-.app { display: flex; flex-direction: column; height: 100dvh; height: var(--app-height, 100dvh); max-width: 480px; margin: 0 auto; }
+.app { display: flex; flex-direction: column; min-height: 100dvh; min-height: var(--app-height, 100dvh); max-width: 480px; margin: 0 auto; }
 
 .app-header { display: flex; align-items: center; justify-content: center; padding: 14px 24px 10px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative; }
 .wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
@@ -39,10 +39,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .settings-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: color 0.2s, background 0.2s; }
 .settings-btn:hover { color: var(--text); background: var(--glass); }
 
-.screen { display: none; flex: 1; overflow: hidden; padding: 0 0 8px; min-height: 0; }
+.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 0 8px; min-height: 0; -webkit-overflow-scrolling: touch; }
 .screen.active { display: flex; flex-direction: column; }
-#homeScreen { position: relative; }
-.nav { display: flex; background: rgba(17,17,17,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
+#homeScreen { position: relative; padding-bottom: 200px; }
+.nav { display: flex; background: rgba(17,17,17,0.97); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 100; }
 .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--muted); font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
 .nav-btn svg { transition: transform 0.2s; }
 .nav-btn.active { color: var(--green); border-top-color: var(--green); }
@@ -93,7 +93,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 @keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
 
-.spend-area { padding: 4px 24px 4px; display: flex; flex-direction: column; gap: 4px; }
+.spend-area { padding: 6px 24px 8px; display: flex; flex-direction: column; gap: 4px; position: fixed; bottom: 60px; left: 0; right: 0; max-width: 480px; margin: 0 auto; background: var(--bg); z-index: 90; border-top: 1px solid var(--border); }
 .input-row { display: flex; gap: 8px; }
 .input-wrap { flex: 1; display: flex; align-items: center; height: 48px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; background: transparent; padding-left: 4px; transition: border-color 0.2s; }
 .input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
@@ -549,7 +549,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div><!-- end homeScreen -->
 
   <!-- CALENDAR -->
-  <div class="screen" id="calScreen">
+  <div class="screen" id="calScreen" style="padding-bottom:80px;">
     <div class="cal-header">
       <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
       <h2 id="calMonthLabel">—</h2>
@@ -581,7 +581,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
 
   <!-- OVERVIEW -->
-  <div class="screen" id="logScreen" style="overflow-y:hidden;">
+  <div class="screen" id="logScreen" style="overflow-y:auto;padding-bottom:80px;">
     <div style="padding:10px 20px 4px;">
       <div id="overviewTitle" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:-0.5px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;">
