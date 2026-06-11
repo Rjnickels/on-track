@@ -711,9 +711,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
               <span id="notifThumb" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;"></span>
             </label>
           </div>
-          <div id="notifTimeRow" style="display:none;align-items:center;justify-content:space-between;">
-            <label style="font-size:13px;color:var(--muted);">Reminder time</label>
-            <input type="time" id="notifTime" value="20:00" onchange="saveNotifTime()" style="background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;cursor:pointer;"/>
+          <div id="notifTimeRow" style="display:none;align-items:center;justify-content:space-between;padding-top:4px;">
+            <span style="font-size:12px;color:var(--muted);">You'll get a daily reminder at 8pm</span>
           </div>
           <div id="notifMsg" style="font-size:11px;color:var(--muted);min-height:14px;"></div>
         </div>
@@ -1116,26 +1115,27 @@ const OS_APP_ID = 'fd4e9adb-17df-4096-b7f8-0832c2f321c1';
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
   await OneSignal.init({ appId: OS_APP_ID, serviceWorkerPath: '/sw.js' });
+  window._OSReady = true;
 });
-async function osSubscribe(){
+async function waitForOS(){
   return new Promise(resolve=>{
-    OneSignalDeferred.push(async function(OneSignal){
-      await OneSignal.Notifications.requestPermission();
-      resolve(OneSignal.User.PushSubscription.id);
-    });
+    if(window._OSReady){ resolve(); return; }
+    const t=setInterval(()=>{ if(window._OSReady){ clearInterval(t); resolve(); } },100);
+    setTimeout(()=>{ clearInterval(t); resolve(); },5000);
   });
+}
+async function osSubscribe(){
+  await waitForOS();
+  await OneSignal.Notifications.requestPermission();
+  return OneSignal.User.PushSubscription.id;
 }
 async function osUnsubscribe(){
-  OneSignalDeferred.push(async function(OneSignal){
-    await OneSignal.User.PushSubscription.optOut();
-  });
+  await waitForOS();
+  await OneSignal.User.PushSubscription.optOut();
 }
 async function osIsSubscribed(){
-  return new Promise(resolve=>{
-    OneSignalDeferred.push(function(OneSignal){
-      resolve(!!OneSignal.User.PushSubscription.id && OneSignal.User.PushSubscription.optedIn);
-    });
-  });
+  await waitForOS();
+  return !!OneSignal.User.PushSubscription.id && OneSignal.User.PushSubscription.optedIn;
 }
 
 /* ══ SETTINGS ══ */
@@ -1157,7 +1157,6 @@ function openSettings(){
   $('notifToggle').checked=notifOn;
   updateNotifToggleUI(notifOn);
   $('notifTimeRow').style.display=notifOn?'flex':'none';
-  $('notifTime').value=localStorage.getItem('ot_notif_time')||'20:00';
   $('profileMsg').textContent='';
   $('budgetMsg').textContent='';
   $('notifMsg').textContent='';
@@ -1229,10 +1228,6 @@ async function toggleNotifications(on){
     msg.textContent='Notifications off'; msg.style.color='var(--muted)';
     setTimeout(()=>msg.textContent='',2000);
   }
-}
-async function saveNotifTime(){
-  localStorage.setItem('ot_notif_time',$('notifTime').value);
-  await saveNotifPrefs();
 }
 async function saveNotifPrefs(){
   if(!currentUser) return;
