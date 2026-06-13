@@ -1174,24 +1174,27 @@ let _OS = null;
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 OneSignalDeferred.push(async function(OneSignal) {
   try {
-    await OneSignal.init({
-      appId: OS_APP_ID
-    });
+    await OneSignal.init({ appId: OS_APP_ID });
     _OS = OneSignal;
-  } catch(e) { console.warn('OneSignal init error:', e); }
+  } catch(e) {
+    console.error('OneSignal init failed:', e);
+    // Store error for display
+    window._OSError = e.message || String(e);
+  }
 });
-async function waitForOS(ms=10000){
+async function waitForOS(ms=15000){
   const start=Date.now();
   while(Date.now()-start<ms){
     if(_OS) return;
-    await new Promise(r=>setTimeout(r,300));
+    if(window._OSError) throw new Error('OneSignal error: ' + window._OSError);
+    await new Promise(r=>setTimeout(r,500));
   }
-  throw new Error('Timed out — please try again');
+  throw new Error('OneSignal did not load after 15s. The SDK script may be blocked.');
 }
 async function osSubscribe(){
   await waitForOS();
   await _OS.Notifications.requestPermission();
-  await new Promise(r=>setTimeout(r,1000));
+  await new Promise(r=>setTimeout(r,1500));
   return _OS.User.PushSubscription.id;
 }
 async function osUnsubscribe(){
@@ -1292,6 +1295,7 @@ async function toggleNotifications(on){
       $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
       msg.textContent=e.message||'Could not enable notifications';
       msg.style.color='#ef9a9a';
+      msg.style.fontSize='10px';
     }
   } else {
     localStorage.removeItem('ot_notif');
