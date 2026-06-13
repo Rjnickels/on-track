@@ -85,11 +85,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .date-label.is-today { color: var(--text); }
 
 .ring-wrap { position: relative; width: min(320px, calc(var(--app-height, 100dvh) - 430px)); height: min(320px, calc(var(--app-height, 100dvh) - 430px)); min-width: 160px; min-height: 160px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
-.ring-glow { position:absolute; inset:0; border-radius:50%; pointer-events:none; opacity:0; transition:opacity 1s ease; filter:blur(12px); }
-.ring-glow.active { opacity:1; animation:ringGlowPulse 4s ease-in-out infinite; }
+.ring-glow { display:none; }
+.ring-wrap::after {
+  content:''; position:absolute; inset:6%; border-radius:50%;
+  pointer-events:none; opacity:0; transition:opacity 1.5s ease;
+  box-shadow: 0 0 0 12px rgba(33,194,90,0.08), 0 0 30px 8px rgba(33,194,90,0.2), 0 0 60px 16px rgba(33,194,90,0.08);
+}
+.ring-wrap.glowing::after { opacity:1; animation:ringGlowPulse 4s ease-in-out infinite; }
+.ring-wrap.glowing-red::after { opacity:1; box-shadow: 0 0 0 12px rgba(239,154,154,0.08), 0 0 30px 8px rgba(239,154,154,0.2), 0 0 60px 16px rgba(239,154,154,0.08); }
 @keyframes ringGlowPulse {
-  0%,100% { background: radial-gradient(circle, transparent 62%, rgba(33,194,90,0.3) 74%, rgba(33,194,90,0.12) 86%, transparent 94%); }
-  50%      { background: radial-gradient(circle, transparent 62%, rgba(33,194,90,0.45) 74%, rgba(33,194,90,0.18) 86%, transparent 94%); }
+  0%,100% { box-shadow: 0 0 0 12px rgba(33,194,90,0.08), 0 0 28px 6px rgba(33,194,90,0.18), 0 0 55px 14px rgba(33,194,90,0.07); }
+  50%      { box-shadow: 0 0 0 12px rgba(33,194,90,0.14), 0 0 38px 10px rgba(33,194,90,0.28), 0 0 75px 20px rgba(33,194,90,0.1); }
 }
 .ring-wrap.slide-left  { transform: translateX(-60px); opacity: 0; }
 .ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
@@ -1557,19 +1563,13 @@ function render(){
       const fill=$('ringFill');fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=off;fill.style.stroke=col;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
       fill.style.removeProperty('filter');
+      const ringWrapEl=$('ringWrap');
       const glowDiv=$('ringGlow');
-      if(glowDiv){
-        glowDiv.style.background='';
-        glowDiv.style.opacity='';
-        glowDiv.style.animation='';
-        if(amount<0){
-          glowDiv.style.background='radial-gradient(circle, transparent 62%, rgba(239,154,154,0.3) 74%, rgba(239,154,154,0.12) 86%, transparent 94%)';
-          glowDiv.classList.add('active');
-        } else if(amount>=0&&ratio>=0.5){
-          glowDiv.classList.add('active');
-        } else {
-          glowDiv.classList.remove('active');
-        }
+      if(glowDiv) glowDiv.style.background='';
+      if(ringWrapEl){
+        ringWrapEl.classList.remove('glowing','glowing-red');
+        if(amount<0) ringWrapEl.classList.add('glowing-red');
+        else if(amount>=0&&ratio>=0.5) ringWrapEl.classList.add('glowing');
       }
       $('ringWrap').classList.toggle('over',amount<0);
       $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
