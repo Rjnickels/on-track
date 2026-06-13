@@ -47,7 +47,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
 .wordmark .wm-on { color: #ffffff; }
 .wordmark .wm-track { color: var(--green); }
-.logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+.logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
 .logout-btn:hover { color: var(--text); }
 .settings-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: color 0.2s, background 0.2s; }
 .settings-btn:hover { color: var(--text); background: var(--glass); }
@@ -55,8 +55,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .screen { display: none; flex: 1; min-height: 0; }
 .screen.active { display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #homeScreen { position: relative; }
-.nav { display: flex; background: rgba(17,17,17,0.97); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--muted); font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+.nav { display: flex; background: var(--bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--text); font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
 .nav-btn svg { transition: transform 0.2s; }
 .nav-btn.active { color: var(--green); border-top-color: var(--green); }
 .nav-btn.active svg { transform: scale(1.1); }
@@ -67,7 +67,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .auth-screen p { color: var(--muted); font-size: 13px; line-height: 1.7; }
 .auth-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 .auth-input { width: 100%; height: 48px; padding: 0 16px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; font-size: 16px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text); outline: none; transition: border-color 0.2s; }
-.auth-input::placeholder { color: rgba(255,255,255,0.5); }
+.auth-input::placeholder { color: var(--muted); }
 .auth-input:focus { border-bottom-color: var(--green); }
 .auth-error { color: #ef9a9a; font-size: 12px; min-height: 18px; }
 .auth-toggle { color: var(--muted); font-size: 13px; cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; text-decoration: underline; }
@@ -111,7 +111,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .input-wrap { flex: 1; display: flex; align-items: center; height: 48px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; background: transparent; padding-left: 4px; transition: border-color 0.2s; }
 .input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
 .input-wrap input { flex: 1; width: 100%; height: 100%; padding: 0 8px 0 2px; border: none; border-radius: 0; font-size: 18px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text); outline: none; }
-.input-wrap input::placeholder { color: rgba(255,255,255,0.5); }
+.input-wrap input::placeholder { color: var(--muted); }
 .input-wrap:focus-within { border-bottom-color: var(--green); }
 
 .btn-add { padding: 0 22px; height: 48px; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; background: var(--green); color: #06220f; cursor: pointer; transition: transform 0.1s, background 0.2s; white-space: nowrap; box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
@@ -123,7 +123,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
 .overlay.show { display: flex; }
-.overlay-card { background: #222; border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; max-width: 340px; text-align: center; }
+.overlay-card { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; max-width: 340px; text-align: center; }
 .overlay-text { font-size: 16px; line-height: 1.7; color: var(--text); }
 
 .budget-setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
@@ -147,18 +147,28 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .cal-cell .cal-val { font-size: 11px; opacity: 0.9; margin-top: 2px; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
-.cal-cell.empty  { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
-.cal-cell.future { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+.cal-cell.empty  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.cal-cell.future { background: var(--glass); color: var(--muted); }
 .cal-cell.today  { outline: 2px solid var(--green); outline-offset: 2px; }
 @keyframes cellFade { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
 
-.projection { margin: 10px 20px 8px; padding: 28px 24px; border-radius: 16px; font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center; border: 1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)); }
+.projection { margin: 10px 20px 8px; padding: 28px 24px; border-radius: 16px; font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center; border: 1px solid var(--border); background: var(--glass); color: var(--text); }
 .projection.ahead { background: linear-gradient(135deg, rgba(33,194,90,0.12), rgba(33,194,90,0.03)); border-color: rgba(33,194,90,0.25); }
 .projection.behind { background: linear-gradient(135deg, rgba(183,28,28,0.12), rgba(183,28,28,0.03)); border-color: rgba(183,28,28,0.25); }
 .projection strong { font-size: 28px; display: block; margin-top: 6px; }
-.projection .on { color: #ffffff; }
+.projection .on { color: var(--text); }
 .projection .track { color: var(--green); }
 .divider { height: 1px; background: var(--border); margin: 10px 24px; }
+[data-theme="light"] .auth-input { background: rgba(0,0,0,0.05); color: #111; border-color: rgba(0,0,0,0.15); }
+[data-theme="light"] .input-wrap { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
+[data-theme="light"] .input-wrap input { color: #111; }
+[data-theme="light"] .cal-cell { color: #111; }
+[data-theme="light"] .reset-btn { color: #c62828; border-color: rgba(198,40,40,0.3); }
+[data-theme="light"] h2 { color: #111; }
+[data-theme="light"] .calc-input { color: #111; }
+[data-theme="light"] .calc-input-wrap { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
+[data-theme="light"] .btn-add { color: #fff; }
+[data-theme="light"] .budget-setup h2 { color: #111; }
 .reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
 
@@ -188,7 +198,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button class="settings-btn" id="settingsBtn" onclick="openSettings()" style="display:none">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
-    <div class="wordmark"><span class="wm-on">On</span><span class="wm-track">Track</span></div>
+    <div class="wordmark"><span class="wm-on" style="color:var(--text);">On</span><span class="wm-track">Track</span></div>
     <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display:none">Log out</button>
   </header>
 
@@ -204,7 +214,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
   </div>
   <!-- OUTRO ANIMATION (post-login) -->
-  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:#1a1a1a;flex-direction:column;pointer-events:none;">
+  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:var(--bg);flex-direction:column;pointer-events:none;">
     <style>
       @keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
       @keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
@@ -271,17 +281,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         flex-shrink:0;
       ">
         <!-- Side buttons (left) -->
-        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
         <!-- Side button (right) -->
-        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:#1a1a1a;border-radius:0 2px 2px 0;"></div>
+        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:var(--bg);border-radius:0 2px 2px 0;"></div>
 
         <!-- Screen content -->
-        <div style="background:#1a1a1a;border-radius:50px;overflow:hidden;">
+        <div style="background:var(--bg);border-radius:50px;overflow:hidden;">
 
           <!-- Status bar + Dynamic Island -->
-          <div style="height:52px;background:#111;display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
+          <div style="height:52px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
             <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
             <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
             <div style="display:flex;align-items:center;gap:5px;">
@@ -292,15 +302,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           </div>
 
           <!-- App header -->
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:#1a1a1a;">
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:var(--bg);">
             <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
           </div>
 
           <!-- Ring -->
-          <div style="display:flex;flex-direction:column;align-items:center;padding:14px 24px 18px;gap:8px;background:#1a1a1a;">
+          <div style="display:flex;flex-direction:column;align-items:center;padding:14px 24px 18px;gap:8px;background:var(--bg);">
             <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
               <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.8);font-size:18px;">‹</span></div>
-              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#f0f0f0;font-family:'Inter',sans-serif;">Today</span>
+              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-family:'Inter',sans-serif;">Today</span>
               <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.8);font-size:18px;">›</span></div>
             </div>
             <div style="position:relative;width:170px;height:170px;">
@@ -345,12 +355,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <!-- iPhone mockup — same as welcome -->
     <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:24px;">
       <div style="width:272px;background:#0a0a0a;border-radius:52px;border:2px solid rgba(255,255,255,0.18);box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 30px 80px rgba(0,0,0,0.8);overflow:hidden;position:relative;flex-shrink:0;">
-        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:#1a1a1a;border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:#1a1a1a;border-radius:0 2px 2px 0;"></div>
-        <div style="background:#1a1a1a;border-radius:50px;overflow:hidden;">
-          <div style="height:52px;background:#111;display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
+        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
+        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:var(--bg);border-radius:0 2px 2px 0;"></div>
+        <div style="background:var(--bg);border-radius:50px;overflow:hidden;">
+          <div style="height:52px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
             <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
             <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
             <div style="display:flex;align-items:center;gap:5px;">
@@ -359,13 +369,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
               <div style="width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.8);border-radius:3px;display:flex;align-items:center;padding:0 2px;position:relative;"><div style="width:70%;height:6px;background:#fff;border-radius:1.5px;"></div><div style="position:absolute;right:-4px;width:3px;height:5px;background:rgba(255,255,255,0.8);border-radius:0 1.5px 1.5px 0;"></div></div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:#1a1a1a;">
+          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:var(--bg);">
             <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:#1a1a1a;">
+          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:var(--bg);">
             <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
               <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.8);font-size:20px;">‹</span></div>
-              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#f0f0f0;font-family:'Inter',sans-serif;">Today</span>
+              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-family:'Inter',sans-serif;">Today</span>
               <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.8);font-size:20px;">›</span></div>
             </div>
             <div style="position:relative;width:210px;height:210px;">
@@ -425,8 +435,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <div class="screen" id="homeScreen">
 
     <!-- Disposable income overlay — shows once for new users before budget setup -->
-    <div class="overlay" id="incomeOverlay">
-      <div class="overlay-card" style="width:100%;max-height:90vh;overflow-y:auto;">
+    <div class="overlay" id="incomeOverlay" style="background:rgba(0,0,0,0.5);">
+      <div class="overlay-card" style="width:100%;max-height:90vh;overflow-y:auto;background:var(--bg);">
 
         <!-- Question screen -->
         <div id="incomeQuestion">
@@ -523,7 +533,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
       <!-- Spend pace meter — only shows on today when spending logged -->
       <div id="spendPace" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
-        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:8px 14px;">
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:8px 14px;color:var(--text);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
             <span id="paceLabel" style="font-size:11px;font-weight:600;color:var(--green);">On pace</span>
@@ -605,25 +615,25 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <p id="logDateLabel" style="display:none;">—</p>
     </div>
 
-    <div class="projection" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
+    <div class="projection" data-themed="true" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
 
     <!-- Get back on track / savings — directly below banner -->
     <div id="onTrackCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:12px;padding:10px 14px;">
+      <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
         <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(239,154,154,0.7);margin-bottom:4px;">How to get back on track</div>
-        <div style="font-size:13px;font-weight:600;color:#f0f0f0;line-height:1.5;" id="onTrackText">—</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="onTrackText">—</div>
       </div>
     </div>
     <div id="savingsCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:10px 14px;">
+      <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
         <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Savings projection</div>
-        <div style="font-size:13px;font-weight:600;color:#f0f0f0;line-height:1.5;" id="savingsText">—</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="savingsText">—</div>
       </div>
     </div>
 
     <!-- Option D: Days left ring + remaining budget -->
     <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;color:var(--text);">
         <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
           <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
             <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
@@ -647,7 +657,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
     <!-- Most expensive day -->
     <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 14px;" id="biggestDayCard">
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);" id="biggestDayCard">
         <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Biggest spend this month</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);" id="biggestDayText">—</div>
       </div>
@@ -659,11 +669,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
 
   <!-- SETTINGS -->
-  <div class="overlay" id="settingsOverlay" style="align-items:flex-end;padding:0;">
-    <div style="background:#1e1e1e;border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:0 0 40px;max-height:92vh;overflow-y:auto;">
+  <div class="overlay" id="settingsOverlay" style="align-items:flex-end;padding:0;background:rgba(0,0,0,0.5);">
+    <div style="background:var(--bg);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:0 0 40px;max-height:92vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;">
         <span style="font-size:17px;font-weight:700;color:var(--text);">Settings</span>
-        <button onclick="closeSettings()" style="background:var(--glass);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
+        <button onclick="closeSettings()" style="background:var(--glass);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- Profile -->
@@ -754,7 +764,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
   <!-- OVERLAYS -->
   <div class="overlay" id="nameOverlay">
-    <div class="overlay-card" style="width:100%;">
+    <div class="overlay-card" style="background:var(--bg);" style="width:100%;">
       <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick thing 👋</p>
       <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">What should we call you?</p>
       <input class="auth-input" id="nameInput" type="text" placeholder="First name" autocomplete="given-name" style="border-bottom:2px solid var(--border);margin-bottom:16px;"/>
@@ -763,22 +773,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
 
   <div class="overlay" id="onboardOverlay">
-    <div class="overlay-card">
+    <div class="overlay-card" style="background:var(--bg);">
       <p class="overlay-text" id="onboardText"></p>
       <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
     </div>
   </div>
 
   <!-- END OF MONTH SUMMARY -->
-  <div class="overlay" id="eomOverlay" style="align-items:flex-end;padding:0;">
-    <div style="background:#1a1a1a;border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:28px 24px 40px;max-height:92vh;overflow-y:auto;">
+  <div class="overlay" id="eomOverlay" style="align-items:flex-end;padding:0;background:rgba(0,0,0,0.5);">
+    <div style="background:var(--bg);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:28px 24px 40px;max-height:92vh;overflow-y:auto;color:var(--text);">
       <div id="eomContent"></div>
     </div>
   </div>
 
   <!-- NEW MONTH PROMPT -->
-  <div class="overlay" id="newMonthOverlay">
-    <div class="overlay-card" style="width:100%;">
+  <div class="overlay" id="newMonthOverlay" style="background:rgba(0,0,0,0.5);">
+    <div class="overlay-card" style="background:var(--bg);" style="width:100%;">
       <div style="font-size:32px;margin-bottom:8px;">🗓️</div>
       <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;">New month!</p>
       <p style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.6;">Keep the same budget as last month?</p>
@@ -1186,20 +1196,6 @@ async function osSubscribe(){
 }
 async function osUnsubscribe(){
   try{ if(_OS) await _OS.User.PushSubscription.optOut(); }catch(e){}
-}
-
-async function osSubscribe(){
-  await waitForOS();
-  await OneSignal.Notifications.requestPermission();
-  return OneSignal.User.PushSubscription.id;
-}
-async function osUnsubscribe(){
-  await waitForOS();
-  await OneSignal.User.PushSubscription.optOut();
-}
-async function osIsSubscribed(){
-  await waitForOS();
-  return !!OneSignal.User.PushSubscription.id && OneSignal.User.PushSubscription.optedIn;
 }
 
 /* ══ SETTINGS ══ */
@@ -1709,7 +1705,7 @@ function render(){
     if(bigDay){
       const d=new Date(viewYear,viewMonth,parseInt(bigDay[0]));
       const dayName=d.toLocaleDateString('default',{weekday:'long',day:'numeric',month:'long'});
-      $('biggestDayText').innerHTML=`${dayName}<br><span style="color:#f0f0f0;font-size:20px;font-weight:700;letter-spacing:-0.5px;">${cur}${bigDay[1].toFixed(2)}</span>`;
+      $('biggestDayText').innerHTML=`${dayName}<br><span style="color:var(--text);font-size:20px;font-weight:700;letter-spacing:-0.5px;">${cur}${bigDay[1].toFixed(2)}</span>`;
       $('biggestDayCard').style.display='block';
     } else {
       $('biggestDayCard').style.display='none';
