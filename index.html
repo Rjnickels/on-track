@@ -1124,7 +1124,7 @@ OneSignalDeferred.push(async function(OneSignal) {
   try {
     await OneSignal.init({
       appId: OS_APP_ID,
-      serviceWorkerPath: 'sw.js',
+      serviceWorkerPath: 'OneSignalSDKWorker.js',
       serviceWorkerParam: { scope: '/' }
     });
   } catch(e) { console.warn('OneSignal init error:', e); }
