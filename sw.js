@@ -1,5 +1,3 @@
-importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
-
 const CACHE = 'ontrack-v1';
 const ASSETS = [
   '/',
