@@ -1130,24 +1130,27 @@ OneSignalDeferred.push(async function(OneSignal) {
   } catch(e) { console.warn('OneSignal init error:', e); }
 });
 
-async function waitForOS(ms=8000){
+async function waitForOS(ms=10000){
   const start=Date.now();
   while(Date.now()-start<ms){
-    if(window.OneSignal?.User?.PushSubscription!==undefined) return;
-    await new Promise(r=>setTimeout(r,200));
+    // OneSignal v16 is ready when window.OneSignal exists and init has run
+    if(window.OneSignal && typeof window.OneSignal.Notifications !== 'undefined') return;
+    await new Promise(r=>setTimeout(r,300));
   }
-  throw new Error('Notification service unavailable — try reinstalling the app');
+  throw new Error('Timed out — please try again');
 }
 async function osSubscribe(){
   await waitForOS();
-  const permission=await window.OneSignal.Notifications.requestPermission();
-  if(!permission) return null;
+  await window.OneSignal.Notifications.requestPermission();
+  await new Promise(r=>setTimeout(r,1000)); // brief wait for subscription to register
   return window.OneSignal.User.PushSubscription.id;
 }
 async function osUnsubscribe(){
-  if(window.OneSignal?.User?.PushSubscription){
-    await window.OneSignal.User.PushSubscription.optOut();
-  }
+  try{
+    if(window.OneSignal?.User?.PushSubscription){
+      await window.OneSignal.User.PushSubscription.optOut();
+    }
+  }catch(e){}
 }
 
 async function osSubscribe(){
