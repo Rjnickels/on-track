@@ -56,12 +56,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .screen.active { display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #homeScreen { position: relative; }
 .nav { display: flex; background: var(--bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--text); font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--text); font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
 .nav-btn svg { transition: transform 0.2s; }
 .nav-btn.active { color: var(--green); border-top-color: var(--green); }
 .nav-btn.active svg { transform: scale(1.1); }
-.nav-home { border-top: none !important; position: relative; top: -10px; }
-.nav-home-inner { width: 52px; height: 52px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(33,194,90,0.4); transition: transform 0.15s, box-shadow 0.15s; }
+.nav-home { border-top: none !important; position: relative; top: -16px; }
+.nav-home-inner { width: 62px; height: 62px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(33,194,90,0.45); transition: transform 0.15s, box-shadow 0.15s; }
 .nav-home-inner svg { color: #fff; }
 .nav-home:active .nav-home-inner { transform: scale(0.92); box-shadow: 0 2px 8px rgba(33,194,90,0.3); }
 .nav-home.active .nav-home-inner { box-shadow: 0 4px 20px rgba(33,194,90,0.6); }
@@ -155,7 +155,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .cal-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; line-height: 1.3; text-align: center; user-select: none; cursor: pointer; animation: cellFade 0.3s ease both; transition: transform 0.1s; }
 .cal-cell:active { transform: scale(0.93); }
 .cal-cell .cal-num { font-size: 16px; }
-.cal-cell .cal-val { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+.cal-cell .cal-val { font-size: 12px; opacity: 0.9; margin-top: 2px; }
 .cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
 .cal-cell.red    { background: var(--red); color: #ffcdd2; }
 .cal-cell.empty  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
@@ -205,7 +205,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 <body>
 <div class="app">
 
-  <header class="app-header">
+  <header class="app-header" id="appHeader" style="opacity:0;">
     <button class="settings-btn" id="settingsBtn" onclick="openSettings()" style="display:none">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
@@ -517,10 +517,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <form onsubmit="event.preventDefault(); setBudget();">
         <div style="display:flex;gap:8px;margin-bottom:16px;width:100%;">
           <button type="button" class="currency-btn active" onclick="setCurrency(this,'£')">£ GBP</button>
-          <button type="button" class="currency-btn" onclick="setCurrency(this,'$')">$ USD</button>
-          <button type="button" class="currency-btn" onclick="setCurrency(this,'€')">€ EUR</button>
-          <button type="button" class="currency-btn" onclick="setCurrency(this,'A$')">A$ AUD</button>
-          <button type="button" class="currency-btn" onclick="setCurrency(this,'C$')">C$ CAD</button>
+          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'$')">$ USD</button>
+          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'€')">€ EUR</button>
+          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'A$')">A$ AUD</button>
+          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'C$')">C$ CAD</button>
         </div>
         <div class="input-wrap"><span id="currencySymbol">£</span><input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/></div>
         <p style="font-size:11px; opacity:0.5; margin-top:6px; margin-bottom:12px;">What's left once your bills are paid</p>
@@ -675,7 +675,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     <!-- Most expensive day -->
     <div style="margin:4px 16px;">
       <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);" id="biggestDayCard">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Biggest spend this month</div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Biggest spend this month</div>
         <div style="font-size:14px;font-weight:600;color:var(--text);" id="biggestDayText">—</div>
       </div>
     </div>
@@ -689,17 +689,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <div class="overlay" id="settingsOverlay" style="align-items:flex-end;padding:0;background:rgba(0,0,0,0.5);">
     <div style="background:var(--bg);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:0 0 40px;max-height:92vh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;">
-        <span style="font-size:17px;font-weight:700;color:var(--text);">Settings</span>
+        <span style="font-size:20px;font-weight:700;color:var(--text);">Settings</span>
         <button onclick="closeSettings()" style="background:var(--glass);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
 
       <!-- Profile -->
       <div style="padding:0 24px 16px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Profile</div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Profile</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Name</label>
-            <input id="settingsName" type="text" placeholder="Your first name" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+            <label style="font-size:14px;color:var(--muted);width:90px;flex-shrink:0;">Name</label>
+            <input id="settingsName" type="text" placeholder="Your first name" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
           </div>
           <button onclick="saveProfile()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Save name</button>
           <div id="profileMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -710,19 +710,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
       <!-- Budget & Currency -->
       <div style="padding:0 24px 16px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Budget & Currency</div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Budget & Currency</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:13px;color:var(--muted);width:80px;flex-shrink:0;">Budget</label>
-            <input id="settingsBudget" type="number" min="1" step="1" placeholder="Monthly budget" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
+            <label style="font-size:14px;color:var(--muted);width:90px;flex-shrink:0;">Budget</label>
+            <input id="settingsBudget" type="number" min="1" step="1" placeholder="Monthly budget" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
           </div>
           <p style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">Only affects today onwards — past days stay as they are.</p>
           <div style="display:flex;gap:6px;margin-top:4px;">
-            <button class="currency-btn" onclick="setCurrency(this,'£')" id="cur_gbp">🇬🇧 £</button>
-            <button class="currency-btn" onclick="setCurrency(this,'$')" id="cur_usd">🇺🇸 $</button>
-            <button class="currency-btn" onclick="setCurrency(this,'€')" id="cur_eur">🇪🇺 €</button>
-            <button class="currency-btn" onclick="setCurrency(this,'A$')" id="cur_aud">🇦🇺 A$</button>
-            <button class="currency-btn" onclick="setCurrency(this,'C$')" id="cur_cad">🇨🇦 C$</button>
+            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'£')" id="cur_gbp">🇬🇧 £</button>
+            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'$')" id="cur_usd">🇺🇸 $</button>
+            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'€')" id="cur_eur">🇪🇺 €</button>
+            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'A$')" id="cur_aud">🇦🇺 A$</button>
+            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'C$')" id="cur_cad">🇨🇦 C$</button>
           </div>
           <button onclick="saveBudgetSettings()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Update budget</button>
           <div id="budgetMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -731,50 +731,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
       <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
 
-      <!-- Appearance -->
+      <!-- Budget Review -->
       <div style="padding:0 24px 16px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Appearance</div>
-        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);">Light mode</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Switch to a white background</div>
-          </div>
-          <label style="position:relative;display:inline-block;width:44px;height:26px;cursor:pointer;">
-            <input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
-            <span id="themeTrack" style="position:absolute;inset:0;background:rgba(255,255,255,0.15);border-radius:50px;transition:background 0.2s;"></span>
-            <span id="themeThumb" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;"></span>
-          </label>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Monthly Budget</div>
+        <div id="budgetBreakdownCard" style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:none;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px;">Your breakdown</div>
+          <div id="breakdownLines" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
-      <div style="padding:0 24px 16px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Notifications</div>
-        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);">Daily reminder</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px;">Remind me to log my spending</div>
-            </div>
-            <label style="position:relative;display:inline-block;width:44px;height:26px;cursor:pointer;">
-              <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
-              <span id="notifTrack" style="position:absolute;inset:0;background:rgba(255,255,255,0.15);border-radius:50px;transition:background 0.2s;"></span>
-              <span id="notifThumb" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;"></span>
-            </label>
-          </div>
-          <div id="notifTimeRow" style="display:none;padding-top:2px;">
-            <span style="font-size:11px;color:rgba(255,255,255,0.7);">Reminders send daily at 6pm</span>
-          </div>
-          <div id="notifMsg" style="font-size:11px;color:var(--muted);min-height:14px;"></div>
-        </div>
+        <button onclick="openBudgetReview()" class="btn-set" style="height:46px;font-size:14px;">Review my budget</button>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.5;">Update your income, bills and savings to recalculate your monthly budget.</p>
       </div>
 
       <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
 
       <!-- Danger zone -->
       <div style="padding:0 24px;">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">Danger Zone</div>
-        <button onclick="clearAllData()" style="width:100%;padding:11px;border:1px solid rgba(239,154,154,0.2);border-radius:50px;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;background:transparent;color:#ef9a9a;cursor:pointer;">Clear all my data</button>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Danger Zone</div>
+        <button onclick="clearAllData()" style="width:100%;padding:13px;border:1px solid rgba(239,154,154,0.2);border-radius:50px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;background:transparent;color:#ef9a9a;cursor:pointer;">Clear all my data</button>
       </div>
     </div>
   </div>
@@ -811,7 +784,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <p style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.6;">Keep the same budget as last month?</p>
       <p id="newMonthAmt" style="font-size:28px;font-weight:700;color:var(--green);margin-bottom:20px;letter-spacing:-1px;">£500</p>
       <button class="btn-set" onclick="keepMonthBudget()" style="margin-bottom:10px;">Keep this budget</button>
-      <button onclick="changeMonthBudget()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">Change it</button>
+      <button onclick="changeMonthBudget()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;margin-bottom:8px;">Change it</button>
+      <button onclick="$('newMonthOverlay').classList.remove('show');openBudgetReview();" style="width:100%;height:44px;background:transparent;border:none;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.35);cursor:pointer;">Review my full budget breakdown</button>
     </div>
   </div>
 
@@ -825,7 +799,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </button>
     <button class="nav-btn nav-home active" id="navHome" onclick="goHome()">
       <div class="nav-home-inner">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       </div>
     </button>
     <button class="nav-btn" id="navLog" onclick="goTab('log')">
@@ -1123,6 +1097,7 @@ function showEOM(d,y,m){
     </div>
 
     <button class="btn-set" onclick="$('eomOverlay').classList.remove('show')">On to ${new Date(y,m+1,1).toLocaleString('default',{month:'long'})} →</button>
+    ${getEOMSuggestion(saved,budget)?`<div style="margin-top:12px;background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.5;">${getEOMSuggestion(saved,budget)}</div>`:''}
   `;
   $('eomContent').innerHTML=html;
   $('eomOverlay').classList.add('show');
@@ -1172,6 +1147,7 @@ function useCalculatedBudget(){
   if(result>0){
     $('budgetInput').value=result.toFixed(2);
     if(savings>0) localStorage.setItem('ot_savings_target', savings.toFixed(2));
+    saveBudgetBreakdown();
     incomeYes();
   }
 }
@@ -1225,10 +1201,74 @@ async function osUnsubscribe(){
   try{ if(_OS) await _OS.User.PushSubscription.optOut(); }catch(e){}
 }
 
-/* ══ SETTINGS ══ */
+function openBudgetReview(){
+  // Reset calculator fields with saved values
+  const saved=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
+  ['income','rent','food','bills','transport','other','savings'].forEach(k=>{
+    if($('ci_'+k)) $('ci_'+k).value=saved[k]||'';
+  });
+  // Show the income calculator directly
+  $('incomeQuestion').style.display='none';
+  $('incomeCalc').style.display='block';
+  $('incomeOverlay').classList.add('show');
+  closeSettings();
+  calcDisposable();
+}
+
+function saveBudgetBreakdown(){
+  const v=id=>parseFloat($(id).value)||0;
+  const breakdown={
+    income:v('ci_income'), rent:v('ci_rent'), food:v('ci_food'),
+    bills:v('ci_bills'), transport:v('ci_transport'), other:v('ci_other'),
+    savings:v('ci_savings')
+  };
+  localStorage.setItem('ot_budget_breakdown', JSON.stringify(breakdown));
+}
+
+function showBreakdownInSettings(){
+  const b=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
+  const cur=getCurrency();
+  const card=$('budgetBreakdownCard');
+  const lines=$('breakdownLines');
+  if(!card||!lines) return;
+  if(!b.income){ card.style.display='none'; return; }
+  const items=[
+    ['Take-home pay', b.income],
+    ['Rent / mortgage', b.rent],
+    ['Food & groceries', b.food],
+    ['Bills & subscriptions', b.bills],
+    ['Transport', b.transport],
+    ['Other', b.other],
+    ['Savings target', b.savings],
+  ].filter(([,v])=>v>0);
+  lines.innerHTML=items.map(([label,val],i)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;${i>0&&label!=='Savings target'?'':''}padding:2px 0;border-bottom:${i<items.length-1?'1px solid var(--border)':'none'};">
+      <span style="font-size:13px;color:var(--muted);">${label}</span>
+      <span style="font-size:13px;font-weight:600;color:${label==='Take-home pay'?'var(--green)':label==='Savings target'?'var(--green)':'var(--text)'};">${label==='Take-home pay'?'':'-'}${cur}${val.toFixed(0)}</span>
+    </div>
+  `).join('');
+  card.style.display='block';
+}
+
+function getEOMSuggestion(saved, budget){
+  const b=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
+  const cur=getCurrency();
+  const savingsTarget=parseFloat(localStorage.getItem('ot_savings_target'))||b.savings||0;
+  if(saved<=0) return '';
+  const pct=Math.round((saved/budget)*100);
+  if(savingsTarget>0 && saved>0){
+    const newSavings=savingsTarget+saved;
+    return `💡 You had ${cur}${saved.toFixed(0)} left over (${pct}% of your budget). Consider increasing your savings target to ${cur}${newSavings.toFixed(0)} next month.`;
+  }
+  if(saved>=50){
+    return `💡 You had ${cur}${saved.toFixed(0)} left unspent this month. Consider putting this into savings next month.`;
+  }
+  return `💡 You had ${cur}${saved.toFixed(0)} left this month — great discipline.`;
+}
 function openSettings(){
   // Populate fields
   $('settingsName').value=getName()||'';
+  showBreakdownInSettings();
   const isLight=localStorage.getItem('ot_theme')==='light';
   if($('themeToggle')) $('themeToggle').checked=isLight;
   if($('themeTrack')) $('themeTrack').style.background=isLight?'var(--green)':'rgba(255,255,255,0.15)';
@@ -1408,6 +1448,7 @@ async function logout() {
   $('mainNav').style.display='none';
   $('logoutBtn').style.display='none';
   $('settingsBtn').style.display='none';
+  const h=document.getElementById('appHeader'); if(h) h.style.opacity='0';
   document.querySelector('.app').removeAttribute('data-theme');
   showAuth();
 }
@@ -1429,6 +1470,8 @@ function showApp() {
   $('mainNav').style.display = 'flex';
   $('logoutBtn').style.display = 'block';
   $('settingsBtn').style.display = 'flex';
+  const h=document.getElementById('appHeader');
+  if(h){ h.style.transition='opacity 0.4s ease'; h.style.opacity='1'; }
   applyTheme(localStorage.getItem('ot_theme')==='light');
 }
 
