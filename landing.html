@@ -7,364 +7,404 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
 body{background:#080808;color:#f0f0f0;font-family:'Inter',sans-serif;overflow-x:hidden;}
 
-/* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);}
-.nav-brand{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,0.9);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.07);}
+.nav-brand{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
 .nav-brand span{color:#21c25a;}
-.nav-cta{background:#21c25a;color:#000;font-size:14px;font-weight:700;padding:10px 24px;border-radius:50px;text-decoration:none;transition:background 0.2s;}
-.nav-cta:hover{background:#27d966;}
+.nav-cta{background:#21c25a;color:#000;font-size:14px;font-weight:700;padding:11px 28px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
+.nav-cta:hover{background:#27d966;transform:translateY(-1px);}
 
-/* ── HERO ── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 48px 60px;position:relative;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(33,194,90,0.07) 0%,transparent 70%);}
+/* HERO LAYOUT */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:100px 80px 80px;
+  gap:80px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{position:absolute;right:0;top:0;bottom:0;width:60%;background:radial-gradient(ellipse at 70% 50%,rgba(33,194,90,0.07) 0%,transparent 70%);pointer-events:none;}
 
-.hero-inner{display:flex;align-items:center;justify-content:space-between;gap:80px;max-width:1200px;width:100%;}
+/* TEXT */
+.hero-text{flex:0 0 480px;position:relative;z-index:2;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:22px;}
+.headline{font-size:clamp(40px,4.5vw,66px);font-weight:900;letter-spacing:-3px;line-height:0.97;color:#fff;margin-bottom:32px;}
+.headline span{color:#21c25a;}
 
-/* LEFT: text + slides */
-.hero-left{flex:1;max-width:520px;}
-.hero-eyebrow{font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:20px;}
-.hero-headline{font-size:clamp(42px,5vw,64px);font-weight:900;letter-spacing:-2.5px;line-height:1.0;color:#fff;margin-bottom:24px;}
-.hero-headline span{color:#21c25a;}
+.slide-text{height:150px;margin-bottom:36px;overflow:hidden;}
+.ft{display:none;animation:fu 0.45s ease both;}
+.ft.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ft-tag{display:inline-block;background:rgba(33,194,90,0.1);border:1px solid rgba(33,194,90,0.2);border-radius:50px;padding:4px 14px;font-size:11px;font-weight:700;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.ft-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.5px;}
+.ft-desc{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;}
 
-/* Slide feature text */
-.slide-features{min-height:160px;margin-bottom:40px;}
-.feature{display:none;animation:fadeUp 0.5s ease forwards;}
-.feature.active{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.feature-tag{display:inline-block;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.25);border-radius:50px;padding:4px 14px;font-size:11px;font-weight:600;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
-.feature-title{font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.5px;}
-.feature-desc{font-size:16px;color:rgba(255,255,255,0.55);line-height:1.7;}
-
-/* Slide dots */
 .dots{display:flex;gap:8px;margin-bottom:40px;}
-.dot{width:28px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);cursor:pointer;transition:background 0.3s,width 0.3s;}
+.dot{height:4px;border-radius:2px;background:rgba(255,255,255,0.15);cursor:pointer;transition:all 0.35s;width:24px;}
 .dot.active{background:#21c25a;width:48px;}
 
-.hero-cta{display:inline-flex;align-items:center;gap:10px;background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:16px 32px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
-.hero-cta:hover{background:#27d966;transform:translateY(-1px);}
-.hero-cta-sub{margin-top:12px;font-size:13px;color:rgba(255,255,255,0.35);}
+.cta-row{display:flex;align-items:center;gap:20px;}
+.btn-primary{background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:16px 36px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
+.btn-primary:hover{background:#27d966;transform:translateY(-2px);box-shadow:0 8px 32px rgba(33,194,90,0.3);}
+.cta-note{font-size:13px;color:rgba(255,255,255,0.3);}
 
-/* RIGHT: iPhone mockup */
-.hero-right{flex-shrink:0;position:relative;}
-.phone-scene{width:300px;height:580px;position:relative;}
+/* PHONE — FIXED SIZE, NEVER CHANGES */
+.hero-phone{
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.phone-tilt{
+  transform:perspective(1400px) rotateY(-20deg) rotateX(5deg);
+  transition:transform 0.8s ease;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 80px rgba(33,194,90,0.1));
+}
+.phone-tilt:hover{
+  transform:perspective(1400px) rotateY(-12deg) rotateX(3deg);
+}
 
-/* 3D tilt */
-.phone-tilt{transform:perspective(1200px) rotateY(-18deg) rotateX(4deg);transform-style:preserve-3d;transition:transform 0.6s ease;}
-.phone-tilt:hover{transform:perspective(1200px) rotateY(-10deg) rotateX(2deg);}
+/* iPhone 17 Pro — 300 x 640px fixed */
+.phone{
+  width:300px;
+  height:640px;
+  background:#0f0f0f;
+  border-radius:50px;
+  border:2px solid rgba(255,255,255,0.14);
+  overflow:hidden;
+  position:relative;
+  flex-shrink:0;
+}
+.phone::before{
+  content:'';
+  position:absolute;inset:0;border-radius:50px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.5);
+  pointer-events:none;z-index:20;
+}
+/* Side button */
+.phone-side{position:absolute;right:-3px;top:130px;width:3px;height:70px;background:rgba(255,255,255,0.08);border-radius:0 3px 3px 0;}
 
-/* Glow behind phone */
-.phone-glow{position:absolute;top:10%;left:10%;right:10%;bottom:10%;border-radius:50%;background:radial-gradient(circle,rgba(33,194,90,0.2) 0%,transparent 70%);filter:blur(40px);pointer-events:none;}
+/* Dynamic island */
+.phone-top{height:40px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.island{width:110px;height:30px;background:#000;border-radius:20px;}
 
-/* Phone shell */
-.phone{width:260px;position:relative;background:#0f0f0f;border-radius:44px;border:2px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);}
-.phone-island{height:32px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;}
-.island{width:88px;height:20px;background:#000;border-radius:20px;}
-.phone-screen{padding:12px 16px 18px;}
+/* Screen content — fixed height */
+.phone-content{
+  height:600px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
 
-/* Screen slides */
-.screen-slide{display:none;}
-.screen-slide.active{display:block;animation:fadeUp 0.5s ease forwards;}
+/* App header */
+.ah{
+  display:flex;align-items:center;justify-content:center;
+  padding:10px 20px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+  position:relative;
+}
+.ah-wm{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.ah-wm span{color:#21c25a;}
+.ah-gear{position:absolute;left:16px;color:rgba(255,255,255,0.3);}
+.ah-lo{position:absolute;right:16px;font-size:8px;color:rgba(255,255,255,0.25);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;}
 
-/* App header mini */
-.mini-header{display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative;}
-.mini-wm{font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
-.mini-wm span{color:#21c25a;}
-.mini-logout{position:absolute;right:0;font-size:7px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;}
+/* Screens */
+.ss{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.ss.active{display:flex;animation:fu 0.4s ease both;}
 
-/* Ring screen */
-.mini-date{text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;}
-.mini-ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 8px;}
-.mini-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
-.mini-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
-.mini-amt{font-size:26px;font-weight:700;color:#21c25a;letter-spacing:-1px;line-height:1;}
-.mini-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.45);}
-.mini-status{font-size:8px;font-weight:700;color:#21c25a;}
-.mini-streak{text-align:center;font-size:8px;font-weight:700;color:#21c25a;letter-spacing:0.5px;margin-bottom:8px;}
-.mini-input{background:rgba(255,255,255,0.05);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-.mini-sym{font-size:11px;color:rgba(255,255,255,0.3);}
-.mini-ph{font-size:9px;color:rgba(255,255,255,0.2);flex:1;}
-.mini-add{background:#21c25a;border-radius:16px;padding:5px 10px;font-size:8px;font-weight:700;color:#000;}
+/* Screen 1: HOME */
+.s1-body{flex:1;display:flex;flex-direction:column;padding:12px 20px 0;overflow:hidden;}
+.date-row{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:12px;flex-shrink:0;}
+.d-arr{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;}
+.d-arr svg{width:16px;height:16px;color:rgba(255,255,255,0.5);}
+.d-lbl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;}
+.ring-wrap{flex-shrink:0;display:flex;justify-content:center;margin-bottom:10px;}
+.ring-c{position:relative;width:200px;height:200px;}
+.ring-c svg{width:100%;height:100%;transform:rotate(-90deg);}
+.ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.r-amt{font-size:34px;font-weight:700;color:#21c25a;letter-spacing:-1.5px;line-height:1;}
+.r-lbl{font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.45);}
+.r-stat{font-size:10px;font-weight:700;color:#21c25a;}
+.r-daily{font-size:8px;color:rgba(255,255,255,0.3);}
+.streak{text-align:center;font-size:9px;font-weight:700;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;flex-shrink:0;}
+.pace-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;}
+.pace-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.pace-l{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
+.pace-v{font-size:9px;font-weight:700;color:#21c25a;}
+.pace-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:4px;}
+.pace-f{height:100%;width:40%;background:#21c25a;border-radius:4px;}
+.input-row{display:flex;gap:8px;flex-shrink:0;}
+.inp{flex:1;background:rgba(255,255,255,0.05);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:6px;}
+.inp-sym{font-size:12px;color:rgba(255,255,255,0.25);}
+.inp-ph{font-size:11px;color:rgba(255,255,255,0.18);}
+.add-btn{background:#21c25a;border-radius:20px;padding:11px 16px;font-size:12px;font-weight:700;color:#000;white-space:nowrap;}
 
-/* Calendar screen */
-.mini-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.mini-cal-title{font-size:13px;font-weight:700;color:#fff;}
-.mini-cal-arrow{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,0.4);}
-.mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;}
-.mini-day-label{font-size:7px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center;padding:2px 0;}
-.mini-cal-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;}
-.mc-g{background:rgba(33,194,90,0.7);color:#fff;}
-.mc-r{background:rgba(183,28,28,0.6);color:#fff;}
-.mc-e{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);}
-.mc-f{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2);}
-.cal-legend{display:flex;justify-content:center;gap:12px;}
-.cal-leg-item{display:flex;align-items:center;gap:4px;font-size:7px;color:rgba(255,255,255,0.4);}
-.cal-leg-dot{width:6px;height:6px;border-radius:2px;}
+/* Screen 2: CALENDAR */
+.s2-body{flex:1;display:flex;flex-direction:column;padding:12px 18px 0;overflow:hidden;}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0;}
+.cal-month{font-size:15px;font-weight:700;color:#fff;}
+.cal-arr{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;}
+.cal-arr svg{width:14px;height:14px;color:rgba(255,255,255,0.4);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;flex-shrink:0;}
+.cd-lbl{font-size:7px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center;padding-bottom:3px;}
+.cd{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.cd-amt{font-size:6px;margin-top:1px;opacity:0.8;}
+.cg{background:rgba(33,194,90,0.75);color:#fff;}
+.cr{background:rgba(183,28,28,0.7);color:#fff;}
+.ce{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
+.cf{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.15);}
+.leg{display:flex;justify-content:center;gap:14px;margin-top:10px;flex-shrink:0;}
+.leg-i{display:flex;align-items:center;gap:5px;font-size:8px;color:rgba(255,255,255,0.4);}
+.leg-d{width:8px;height:8px;border-radius:3px;}
 
-/* Overview screen */
-.mini-ov-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;}
-.mini-ov-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:10px;}
-.mini-proj{background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
-.mini-proj-amt{font-size:18px;font-weight:700;color:#21c25a;letter-spacing:-0.5px;}
-.mini-proj-lbl{font-size:8px;color:rgba(255,255,255,0.4);margin-top:2px;}
-.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.mini-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px;}
-.mini-stat-val{font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
-.mini-stat-lbl{font-size:7px;color:rgba(255,255,255,0.35);margin-top:2px;}
+/* Screen 3: OVERVIEW */
+.s3-body{flex:1;display:flex;flex-direction:column;padding:14px 18px 0;overflow:hidden;}
+.s3-hi{font-size:19px;font-weight:700;color:#fff;letter-spacing:-0.5px;margin-bottom:3px;flex-shrink:0;}
+.s3-sub{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:12px;flex-shrink:0;}
+.s3-proj{background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center;flex-shrink:0;}
+.s3-pa{font-size:22px;font-weight:700;color:#21c25a;letter-spacing:-1px;}
+.s3-pl{font-size:9px;color:rgba(255,255,255,0.35);margin-top:4px;}
+.s3-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;}
+.s3-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;}
+.s3-sv{font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
+.s3-sl{font-size:8px;color:rgba(255,255,255,0.35);margin-top:3px;}
 
-/* Mini nav */
-.mini-nav{display:flex;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:6px;}
-.mini-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
-.mini-tab-icon{font-size:13px;}
-.mini-tab-lbl{font-size:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
-.mini-tab.act .mini-tab-lbl{color:#21c25a;}
+/* Shared nav */
+.app-nav{display:flex;border-top:1px solid rgba(255,255,255,0.07);padding:8px 0 4px;flex-shrink:0;align-items:center;}
+.nt{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.nt-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);}
+.nt-icon svg{width:18px;height:18px;}
+.nt-lbl{font-size:7px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+.nt-home-btn{width:44px;height:44px;background:#21c25a;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(33,194,90,0.4);position:relative;top:-8px;}
+.nt-home-btn svg{width:20px;height:20px;color:#000;}
+.nt.act .nt-icon{color:#21c25a;}
+.nt.act .nt-lbl{color:#21c25a;}
 
-/* ── HOW IT WORKS ── */
-.hiw{padding:120px 48px;max-width:1200px;margin:0 auto;}
-.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:16px;}
-.section-title{font-size:clamp(32px,4vw,48px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:64px;max-width:500px;}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
-.step{padding:36px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:20px;transition:border-color 0.3s;}
-.step:hover{border-color:rgba(33,194,90,0.3);}
-.step-num{width:44px;height:44px;border-radius:50%;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.25);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#21c25a;margin-bottom:20px;}
-.step-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;}
-.step-desc{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;}
+/* HOW IT WORKS */
+.hiw{padding:120px 80px;max-width:1200px;margin:0 auto;}
+.s-eye{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:16px;}
+.s-title{font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-2px;color:#fff;margin-bottom:60px;line-height:1.1;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.step{padding:36px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:24px;transition:border-color 0.3s;}
+.step:hover{border-color:rgba(33,194,90,0.25);}
+.step-n{width:46px;height:46px;border-radius:50%;background:rgba(33,194,90,0.1);border:1px solid rgba(33,194,90,0.2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#21c25a;margin-bottom:22px;}
+.step-t{font-size:19px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;}
+.step-d{font-size:15px;color:rgba(255,255,255,0.45);line-height:1.7;}
 
-/* ── CTA BAND ── */
-.cta-band{margin:0 48px 120px;padding:80px 80px;background:linear-gradient(135deg,rgba(33,194,90,0.08) 0%,rgba(33,194,90,0.03) 100%);border:1px solid rgba(33,194,90,0.15);border-radius:32px;display:flex;align-items:center;justify-content:space-between;gap:48px;}
-.cta-band-left h2{font-size:clamp(28px,3.5vw,42px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;}
-.cta-band-left p{font-size:16px;color:rgba(255,255,255,0.5);max-width:420px;line-height:1.6;}
-.cta-band-right{flex-shrink:0;text-align:center;}
-.cta-big{display:inline-block;background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:18px 40px;border-radius:50px;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
-.cta-big:hover{background:#27d966;transform:translateY(-2px);}
-.cta-band-sub{font-size:12px;color:rgba(255,255,255,0.3);margin-top:10px;}
+/* CTA */
+.cta-wrap{padding:0 80px 120px;max-width:1360px;margin:0 auto;}
+.cta-band{padding:80px;background:rgba(33,194,90,0.05);border:1px solid rgba(33,194,90,0.12);border-radius:32px;display:flex;align-items:center;justify-content:space-between;gap:60px;}
+.cta-h{font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:14px;line-height:1.1;}
+.cta-p{font-size:16px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:420px;}
+.btn-big{display:inline-block;background:#21c25a;color:#000;font-size:17px;font-weight:700;padding:20px 48px;border-radius:50px;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.btn-big:hover{background:#27d966;transform:translateY(-2px);box-shadow:0 12px 40px rgba(33,194,90,0.3);}
+.cta-sub{font-size:12px;color:rgba(255,255,255,0.25);margin-top:12px;text-align:center;}
 
-/* ── FOOTER ── */
-footer{padding:32px 48px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
-.footer-brand{font-size:16px;font-weight:800;color:#fff;}
-.footer-brand span{color:#21c25a;}
-.footer-links{display:flex;gap:24px;}
-.footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s;}
-.footer-links a:hover{color:#21c25a;}
+footer{padding:28px 80px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
+.f-brand{font-size:17px;font-weight:800;color:#fff;}
+.f-brand span{color:#21c25a;}
+.f-links{display:flex;gap:28px;}
+.f-links a{font-size:13px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;}
+.f-links a:hover{color:#21c25a;}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-brand">On<span>Track</span></div>
-  <a href="/index.html" class="nav-cta">Try it free →</a>
+  <a href="/?app=1" class="nav-cta">Try it free →</a>
 </nav>
 
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-inner">
 
-    <!-- LEFT -->
-    <div class="hero-left">
-      <div class="hero-eyebrow">Daily budget tracker</div>
-      <h1 class="hero-headline">Know exactly<br>what you can<br><span>spend today.</span></h1>
+  <div class="hero-text">
+    <div class="eyebrow">Daily budget tracker</div>
+    <h1 class="headline">Know exactly<br>what you can<br><span>spend today.</span></h1>
 
-      <div class="slide-features">
-        <div class="feature active" id="feat0">
-          <div class="feature-tag">Home</div>
-          <div class="feature-title">Your daily allowance at a glance</div>
-          <div class="feature-desc">Set your monthly budget once. OnTrack divides it across the month and tells you exactly what you can spend today — updated every time you log something.</div>
-        </div>
-        <div class="feature" id="feat1">
-          <div class="feature-tag">Calendar</div>
-          <div class="feature-title">See your whole month in seconds</div>
-          <div class="feature-desc">Green days mean you stayed on track. Red days mean you overspent. At a glance you can see patterns, streaks, and where things went wrong.</div>
-        </div>
-        <div class="feature" id="feat2">
-          <div class="feature-tag">Overview</div>
-          <div class="feature-title">Monthly insights that actually mean something</div>
-          <div class="feature-desc">See how much you've saved, your average daily spend, your most expensive days, and whether you're ahead or behind your budget this month.</div>
-        </div>
+    <div class="slide-text">
+      <div class="ft active" id="ft0">
+        <div class="ft-tag">Home screen</div>
+        <div class="ft-title">Your daily allowance, always visible</div>
+        <div class="ft-desc">The ring tells you everything at a glance. Green means you're fine. Log a spend in two taps — no categories, no faff.</div>
       </div>
-
-      <div class="dots">
-        <div class="dot active" onclick="goSlide(0)"></div>
-        <div class="dot" onclick="goSlide(1)"></div>
-        <div class="dot" onclick="goSlide(2)"></div>
+      <div class="ft" id="ft1">
+        <div class="ft-tag">Calendar view</div>
+        <div class="ft-title">See your whole month at once</div>
+        <div class="ft-desc">Every day is green or red. Instantly spot patterns, track streaks, and understand exactly where the month went.</div>
       </div>
-
-      <a href="/index.html" class="hero-cta">Try it free →</a>
-      <div class="hero-cta-sub">No download needed. Works on any phone.</div>
+      <div class="ft" id="ft2">
+        <div class="ft-tag">Overview</div>
+        <div class="ft-title">Monthly insights that mean something</div>
+        <div class="ft-desc">How much you've saved, your daily average, your best streak. Real numbers, no noise.</div>
+      </div>
     </div>
 
-    <!-- RIGHT: Angled iPhone -->
-    <div class="hero-right">
-      <div class="phone-scene">
-        <div class="phone-glow"></div>
-        <div class="phone-tilt">
-          <div class="phone">
-            <div class="phone-island"><div class="island"></div></div>
-            <div class="phone-screen">
+    <div class="dots">
+      <div class="dot active" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+      <div class="dot" onclick="goSlide(2)"></div>
+    </div>
 
-              <!-- Screen 0: Home -->
-              <div class="screen-slide active" id="screen0">
-                <div class="mini-header">
-                  <div class="mini-wm">On<span>Track</span></div>
-                  <div class="mini-logout">LOG OUT</div>
-                </div>
-                <div class="mini-date">Today</div>
-                <div class="mini-ring-wrap">
-                  <svg viewBox="0 0 140 140">
-                    <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(33,194,90,0.08)" stroke-width="8"/>
-                    <circle cx="70" cy="70" r="60" fill="none" stroke="#21c25a" stroke-width="8" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="94"/>
-                  </svg>
-                  <div class="mini-ring-text">
-                    <div class="mini-amt">£8.40</div>
-                    <div class="mini-lbl">left today</div>
-                    <div class="mini-status">✓ ON TRACK</div>
+    <div class="cta-row">
+      <a href="/?app=1" class="btn-primary">Try it free →</a>
+      <div class="cta-note">No download. Works on any phone.</div>
+    </div>
+  </div>
+
+  <!-- FIXED iPhone 17 Pro -->
+  <div class="hero-phone">
+    <div class="phone-tilt">
+      <div class="phone">
+        <div class="phone-side"></div>
+        <div class="phone-top"><div class="island"></div></div>
+        <div class="phone-content">
+
+          <!-- SCREEN: HOME -->
+          <div class="ss active" id="ss0">
+            <div class="ah">
+              <svg class="ah-gear" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <div class="ah-wm">On<span>Track</span></div>
+              <div class="ah-lo">Log out</div>
+            </div>
+            <div class="s1-body">
+              <div class="date-row">
+                <div class="d-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+                <div class="d-lbl">Today</div>
+                <div class="d-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+              </div>
+              <div class="ring-wrap">
+                <div class="ring-c">
+                  <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="rgba(33,194,90,0.08)" stroke-width="10"/><circle cx="100" cy="100" r="86" fill="none" stroke="#21c25a" stroke-width="10" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="135"/></svg>
+                  <div class="ring-inner">
+                    <div class="r-amt">£8.40</div>
+                    <div class="r-lbl">left to spend today</div>
+                    <div class="r-stat">✓ ON TRACK</div>
+                    <div class="r-daily">Daily budget: £12.48</div>
                   </div>
                 </div>
-                <div class="mini-streak">3 DAY STREAK</div>
-                <div class="mini-input">
-                  <div class="mini-sym">£</div>
-                  <div class="mini-ph">What did you spend?</div>
-                  <div class="mini-add">Add</div>
-                </div>
-                <div class="mini-nav">
-                  <div class="mini-tab act"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl" style="color:#21c25a;">Home</div></div>
-                  <div class="mini-tab"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl">Calendar</div></div>
-                  <div class="mini-tab"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl">Overview</div></div>
-                </div>
               </div>
-
-              <!-- Screen 1: Calendar -->
-              <div class="screen-slide" id="screen1">
-                <div class="mini-header">
-                  <div class="mini-wm">On<span>Track</span></div>
-                </div>
-                <div class="mini-cal-header">
-                  <div class="mini-cal-arrow">‹</div>
-                  <div class="mini-cal-title">June 2026</div>
-                  <div class="mini-cal-arrow">›</div>
-                </div>
-                <div class="mini-cal-days">
-                  <div class="mini-day-label">M</div><div class="mini-day-label">T</div><div class="mini-day-label">W</div><div class="mini-day-label">T</div><div class="mini-day-label">F</div><div class="mini-day-label">S</div><div class="mini-day-label">S</div>
-                  <div class="mini-cal-cell mc-g">2</div><div class="mini-cal-cell mc-g">3</div><div class="mini-cal-cell mc-r">4</div><div class="mini-cal-cell mc-g">5</div><div class="mini-cal-cell mc-g">6</div><div class="mini-cal-cell mc-g">7</div><div class="mini-cal-cell mc-r">8</div>
-                  <div class="mini-cal-cell mc-g">9</div><div class="mini-cal-cell mc-g">10</div><div class="mini-cal-cell mc-g">11</div><div class="mini-cal-cell mc-r">12</div><div class="mini-cal-cell mc-g">13</div><div class="mini-cal-cell mc-g">14</div><div class="mini-cal-cell mc-g">15</div>
-                  <div class="mini-cal-cell mc-g">16</div><div class="mini-cal-cell mc-g">17</div><div class="mini-cal-cell mc-g">18</div><div class="mini-cal-cell mc-g">19</div><div class="mini-cal-cell mc-r">20</div><div class="mini-cal-cell mc-e">21</div><div class="mini-cal-cell mc-f">22</div>
-                  <div class="mini-cal-cell mc-f">23</div><div class="mini-cal-cell mc-f">24</div><div class="mini-cal-cell mc-f">25</div><div class="mini-cal-cell mc-f">26</div><div class="mini-cal-cell mc-f">27</div><div class="mini-cal-cell mc-f">28</div><div class="mini-cal-cell mc-f">29</div>
-                </div>
-                <div class="cal-legend">
-                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(33,194,90,0.7);"></div>On track</div>
-                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(183,28,28,0.6);"></div>Over</div>
-                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);"></div>Not logged</div>
-                </div>
-                <div class="mini-nav" style="margin-top:8px;">
-                  <div class="mini-tab"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl">Home</div></div>
-                  <div class="mini-tab act"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl" style="color:#21c25a;">Calendar</div></div>
-                  <div class="mini-tab"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl">Overview</div></div>
-                </div>
+              <div class="streak">3 DAY STREAK</div>
+              <div class="pace-card">
+                <div class="pace-top"><span class="pace-l">Spend pace</span><span class="pace-v">On pace</span></div>
+                <div class="pace-bar"><div class="pace-f"></div></div>
               </div>
-
-              <!-- Screen 2: Overview -->
-              <div class="screen-slide" id="screen2">
-                <div class="mini-header">
-                  <div class="mini-wm">On<span>Track</span></div>
-                </div>
-                <div class="mini-ov-title">Good evening, Rob</div>
-                <div class="mini-ov-sub">June 2026</div>
-                <div class="mini-proj">
-                  <div class="mini-proj-amt">£45.20 ahead</div>
-                  <div class="mini-proj-lbl">of budget this month</div>
-                </div>
-                <div class="mini-stats">
-                  <div class="mini-stat"><div class="mini-stat-val" style="color:#21c25a;">£9.20</div><div class="mini-stat-lbl">avg daily spend</div></div>
-                  <div class="mini-stat"><div class="mini-stat-val">18/21</div><div class="mini-stat-lbl">days on track</div></div>
-                  <div class="mini-stat"><div class="mini-stat-val">7 🔥</div><div class="mini-stat-lbl">best streak</div></div>
-                  <div class="mini-stat"><div class="mini-stat-val" style="color:#21c25a;">£193</div><div class="mini-stat-lbl">saved so far</div></div>
-                </div>
-                <div class="mini-nav" style="margin-top:8px;">
-                  <div class="mini-tab"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl">Home</div></div>
-                  <div class="mini-tab"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl">Calendar</div></div>
-                  <div class="mini-tab act"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl" style="color:#21c25a;">Overview</div></div>
-                </div>
+              <div class="input-row">
+                <div class="inp"><div class="inp-sym">£</div><div class="inp-ph">What did you spend?</div></div>
+                <div class="add-btn">Add</div>
               </div>
-
+            </div>
+            <div class="app-nav">
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl">Calendar</div></div>
+              <div class="nt act"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Home</div></div>
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl">Overview</div></div>
             </div>
           </div>
+
+          <!-- SCREEN: CALENDAR -->
+          <div class="ss" id="ss1">
+            <div class="ah"><div class="ah-wm">On<span>Track</span></div></div>
+            <div class="s2-body">
+              <div class="cal-hdr">
+                <div class="cal-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+                <div class="cal-month">June 2026</div>
+                <div class="cal-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+              </div>
+              <div class="cal-grid">
+                <div class="cd-lbl">M</div><div class="cd-lbl">T</div><div class="cd-lbl">W</div><div class="cd-lbl">T</div><div class="cd-lbl">F</div><div class="cd-lbl">S</div><div class="cd-lbl">S</div>
+                <div class="cd cg"><span>2</span><span class="cd-amt">£4</span></div><div class="cd cg"><span>3</span><span class="cd-amt">£9</span></div><div class="cd cr"><span>4</span><span class="cd-amt">£18</span></div><div class="cd cg"><span>5</span><span class="cd-amt">£6</span></div><div class="cd cg"><span>6</span><span class="cd-amt">£11</span></div><div class="cd cg"><span>7</span><span class="cd-amt">£3</span></div><div class="cd cr"><span>8</span><span class="cd-amt">£20</span></div>
+                <div class="cd cg"><span>9</span><span class="cd-amt">£7</span></div><div class="cd cg"><span>10</span><span class="cd-amt">£5</span></div><div class="cd cg"><span>11</span><span class="cd-amt">£9</span></div><div class="cd cg"><span>12</span><span class="cd-amt">£4</span></div><div class="cd cr"><span>13</span><span class="cd-amt">£16</span></div><div class="cd cg"><span>14</span><span class="cd-amt">£8</span></div><div class="cd cg"><span>15</span><span class="cd-amt">£6</span></div>
+                <div class="cd cg"><span>16</span><span class="cd-amt">£10</span></div><div class="cd cg"><span>17</span><span class="cd-amt">£3</span></div><div class="cd cg"><span>18</span><span class="cd-amt">£7</span></div><div class="cd cg"><span>19</span><span class="cd-amt">£5</span></div><div class="cd cg"><span>20</span><span class="cd-amt">£9</span></div><div class="cd ce"><span>21</span></div><div class="cd cf"><span>22</span></div>
+                <div class="cd cf"><span>23</span></div><div class="cd cf"><span>24</span></div><div class="cd cf"><span>25</span></div><div class="cd cf"><span>26</span></div><div class="cd cf"><span>27</span></div><div class="cd cf"><span>28</span></div><div class="cd cf"><span>29</span></div>
+              </div>
+              <div class="leg">
+                <div class="leg-i"><div class="leg-d" style="background:rgba(33,194,90,0.75);"></div>On track</div>
+                <div class="leg-i"><div class="leg-d" style="background:rgba(183,28,28,0.7);"></div>Over</div>
+                <div class="leg-i"><div class="leg-d" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);"></div>Not logged</div>
+              </div>
+            </div>
+            <div class="app-nav">
+              <div class="nt act"><div class="nt-icon" style="color:#21c25a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Calendar</div></div>
+              <div class="nt"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl">Home</div></div>
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl">Overview</div></div>
+            </div>
+          </div>
+
+          <!-- SCREEN: OVERVIEW -->
+          <div class="ss" id="ss2">
+            <div class="ah"><div class="ah-wm">On<span>Track</span></div></div>
+            <div class="s3-body">
+              <div class="s3-hi">Good evening, Rob</div>
+              <div class="s3-sub">June 2026</div>
+              <div class="s3-proj">
+                <div class="s3-pa">£45.20 ahead</div>
+                <div class="s3-pl">of budget this month</div>
+              </div>
+              <div class="s3-grid">
+                <div class="s3-stat"><div class="s3-sv" style="color:#21c25a;">£9.20</div><div class="s3-sl">avg daily spend</div></div>
+                <div class="s3-stat"><div class="s3-sv">18/21</div><div class="s3-sl">days on track</div></div>
+                <div class="s3-stat"><div class="s3-sv">7 days</div><div class="s3-sl">best streak</div></div>
+                <div class="s3-stat"><div class="s3-sv" style="color:#21c25a;">£193</div><div class="s3-sl">saved so far</div></div>
+              </div>
+            </div>
+            <div class="app-nav">
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl">Calendar</div></div>
+              <div class="nt"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl">Home</div></div>
+              <div class="nt act"><div class="nt-icon" style="color:#21c25a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Overview</div></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
 <section class="hiw">
-  <div class="section-eyebrow">Simple by design</div>
-  <h2 class="section-title">Up and running in two minutes.</h2>
+  <div class="s-eye">Simple by design</div>
+  <h2 class="s-title">Up and running<br>in two minutes.</h2>
   <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-title">Set your budget</div>
-      <div class="step-desc">Enter your monthly disposable income — or use our calculator to work it out from your pay and bills.</div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-title">Log what you spend</div>
-      <div class="step-desc">No categories, no tags, no faff. Just type the amount and tap add. Takes two seconds.</div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-title">Watch the ring</div>
-      <div class="step-desc">Green means you're on track. Red means slow down. You always know exactly where you stand.</div>
-    </div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Set your budget</div><div class="step-d">Enter your monthly disposable income — or use our built-in calculator to work it out from your pay and bills.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Log what you spend</div><div class="step-d">No categories. No tags. No faff. Just type the amount and tap add. Takes two seconds.</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">Watch the ring</div><div class="step-d">Green means you're on track. Red means slow down. You always know exactly where you stand today.</div></div>
   </div>
 </section>
 
-<!-- CTA BAND -->
-<div style="max-width:1200px;margin:0 auto;">
+<div class="cta-wrap">
   <div class="cta-band">
-    <div class="cta-band-left">
-      <h2>Start spending with confidence.</h2>
-      <p>Free forever. No download needed. Works on any phone — just open it in your browser and go.</p>
-    </div>
-    <div class="cta-band-right">
-      <a href="/index.html" class="cta-big">Try OnTrack free →</a>
-      <div class="cta-band-sub">ontrackapp.co.uk</div>
+    <div><h2 class="cta-h">Start spending<br>with confidence.</h2><p class="cta-p">Free forever. No download needed. Works on any phone — just open it in your browser and go.</p></div>
+    <div style="text-align:center;flex-shrink:0;">
+      <a href="/?app=1" class="btn-big">Try OnTrack free →</a>
+      <div class="cta-sub">ontrackapp.co.uk</div>
     </div>
   </div>
 </div>
 
 <footer>
-  <div class="footer-brand">On<span>Track</span></div>
-  <div class="footer-links">
+  <div class="f-brand">On<span>Track</span></div>
+  <div class="f-links">
     <a href="/privacy.html">Privacy Policy</a>
     <a href="mailto:hello@ontrackapp.co.uk">Contact</a>
-    <a href="/index.html">Open App</a>
+    <a href="/?app=1">Open App</a>
   </div>
 </footer>
 
 <script>
-let current = 0;
-let timer;
-
+let cur=0,timer;
 function goSlide(n){
-  document.querySelectorAll('.feature,.dot,.screen-slide').forEach(el=>el.classList.remove('active'));
-  document.getElementById('feat'+n).classList.add('active');
-  document.getElementById('screen'+n).classList.add('active');
+  document.querySelectorAll('.ft,.dot,.ss').forEach(e=>e.classList.remove('active'));
+  document.getElementById('ft'+n).classList.add('active');
+  document.getElementById('ss'+n).classList.add('active');
   document.querySelectorAll('.dot')[n].classList.add('active');
-  current = n;
-  resetTimer();
+  cur=n;reset();
 }
-
-function nextSlide(){
-  goSlide((current+1)%3);
-}
-
-function resetTimer(){
-  clearInterval(timer);
-  timer = setInterval(nextSlide, 4000);
-}
-
-resetTimer();
+function next(){goSlide((cur+1)%3);}
+function reset(){clearInterval(timer);timer=setInterval(next,4500);}
+reset();
 </script>
 </body>
 </html>
