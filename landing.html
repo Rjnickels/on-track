@@ -2,1870 +2,409 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-<title>OnTrack</title>
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-// Redirect desktop visitors to landing page
-if(window.innerWidth > 768 && !window.location.search.includes('app')) {
-  window.location.replace('/landing.html');
-}
-</script>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnTrack — Know exactly what you can spend today</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-form { margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#080808;color:#f0f0f0;font-family:'Inter',sans-serif;overflow-x:hidden;}
 
-:root {
-  --green:        #21c25a;
-  --green-bright: #34d76b;
-  --green-deep:   #14843d;
-  --green-soft:   #7be09a;
-  --bg:      #1a1a1a;
-  --surface: rgba(255,255,255,0.06);
-  --glass:   rgba(255,255,255,0.08);
-  --border:  rgba(255,255,255,0.1);
-  --text:    #f0f0f0;
-  --muted:   rgba(255,255,255,0.9);
-  --red:     #b71c1c;
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,0.9);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.07);}
+.nav-brand{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+.nav-brand span{color:#21c25a;}
+.nav-cta{background:#21c25a;color:#000;font-size:14px;font-weight:700;padding:11px 28px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
+.nav-cta:hover{background:#27d966;transform:translateY(-1px);}
+
+/* HERO LAYOUT */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:100px 80px 80px;
+  gap:80px;
+  position:relative;
+  overflow:hidden;
 }
-.app[data-theme="light"] {
-  --green:        #18a84a;
-  --green-bright: #21c25a;
-  --green-deep:   #0f7a35;
-  --green-soft:   #18a84a;
-  --bg:      #ffffff;
-  --surface: rgba(0,0,0,0.04);
-  --glass:   rgba(0,0,0,0.04);
-  --border:  rgba(0,0,0,0.1);
-  --text:    #111111;
-  --muted:   rgba(0,0,0,0.55);
-  --red:     #c62828;
+.hero-bg{position:absolute;right:0;top:0;bottom:0;width:60%;background:radial-gradient(ellipse at 70% 50%,rgba(33,194,90,0.07) 0%,transparent 70%);pointer-events:none;}
+
+/* TEXT */
+.hero-text{flex:0 0 480px;position:relative;z-index:2;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:22px;}
+.headline{font-size:clamp(40px,4.5vw,66px);font-weight:900;letter-spacing:-3px;line-height:0.97;color:#fff;margin-bottom:32px;}
+.headline span{color:#21c25a;}
+
+.slide-text{height:150px;margin-bottom:36px;overflow:hidden;}
+.ft{display:none;animation:fu 0.45s ease both;}
+.ft.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ft-tag{display:inline-block;background:rgba(33,194,90,0.1);border:1px solid rgba(33,194,90,0.2);border-radius:50px;padding:4px 14px;font-size:11px;font-weight:700;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.ft-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.5px;}
+.ft-desc{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;}
+
+.dots{display:flex;gap:8px;margin-bottom:40px;}
+.dot{height:4px;border-radius:2px;background:rgba(255,255,255,0.15);cursor:pointer;transition:all 0.35s;width:24px;}
+.dot.active{background:#21c25a;width:48px;}
+
+.cta-row{display:flex;align-items:center;gap:20px;}
+.btn-primary{background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:16px 36px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
+.btn-primary:hover{background:#27d966;transform:translateY(-2px);box-shadow:0 8px 32px rgba(33,194,90,0.3);}
+.cta-note{font-size:13px;color:rgba(255,255,255,0.3);}
+
+/* PHONE — FIXED SIZE, NEVER CHANGES */
+.hero-phone{
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.phone-tilt{
+  transform:perspective(1400px) rotateY(-20deg) rotateX(5deg);
+  transition:transform 0.8s ease;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 80px rgba(33,194,90,0.1));
+}
+.phone-tilt:hover{
+  transform:perspective(1400px) rotateY(-12deg) rotateX(3deg);
 }
 
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
-.app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; }
-
-.app-header { display: flex; align-items: center; justify-content: center; padding: 14px 24px 10px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; position: relative; }
-.wordmark { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-.wordmark .wm-on { color: #ffffff; }
-.wordmark .wm-track { color: var(--green); }
-.logout-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text); font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; padding: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-.logout-btn:hover { color: var(--text); }
-.settings-btn { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: color 0.2s, background 0.2s; }
-.settings-btn:hover { color: var(--text); background: var(--glass); }
-
-.screen { display: none; flex: 1; min-height: 0; }
-.screen.active { display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-#homeScreen { position: relative; }
-.nav { display: flex; background: var(--bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0; }
-.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 0 12px; background: none; border: none; border-top: 2px solid transparent; color: var(--text); font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-.nav-btn svg { transition: transform 0.2s; }
-.nav-btn.active { color: var(--green); border-top-color: var(--green); }
-.nav-btn.active svg { transform: scale(1.1); }
-.nav-home { border-top: none !important; position: relative; top: -16px; }
-.nav-home-inner { width: 62px; height: 62px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(33,194,90,0.45); transition: transform 0.15s, box-shadow 0.15s; }
-.nav-home-inner svg { color: #fff; }
-.nav-home:active .nav-home-inner { transform: scale(0.92); box-shadow: 0 2px 8px rgba(33,194,90,0.3); }
-.nav-home.active .nav-home-inner { box-shadow: 0 4px 20px rgba(33,194,90,0.6); }
-
-.auth-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
-.auth-screen h2 { font-size: 21px; font-weight: 700; }
-.auth-screen h2 .g { color: var(--green); }
-.auth-screen p { color: var(--muted); font-size: 13px; line-height: 1.7; }
-.auth-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.auth-input { width: 100%; height: 48px; padding: 0 16px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; font-size: 16px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text); outline: none; transition: border-color 0.2s; }
-.auth-input::placeholder { color: var(--muted); }
-.auth-input:focus { border-bottom-color: var(--green); }
-.auth-error { color: #ef9a9a; font-size: 12px; min-height: 18px; }
-.auth-toggle { color: var(--muted); font-size: 13px; cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; text-decoration: underline; }
-.btn-auth { width: 100%; height: 50px; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; background: var(--green); color: #06220f; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
-.btn-auth:hover { background: var(--green-bright); }
-.btn-auth:disabled { opacity: 0.5; cursor: default; }
-
-.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 24px 8px; gap: 10px; overflow: hidden; }
-.date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
-.day-arrow { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
-.day-arrow:hover { background: rgba(255,255,255,0.14); }
-.day-arrow:active { transform: scale(0.92); }
-.day-arrow:disabled { opacity: 0.25; cursor: default; }
-.date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
-.date-label.is-today { color: var(--text); }
-
-.ring-wrap { position: relative; width: min(320px, calc(var(--app-height, 100dvh) - 430px)); aspect-ratio: 1 / 1; min-width: 160px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
-.ring-glow { display:none; }
-.ring-wrap::after {
-  content:''; position:absolute; width:88%; height:88%; top:6%; left:6%; border-radius:50%;
-  pointer-events:none; opacity:0; transition:opacity 1.5s ease;
-  box-shadow: 0 0 0 12px rgba(33,194,90,0.08), 0 0 30px 8px rgba(33,194,90,0.2), 0 0 60px 16px rgba(33,194,90,0.08);
+/* iPhone 17 Pro — 300 x 640px fixed */
+.phone{
+  width:300px;
+  height:640px;
+  background:#0f0f0f;
+  border-radius:50px;
+  border:2px solid rgba(255,255,255,0.14);
+  overflow:hidden;
+  position:relative;
+  flex-shrink:0;
 }
-.ring-wrap.glowing::after { opacity:1; animation:ringGlowPulse 4s ease-in-out infinite; }
-.ring-wrap.glowing-red::after { opacity:1; box-shadow: 0 0 0 12px rgba(239,154,154,0.08), 0 0 30px 8px rgba(239,154,154,0.2), 0 0 60px 16px rgba(239,154,154,0.08); }
-@keyframes ringGlowPulse {
-  0%,100% { box-shadow: 0 0 0 12px rgba(33,194,90,0.08), 0 0 28px 6px rgba(33,194,90,0.18), 0 0 55px 14px rgba(33,194,90,0.07); }
-  50%      { box-shadow: 0 0 0 12px rgba(33,194,90,0.14), 0 0 38px 10px rgba(33,194,90,0.28), 0 0 75px 20px rgba(33,194,90,0.1); }
+.phone::before{
+  content:'';
+  position:absolute;inset:0;border-radius:50px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.5);
+  pointer-events:none;z-index:20;
 }
-.ring-wrap.slide-left  { transform: translateX(-60px); opacity: 0; }
-.ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
-.ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring-track { fill: none; stroke: none; stroke-width: 14; }
-.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; }
-.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
-.ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
-.ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-.ring-status { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; transition: color 0.4s; }
-.streak { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--green); height: 20px; min-height: 20px; text-align: center; visibility: visible; }
+/* Side button */
+.phone-side{position:absolute;right:-3px;top:130px;width:3px;height:70px;background:rgba(255,255,255,0.08);border-radius:0 3px 3px 0;}
 
-@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-@keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.7} }
-.ring-wrap.over { animation: none; }
+/* Dynamic island */
+.phone-top{height:40px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.island{width:110px;height:30px;background:#000;border-radius:20px;}
 
-.spend-area { padding: 6px 24px 8px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; border-top: 1px solid var(--border); }
-.input-row { display: flex; gap: 8px; }
-.input-wrap { flex: 1; display: flex; align-items: center; height: 48px; border: none; border-bottom: 2px solid var(--border); border-radius: 0; background: transparent; padding-left: 4px; transition: border-color 0.2s; }
-.input-wrap span { color: rgba(255,255,255,0.5); font-weight: 600; font-size: 18px; flex-shrink: 0; margin-right: 4px; }
-.input-wrap input { flex: 1; width: 100%; height: 100%; padding: 0 8px 0 2px; border: none; border-radius: 0; font-size: 18px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text); outline: none; }
-.input-wrap input::placeholder { color: var(--muted); }
-.input-wrap:focus-within { border-bottom-color: var(--green); }
-
-.btn-add { padding: 0 22px; height: 48px; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; background: var(--green); color: #06220f; cursor: pointer; transition: transform 0.1s, background 0.2s; white-space: nowrap; box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
-.btn-add:hover { background: var(--green-bright); }
-.btn-add:active { transform: scale(0.95); }
-
-.toast { text-align: center; font-size: 13px; font-weight: 600; color: var(--green); padding: 6px 0; opacity: 0; transition: opacity 0.3s; height: 0; overflow: hidden; }
-.toast.show { opacity: 1; height: auto; }
-
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
-.overlay.show { display: flex; }
-.overlay-card { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; max-width: 340px; text-align: center; }
-.overlay-text { font-size: 16px; line-height: 1.7; color: var(--text); }
-
-.budget-setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 16px; text-align: center; }
-.budget-setup h2 { font-size: 21px; font-weight: 700; }
-.budget-setup h2 .g { color: var(--green); }
-.budget-setup p { color: var(--muted); font-size: 13px; line-height: 1.7; }
-.budget-setup .input-wrap { width: 100%; flex: none; height: 48px; }
-.btn-set { width: 100%; height: 50px; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; background: var(--green); color: #06220f; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 12px rgba(33,194,90,0.3); }
-.btn-set:hover { background: var(--green-bright); }
-
-.cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 12px 10px; }
-.cal-header h2 { font-size: 17px; font-weight: 700; }
-.cal-nav-btn { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; }
-.cal-nav-btn:active { transform: scale(0.92); }
-.cal-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 6px 6px; }
-.cal-day-label { text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; padding: 0 6px; }
-.cal-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; line-height: 1.3; text-align: center; user-select: none; cursor: pointer; animation: cellFade 0.3s ease both; transition: transform 0.1s; }
-.cal-cell:active { transform: scale(0.93); }
-.cal-cell .cal-num { font-size: 16px; }
-.cal-cell .cal-val { font-size: 12px; opacity: 0.9; margin-top: 2px; }
-.cal-cell.green  { background: var(--green-deep); color: #c8f0d5; }
-.cal-cell.red    { background: var(--red); color: #ffcdd2; }
-.cal-cell.empty  { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
-.cal-cell.future { background: var(--glass); color: var(--muted); }
-.cal-cell.today  { outline: 2px solid var(--green); outline-offset: 2px; }
-@keyframes cellFade { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
-
-.projection { margin: 10px 20px 8px; padding: 28px 24px; border-radius: 16px; font-size: 18px; font-weight: 600; line-height: 1.6; text-align: center; border: 1px solid var(--border); background: var(--glass); color: var(--text); }
-.projection.ahead { background: linear-gradient(135deg, rgba(33,194,90,0.12), rgba(33,194,90,0.03)); border-color: rgba(33,194,90,0.25); }
-.projection.behind { background: linear-gradient(135deg, rgba(183,28,28,0.12), rgba(183,28,28,0.03)); border-color: rgba(183,28,28,0.25); }
-.projection strong { font-size: 28px; display: block; margin-top: 6px; }
-.projection .on { color: var(--text); }
-.projection .track { color: var(--green); }
-.divider { height: 1px; background: var(--border); margin: 10px 24px; }
-.app[data-theme="light"] .auth-input { background: rgba(0,0,0,0.05); color: #111; border-color: rgba(0,0,0,0.15); }
-.app[data-theme="light"] .input-wrap { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
-.app[data-theme="light"] .input-wrap input { color: #111; }
-.app[data-theme="light"] .cal-cell { color: #111; }
-.app[data-theme="light"] .reset-btn { color: #c62828; border-color: rgba(198,40,40,0.3); }
-.app[data-theme="light"] h2 { color: #111; }
-.app[data-theme="light"] .calc-input { color: #111; }
-.app[data-theme="light"] .calc-input-wrap { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
-.app[data-theme="light"] .btn-add { color: #fff; }
-.app[data-theme="light"] .budget-setup h2 { color: #111; }
-.reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
-.reset-btn:hover { background: rgba(239,154,154,0.08); }
-
-
-.calc-row label { font-size:13px; color:var(--muted); flex:1; }
-.calc-input-wrap { display:flex; align-items:center; gap:4px; background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:6px 10px; width:110px; flex-shrink:0; }
-.calc-input-wrap span { font-size:13px; font-weight:600; color:var(--muted); }
-.calc-input { background:none; border:none; outline:none; font-size:13px; font-weight:600; color:var(--text); font-family:'Inter',sans-serif; width:100%; text-align:right; }
-.calc-sym { font-size:13px; font-weight:600; color:var(--muted); }
-
-.currency-btn {
-  flex: 1; padding: 7px 4px; border: 1px solid var(--border); border-radius: 50px;
-  font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;
-  background: var(--glass); color: var(--muted); cursor: pointer;
-  transition: all 0.2s; white-space: nowrap;
+/* Screen content — fixed height */
+.phone-content{
+  height:600px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
-.currency-btn.active { background: var(--green); color: #06220f; border-color: var(--green); }
+
+/* App header */
+.ah{
+  display:flex;align-items:center;justify-content:center;
+  padding:10px 20px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+  position:relative;
+}
+.ah-wm{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.ah-wm span{color:#21c25a;}
+.ah-gear{position:absolute;left:16px;color:rgba(255,255,255,0.3);}
+.ah-lo{position:absolute;right:16px;font-size:8px;color:rgba(255,255,255,0.25);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;}
+
+/* Screens */
+.ss{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.ss.active{display:flex;animation:fu 0.4s ease both;}
+
+/* Screen 1: HOME */
+.s1-body{flex:1;display:flex;flex-direction:column;padding:12px 20px 0;overflow:hidden;}
+.date-row{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:12px;flex-shrink:0;}
+.d-arr{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;}
+.d-arr svg{width:16px;height:16px;color:rgba(255,255,255,0.5);}
+.d-lbl{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;}
+.ring-wrap{flex-shrink:0;display:flex;justify-content:center;margin-bottom:10px;}
+.ring-c{position:relative;width:200px;height:200px;}
+.ring-c svg{width:100%;height:100%;transform:rotate(-90deg);}
+.ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.r-amt{font-size:34px;font-weight:700;color:#21c25a;letter-spacing:-1.5px;line-height:1;}
+.r-lbl{font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.45);}
+.r-stat{font-size:10px;font-weight:700;color:#21c25a;}
+.r-daily{font-size:8px;color:rgba(255,255,255,0.3);}
+.streak{text-align:center;font-size:9px;font-weight:700;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;flex-shrink:0;}
+.pace-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;margin-bottom:10px;flex-shrink:0;}
+.pace-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.pace-l{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
+.pace-v{font-size:9px;font-weight:700;color:#21c25a;}
+.pace-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:4px;}
+.pace-f{height:100%;width:40%;background:#21c25a;border-radius:4px;}
+.input-row{display:flex;gap:8px;flex-shrink:0;}
+.inp{flex:1;background:rgba(255,255,255,0.05);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:6px;}
+.inp-sym{font-size:12px;color:rgba(255,255,255,0.25);}
+.inp-ph{font-size:11px;color:rgba(255,255,255,0.18);}
+.add-btn{background:#21c25a;border-radius:20px;padding:11px 16px;font-size:12px;font-weight:700;color:#000;white-space:nowrap;}
+
+/* Screen 2: CALENDAR */
+.s2-body{flex:1;display:flex;flex-direction:column;padding:12px 18px 0;overflow:hidden;}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0;}
+.cal-month{font-size:15px;font-weight:700;color:#fff;}
+.cal-arr{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;}
+.cal-arr svg{width:14px;height:14px;color:rgba(255,255,255,0.4);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;flex-shrink:0;}
+.cd-lbl{font-size:7px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center;padding-bottom:3px;}
+.cd{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.cd-amt{font-size:6px;margin-top:1px;opacity:0.8;}
+.cg{background:rgba(33,194,90,0.75);color:#fff;}
+.cr{background:rgba(183,28,28,0.7);color:#fff;}
+.ce{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);}
+.cf{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.15);}
+.leg{display:flex;justify-content:center;gap:14px;margin-top:10px;flex-shrink:0;}
+.leg-i{display:flex;align-items:center;gap:5px;font-size:8px;color:rgba(255,255,255,0.4);}
+.leg-d{width:8px;height:8px;border-radius:3px;}
+
+/* Screen 3: OVERVIEW */
+.s3-body{flex:1;display:flex;flex-direction:column;padding:14px 18px 0;overflow:hidden;}
+.s3-hi{font-size:19px;font-weight:700;color:#fff;letter-spacing:-0.5px;margin-bottom:3px;flex-shrink:0;}
+.s3-sub{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:12px;flex-shrink:0;}
+.s3-proj{background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:14px;padding:16px;margin-bottom:10px;text-align:center;flex-shrink:0;}
+.s3-pa{font-size:22px;font-weight:700;color:#21c25a;letter-spacing:-1px;}
+.s3-pl{font-size:9px;color:rgba(255,255,255,0.35);margin-top:4px;}
+.s3-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;}
+.s3-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;}
+.s3-sv{font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
+.s3-sl{font-size:8px;color:rgba(255,255,255,0.35);margin-top:3px;}
+
+/* Shared nav */
+.app-nav{display:flex;border-top:1px solid rgba(255,255,255,0.07);padding:8px 0 4px;flex-shrink:0;align-items:center;}
+.nt{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.nt-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);}
+.nt-icon svg{width:18px;height:18px;}
+.nt-lbl{font-size:7px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+.nt-home-btn{width:44px;height:44px;background:#21c25a;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(33,194,90,0.4);position:relative;top:-8px;}
+.nt-home-btn svg{width:20px;height:20px;color:#000;}
+.nt.act .nt-icon{color:#21c25a;}
+.nt.act .nt-lbl{color:#21c25a;}
+
+/* HOW IT WORKS */
+.hiw{padding:120px 80px;max-width:1200px;margin:0 auto;}
+.s-eye{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:16px;}
+.s-title{font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-2px;color:#fff;margin-bottom:60px;line-height:1.1;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.step{padding:36px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:24px;transition:border-color 0.3s;}
+.step:hover{border-color:rgba(33,194,90,0.25);}
+.step-n{width:46px;height:46px;border-radius:50%;background:rgba(33,194,90,0.1);border:1px solid rgba(33,194,90,0.2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#21c25a;margin-bottom:22px;}
+.step-t{font-size:19px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;}
+.step-d{font-size:15px;color:rgba(255,255,255,0.45);line-height:1.7;}
+
+/* CTA */
+.cta-wrap{padding:0 80px 120px;max-width:1360px;margin:0 auto;}
+.cta-band{padding:80px;background:rgba(33,194,90,0.05);border:1px solid rgba(33,194,90,0.12);border-radius:32px;display:flex;align-items:center;justify-content:space-between;gap:60px;}
+.cta-h{font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:14px;line-height:1.1;}
+.cta-p{font-size:16px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:420px;}
+.btn-big{display:inline-block;background:#21c25a;color:#000;font-size:17px;font-weight:700;padding:20px 48px;border-radius:50px;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.btn-big:hover{background:#27d966;transform:translateY(-2px);box-shadow:0 12px 40px rgba(33,194,90,0.3);}
+.cta-sub{font-size:12px;color:rgba(255,255,255,0.25);margin-top:12px;text-align:center;}
+
+footer{padding:28px 80px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
+.f-brand{font-size:17px;font-weight:800;color:#fff;}
+.f-brand span{color:#21c25a;}
+.f-links{display:flex;gap:28px;}
+.f-links a{font-size:13px;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;}
+.f-links a:hover{color:#21c25a;}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <header class="app-header" id="appHeader" style="opacity:0;">
-    <button class="settings-btn" id="settingsBtn" onclick="openSettings()" style="display:none">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
-    <div class="wordmark"><span class="wm-on" style="color:var(--text);">On</span><span class="wm-track">Track</span></div>
-    <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display:none">Log out</button>
-  </header>
+<nav>
+  <div class="nav-brand">On<span>Track</span></div>
+  <a href="/?app=1" class="nav-cta">Try it free →</a>
+</nav>
 
-  <!-- INSTALL BANNER -->
-  <div id="installBanner" style="display:none; position:fixed; bottom:80px; left:16px; right:16px; background:#222; border:1px solid var(--border); border-radius:16px; padding:16px 20px; z-index:200; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-      <div>
-        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px;">Add OnTrack to your home screen</div>
-        <div style="font-size:12px; color:var(--muted)" id="installMsg">Tap Share then "Add to Home Screen"</div>
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-text">
+    <div class="eyebrow">Daily budget tracker</div>
+    <h1 class="headline">Know exactly<br>what you can<br><span>spend today.</span></h1>
+
+    <div class="slide-text">
+      <div class="ft active" id="ft0">
+        <div class="ft-tag">Home screen</div>
+        <div class="ft-title">Your daily allowance, always visible</div>
+        <div class="ft-desc">The ring tells you everything at a glance. Green means you're fine. Log a spend in two taps — no categories, no faff.</div>
       </div>
-      <button onclick="dismissInstall()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;">×</button>
-    </div>
-    <button id="installBtn" onclick="nativeInstall()" style="display:none; margin-top:12px; width:100%; height:40px; border:none; border-radius:50px; background:var(--green); color:#06220f; font-size:14px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;">Install App</button>
-  </div>
-  <!-- OUTRO ANIMATION (post-login) -->
-  <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:var(--bg);flex-direction:column;pointer-events:none;">
-    <style>
-      @keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
-      @keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
-      @keyframes outroRingIn { from{opacity:0;transform:rotate(-180deg) scale(0.4)} to{opacity:1;transform:rotate(0deg) scale(1)} }
-    </style>
-    <div id="outroWordmark" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;">
-      <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
-    </div>
-    <div id="outroHeaderSpacer"></div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-      <div id="outroRing" style="opacity:0;">
-        <svg viewBox="0 0 320 320" width="320" height="320" style="filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.3));">
-          <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="14"/>
-          <circle cx="160" cy="160" r="140" fill="none" stroke="#21c25a" stroke-width="14" stroke-linecap="round"
-            stroke-dasharray="879.6" stroke-dashoffset="219.9"/>
-        </svg>
+      <div class="ft" id="ft1">
+        <div class="ft-tag">Calendar view</div>
+        <div class="ft-title">See your whole month at once</div>
+        <div class="ft-desc">Every day is green or red. Instantly spot patterns, track streaks, and understand exactly where the month went.</div>
+      </div>
+      <div class="ft" id="ft2">
+        <div class="ft-tag">Overview</div>
+        <div class="ft-title">Monthly insights that mean something</div>
+        <div class="ft-desc">How much you've saved, your daily average, your best streak. Real numbers, no noise.</div>
       </div>
     </div>
-    <div id="outroBottomSpacer"></div>
-  </div>
-  <div id="introScreen" style="display:none;position:fixed;inset:0;z-index:300;background:#000;align-items:center;justify-content:center;flex-direction:column;">
-    <style>
-      @keyframes ringFadeIn  { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-      @keyframes ringSpinFade { 0%{opacity:1;transform:rotate(0deg) scale(1)} 70%{opacity:1;transform:rotate(540deg) scale(1.05)} 100%{opacity:0;transform:rotate(720deg) scale(0.8)} }
-      @keyframes wordmarkGlow { 0%{opacity:0;filter:blur(8px) drop-shadow(0 0 0px #21c25a)} 40%{opacity:1;filter:blur(0px) drop-shadow(0 0 24px #21c25a) drop-shadow(0 0 60px rgba(33,194,90,0.5))} 80%{filter:blur(0px) drop-shadow(0 0 16px #21c25a) drop-shadow(0 0 40px rgba(33,194,90,0.3))} 100%{opacity:1;filter:blur(0px) drop-shadow(0 0 6px #21c25a)} }
-      @keyframes introFadeOut { from{opacity:1} to{opacity:0} }
-      @keyframes floorPulse { 0%,100%{opacity:0.2;transform:translateX(-50%) scaleX(0.6)} 50%{opacity:0.6;transform:translateX(-50%) scaleX(1)} }
-    </style>
 
-    <!-- Thick ring — matches home screen ring -->
-    <div id="introRingWrap" style="position:relative;width:240px;height:240px;">
-      <svg id="introRing" viewBox="0 0 240 240" width="240" height="240" style="opacity:0;animation:ringFadeIn 0.8s ease 0.2s forwards;filter:drop-shadow(0 0 10px #21c25a) drop-shadow(0 0 30px rgba(33,194,90,0.4));">
-        <circle cx="120" cy="120" r="100" fill="none" stroke="#21c25a" stroke-width="13" stroke-linecap="round"
-          stroke-dasharray="628" stroke-dashoffset="157"/>
-      </svg>
+    <div class="dots">
+      <div class="dot active" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+      <div class="dot" onclick="goSlide(2)"></div>
     </div>
 
-    <!-- OnTrack wordmark — hidden initially -->
-    <div id="introWordmark" style="display:none;position:absolute;">
-      <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
+    <div class="cta-row">
+      <a href="/?app=1" class="btn-primary">Try it free →</a>
+      <div class="cta-note">No download. Works on any phone.</div>
     </div>
-
-    <!-- Floor glow -->
-    <div style="position:absolute;bottom:30%;left:50%;transform:translateX(-50%) scaleX(0.6);width:220px;height:6px;background:radial-gradient(ellipse,rgba(33,194,90,0.5) 0%,transparent 70%);border-radius:50%;animation:floorPulse 2s ease-in-out infinite;"></div>
   </div>
 
-  <div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:200;background:#000;flex-direction:column;align-items:center;overflow:hidden;justify-content:space-between;">
+  <!-- FIXED iPhone 17 Pro -->
+  <div class="hero-phone">
+    <div class="phone-tilt">
+      <div class="phone">
+        <div class="phone-side"></div>
+        <div class="phone-top"><div class="island"></div></div>
+        <div class="phone-content">
 
-    <!-- iPhone mockup — top portion visible, fades into black -->
-    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:16px;">
-
-      <!-- iPhone frame -->
-      <div style="
-        width:272px;
-        background:#0a0a0a;
-        border-radius:52px;
-        border:2px solid rgba(255,255,255,0.18);
-        box-shadow:
-          0 0 0 1px rgba(255,255,255,0.06),
-          0 30px 80px rgba(0,0,0,0.8),
-          inset 0 0 0 2px rgba(255,255,255,0.04);
-        overflow:hidden;
-        position:relative;
-        flex-shrink:0;
-      ">
-        <!-- Side buttons (left) -->
-        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <!-- Side button (right) -->
-        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:var(--bg);border-radius:0 2px 2px 0;"></div>
-
-        <!-- Screen content -->
-        <div style="background:var(--bg);border-radius:50px;overflow:hidden;">
-
-          <!-- Status bar + Dynamic Island -->
-          <div style="height:52px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
-            <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
-            <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
-            <div style="display:flex;align-items:center;gap:5px;">
-              <svg width="14" height="11" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.4"/></svg>
-              <svg width="15" height="11" viewBox="0 0 16 12" fill="white"><path d="M8 2.4C5.6 2.4 3.5 3.4 2 5L0 3C2.1 1.1 4.9 0 8 0s5.9 1.1 8 3l-2 2C12.5 3.4 10.4 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.6c-1.5 0-2.9.6-3.9 1.6L2 5.1C3.5 3.8 5.6 3 8 3s4.5.8 6 2.1L12 7.2C11 6.2 9.6 5.6 8 5.6z" opacity="0.7"/><path d="M8 8.8c-.8 0-1.6.3-2.1.9L8 12l2.1-2.3C9.6 9.1 8.8 8.8 8 8.8z"/></svg>
-              <div style="width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.8);border-radius:3px;position:relative;display:flex;align-items:center;padding:0 2px;"><div style="width:70%;height:6px;background:#fff;border-radius:1.5px;"></div><div style="position:absolute;right:-4px;width:3px;height:5px;background:rgba(255,255,255,0.8);border-radius:0 1.5px 1.5px 0;"></div></div>
+          <!-- SCREEN: HOME -->
+          <div class="ss active" id="ss0">
+            <div class="ah">
+              <svg class="ah-gear" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <div class="ah-wm">On<span>Track</span></div>
+              <div class="ah-lo">Log out</div>
             </div>
-          </div>
-
-          <!-- App header -->
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:var(--bg);">
-            <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
-          </div>
-
-          <!-- Ring -->
-          <div style="display:flex;flex-direction:column;align-items:center;padding:14px 24px 18px;gap:8px;background:var(--bg);">
-            <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
-              <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.8);font-size:18px;">‹</span></div>
-              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-family:'Inter',sans-serif;">Today</span>
-              <div style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.8);font-size:18px;">›</span></div>
-            </div>
-            <div style="position:relative;width:170px;height:170px;">
-              <svg viewBox="0 0 170 170" style="width:170px;height:170px;transform:rotate(-90deg);">
-                <circle cx="85" cy="85" r="70" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="11"/>
-                <circle cx="85" cy="85" r="70" fill="none" stroke="#21c25a" stroke-width="11" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="109.9"/>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
-                <span style="font-size:34px;font-weight:700;color:#21c25a;letter-spacing:-2.5px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
-                <span style="font-size:8px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.8);font-family:'Inter',sans-serif;">left to spend today</span>
-                <span style="font-size:10px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
+            <div class="s1-body">
+              <div class="date-row">
+                <div class="d-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+                <div class="d-lbl">Today</div>
+                <div class="d-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+              </div>
+              <div class="ring-wrap">
+                <div class="ring-c">
+                  <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="rgba(33,194,90,0.08)" stroke-width="10"/><circle cx="100" cy="100" r="86" fill="none" stroke="#21c25a" stroke-width="10" stroke-linecap="round" stroke-dasharray="540" stroke-dashoffset="135"/></svg>
+                  <div class="ring-inner">
+                    <div class="r-amt">£8.40</div>
+                    <div class="r-lbl">left to spend today</div>
+                    <div class="r-stat">✓ ON TRACK</div>
+                    <div class="r-daily">Daily budget: £12.48</div>
+                  </div>
+                </div>
+              </div>
+              <div class="streak">3 DAY STREAK</div>
+              <div class="pace-card">
+                <div class="pace-top"><span class="pace-l">Spend pace</span><span class="pace-v">On pace</span></div>
+                <div class="pace-bar"><div class="pace-f"></div></div>
+              </div>
+              <div class="input-row">
+                <div class="inp"><div class="inp-sym">£</div><div class="inp-ph">What did you spend?</div></div>
+                <div class="add-btn">Add</div>
               </div>
             </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Gradient fade — phone fades into black -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.6) 50%,#000 100%);pointer-events:none;border-radius:0 0 52px 52px;"></div>
-
-    </div>
-
-    <!-- Welcome content -->
-    <div style="padding:16px 28px 36px;display:flex;flex-direction:column;gap:14px;width:100%;max-width:480px;">
-      <div>
-        <div style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;">Know exactly what you can <span style="color:#21c25a;">spend today.</span></div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.7;font-family:'Inter',sans-serif;">OnTrack is a free app that turns your monthly budget into a live daily spend limit.</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.6;font-family:'Inter',sans-serif;">Set your budget. Log spending. Stay <span style="color:#21c25a;">OnTrack</span>.</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <button onclick="startWelcome(false)" style="width:100%;height:54px;background:#21c25a;border:none;border-radius:50px;font-size:16px;font-weight:700;font-family:'Inter',sans-serif;color:#e8f8ed;cursor:pointer;box-shadow:0 4px 24px rgba(33,194,90,0.25);">Get Started — It's Free</button>
-        <button onclick="startWelcome(true)" style="width:100%;height:50px;background:transparent;border:1.5px solid rgba(255,255,255,0.5);border-radius:50px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;color:#ffffff;cursor:pointer;">Sign In</button>
-        <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.6);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:4px;">Privacy Policy</a>
-      </div>
-    </div>
-
-  </div>
-
-  <div id="authScreen" style="display:none;position:fixed;inset:0;z-index:190;background:#000;flex-direction:column;align-items:center;overflow-y:auto;">
-
-    <!-- iPhone mockup — same as welcome -->
-    <div style="position:relative;width:100%;display:flex;justify-content:center;flex-shrink:0;margin-top:24px;">
-      <div style="width:272px;background:#0a0a0a;border-radius:52px;border:2px solid rgba(255,255,255,0.18);box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 30px 80px rgba(0,0,0,0.8);overflow:hidden;position:relative;flex-shrink:0;">
-        <div style="position:absolute;left:-3px;top:80px;width:3px;height:28px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:118px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;left:-3px;top:178px;width:3px;height:52px;background:var(--bg);border-radius:2px 0 0 2px;"></div>
-        <div style="position:absolute;right:-3px;top:120px;width:3px;height:72px;background:var(--bg);border-radius:0 2px 2px 0;"></div>
-        <div style="background:var(--bg);border-radius:50px;overflow:hidden;">
-          <div style="height:52px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;">
-            <span style="font-size:12px;font-weight:600;color:#fff;font-family:'Inter',sans-serif;">9:41</span>
-            <div style="width:90px;height:28px;background:#000;border-radius:20px;position:absolute;left:50%;transform:translateX(-50%);top:10px;"></div>
-            <div style="display:flex;align-items:center;gap:5px;">
-              <svg width="14" height="11" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.6"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.4"/></svg>
-              <svg width="15" height="11" viewBox="0 0 16 12" fill="white"><path d="M8 2.4C5.6 2.4 3.5 3.4 2 5L0 3C2.1 1.1 4.9 0 8 0s5.9 1.1 8 3l-2 2C12.5 3.4 10.4 2.4 8 2.4z" opacity="0.4"/><path d="M8 5.6c-1.5 0-2.9.6-3.9 1.6L2 5.1C3.5 3.8 5.6 3 8 3s4.5.8 6 2.1L12 7.2C11 6.2 9.6 5.6 8 5.6z" opacity="0.7"/><path d="M8 8.8c-.8 0-1.6.3-2.1.9L8 12l2.1-2.3C9.6 9.1 8.8 8.8 8 8.8z"/></svg>
-              <div style="width:22px;height:11px;border:1.5px solid rgba(255,255,255,0.8);border-radius:3px;display:flex;align-items:center;padding:0 2px;position:relative;"><div style="width:70%;height:6px;background:#fff;border-radius:1.5px;"></div><div style="position:absolute;right:-4px;width:3px;height:5px;background:rgba(255,255,255,0.8);border-radius:0 1.5px 1.5px 0;"></div></div>
+            <div class="app-nav">
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl">Calendar</div></div>
+              <div class="nt act"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Home</div></div>
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl">Overview</div></div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:center;padding:10px 16px 9px;border-bottom:1px solid rgba(255,255,255,0.07);background:var(--bg);">
-            <span style="font-size:20px;font-weight:700;letter-spacing:-0.5px;font-family:'Inter',sans-serif;"><span style="color:#fff;">On</span><span style="color:#21c25a;">Track</span></span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;padding:18px 24px 24px;gap:10px;background:var(--bg);">
-            <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
-              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;"><span style="color:rgba(255,255,255,0.8);font-size:20px;">‹</span></div>
-              <span style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);font-family:'Inter',sans-serif;">Today</span>
-              <div style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;opacity:0.2;"><span style="color:rgba(255,255,255,0.8);font-size:20px;">›</span></div>
-            </div>
-            <div style="position:relative;width:210px;height:210px;">
-              <svg viewBox="0 0 210 210" style="width:210px;height:210px;transform:rotate(-90deg);">
-                <circle cx="105" cy="105" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
-                <circle cx="105" cy="105" r="88" fill="none" stroke="#21c25a" stroke-width="12" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="138"/>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;">
-                <span style="font-size:42px;font-weight:700;color:#21c25a;letter-spacing:-3px;line-height:1;font-family:'Inter',sans-serif;">£32.50</span>
-                <span style="font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.8);font-family:'Inter',sans-serif;">left to spend today</span>
-                <span style="font-size:11px;font-weight:600;color:#7be09a;font-family:'Inter',sans-serif;">✓ on track</span>
+
+          <!-- SCREEN: CALENDAR -->
+          <div class="ss" id="ss1">
+            <div class="ah"><div class="ah-wm">On<span>Track</span></div></div>
+            <div class="s2-body">
+              <div class="cal-hdr">
+                <div class="cal-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+                <div class="cal-month">June 2026</div>
+                <div class="cal-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+              </div>
+              <div class="cal-grid">
+                <div class="cd-lbl">M</div><div class="cd-lbl">T</div><div class="cd-lbl">W</div><div class="cd-lbl">T</div><div class="cd-lbl">F</div><div class="cd-lbl">S</div><div class="cd-lbl">S</div>
+                <div class="cd cg"><span>2</span><span class="cd-amt">£4</span></div><div class="cd cg"><span>3</span><span class="cd-amt">£9</span></div><div class="cd cr"><span>4</span><span class="cd-amt">£18</span></div><div class="cd cg"><span>5</span><span class="cd-amt">£6</span></div><div class="cd cg"><span>6</span><span class="cd-amt">£11</span></div><div class="cd cg"><span>7</span><span class="cd-amt">£3</span></div><div class="cd cr"><span>8</span><span class="cd-amt">£20</span></div>
+                <div class="cd cg"><span>9</span><span class="cd-amt">£7</span></div><div class="cd cg"><span>10</span><span class="cd-amt">£5</span></div><div class="cd cg"><span>11</span><span class="cd-amt">£9</span></div><div class="cd cg"><span>12</span><span class="cd-amt">£4</span></div><div class="cd cr"><span>13</span><span class="cd-amt">£16</span></div><div class="cd cg"><span>14</span><span class="cd-amt">£8</span></div><div class="cd cg"><span>15</span><span class="cd-amt">£6</span></div>
+                <div class="cd cg"><span>16</span><span class="cd-amt">£10</span></div><div class="cd cg"><span>17</span><span class="cd-amt">£3</span></div><div class="cd cg"><span>18</span><span class="cd-amt">£7</span></div><div class="cd cg"><span>19</span><span class="cd-amt">£5</span></div><div class="cd cg"><span>20</span><span class="cd-amt">£9</span></div><div class="cd ce"><span>21</span></div><div class="cd cf"><span>22</span></div>
+                <div class="cd cf"><span>23</span></div><div class="cd cf"><span>24</span></div><div class="cd cf"><span>25</span></div><div class="cd cf"><span>26</span></div><div class="cd cf"><span>27</span></div><div class="cd cf"><span>28</span></div><div class="cd cf"><span>29</span></div>
+              </div>
+              <div class="leg">
+                <div class="leg-i"><div class="leg-d" style="background:rgba(33,194,90,0.75);"></div>On track</div>
+                <div class="leg-i"><div class="leg-d" style="background:rgba(183,28,28,0.7);"></div>Over</div>
+                <div class="leg-i"><div class="leg-d" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);"></div>Not logged</div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:180px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.6) 50%,#000 100%);pointer-events:none;border-radius:0 0 52px 52px;"></div>
-    </div>
-
-    <!-- Auth form -->
-    <div style="padding:20px 28px 48px;width:100%;max-width:480px;">
-      <div style="margin-bottom:20px;">
-        <div style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.25;font-family:'Inter',sans-serif;" id="authWelcomeTitle">Welcome back</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.8);margin-top:6px;font-family:'Inter',sans-serif;" id="authWelcomeSub">Sign in to your account</div>
-      </div>
-      <div id="loginForm">
-        <form id="authForm" onsubmit="event.preventDefault(); handleAuth();" style="display:flex;flex-direction:column;gap:10px;">
-          <input class="auth-input" id="authName" type="text" placeholder="First name" autocomplete="given-name" style="display:none;"/>
-          <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email"/>
-          <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password"/>
-          <div class="auth-error" id="authError"></div>
-          <div id="privacyCheck" style="display:none;align-items:flex-start;gap:10px;margin-top:4px;">
-            <input type="checkbox" id="privacyBox" style="margin-top:3px;accent-color:#21c25a;width:16px;height:16px;flex-shrink:0;cursor:pointer;"/>
-            <label for="privacyBox" style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;cursor:pointer;">I have read and agree to the <a href="/privacy.html" target="_blank" style="color:#21c25a;text-decoration:none;">Privacy Policy</a></label>
-          </div>
-          <button type="submit" class="btn-auth" id="authBtn" style="margin-top:4px;">Log In</button>
-        </form>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
-          <button type="button" id="authToggle" onclick="toggleAuth()" style="width:100%;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:50px;background:transparent;color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">Need an account? Sign up</button>
-          <button type="button" id="forgotBtn" onclick="showForgot()" style="width:100%;height:44px;border:none;border-radius:50px;background:transparent;color:rgba(255,255,255,0.75);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">Forgot password?</button>
-        </div>
-      </div>
-      <div id="forgotForm" style="display:none;width:100%;">
-        <form onsubmit="event.preventDefault(); sendReset();" style="display:flex;flex-direction:column;gap:10px;">
-          <input class="auth-input" id="resetEmail" type="email" placeholder="Email address" autocomplete="email"/>
-          <div class="auth-error" id="resetMsg"></div>
-          <button type="submit" class="btn-auth">Send reset link</button>
-        </form>
-        <button type="button" onclick="hideForgot()" style="width:100%;height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:50px;background:transparent;color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-top:12px;">Back to login</button>
-      </div>
-      <a href="/privacy.html" target="_blank" style="font-size:11px;color:rgba(255,255,255,0.8);text-align:center;font-family:'Inter',sans-serif;text-decoration:none;padding:8px 0 0;display:block;">Privacy Policy</a>
-    </div>
-
-  </div>
-
-  <!-- HOME -->
-  <div class="screen" id="homeScreen">
-
-    <!-- Disposable income overlay — shows once for new users before budget setup -->
-    <div class="overlay" id="incomeOverlay" style="background:rgba(0,0,0,0.5);">
-      <div class="overlay-card" style="width:100%;max-height:90vh;overflow-y:auto;background:var(--bg);">
-
-        <!-- Question screen -->
-        <div id="incomeQuestion">
-          <p style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick question</p>
-          <p style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;">Do you know your monthly disposable income — what's left after all your bills are paid?</p>
-          <button class="btn-set" onclick="incomeYes()" style="margin-bottom:10px;">Yes, I know it</button>
-          <button onclick="incomeNo()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;">No, help me work it out</button>
-        </div>
-
-        <!-- Calculator screen -->
-        <div id="incomeCalc" style="display:none;">
-          <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Let's work it out</p>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Fill in what you can — we'll calculate what's left.</p>
-
-          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-            <div class="calc-row">
-              <label>Monthly take-home pay</label>
-              <div class="calc-input-wrap"><span id="calcSym1">£</span><input class="calc-input" id="ci_income" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
-            <p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Monthly outgoings</p>
-            <div class="calc-row">
-              <label>Rent / mortgage</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_rent" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div class="calc-row">
-              <label>Food &amp; groceries</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_food" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div class="calc-row">
-              <label>Bills &amp; subscriptions</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_bills" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div class="calc-row">
-              <label>Transport</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_transport" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div class="calc-row">
-              <label>Other fixed costs</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_other" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
-            <p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Monthly savings target</p>
-            <div class="calc-row">
-              <label>I want to save</label>
-              <div class="calc-input-wrap"><span class="calc-sym">£</span><input class="calc-input" id="ci_savings" type="number" min="0" placeholder="0.00" inputmode="decimal" oninput="calcDisposable()"/></div>
-            </div>
-
-            <!-- Result -->
-            <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:14px 16px;margin-top:4px;">
-              <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Your disposable income</div>
-              <div id="calcResult" style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:-1px;">£0.00</div>
-              <div id="calcNote" style="font-size:11px;color:var(--muted);margin-top:3px;">per month after outgoings</div>
+            <div class="app-nav">
+              <div class="nt act"><div class="nt-icon" style="color:#21c25a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Calendar</div></div>
+              <div class="nt"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl">Home</div></div>
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl">Overview</div></div>
             </div>
           </div>
 
-          <button class="btn-set" id="useCalcBtn" onclick="useCalculatedBudget()" style="margin-bottom:10px;" disabled>Use this as my budget</button>
-          <button onclick="incomeYes()" style="width:100%;height:44px;background:transparent;border:none;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.75);cursor:pointer;">I'll enter it manually instead</button>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="budget-setup" id="budgetSetup">
-      <h2>Let's get started</h2>
-      <p>How much do you have to spend this month?</p>
-      <form onsubmit="event.preventDefault(); setBudget();">
-        <div style="display:flex;gap:8px;margin-bottom:16px;width:100%;">
-          <button type="button" class="currency-btn active" onclick="setCurrency(this,'£')">£ GBP</button>
-          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'$')">$ USD</button>
-          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'€')">€ EUR</button>
-          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'A$')">A$ AUD</button>
-          <button type="button" class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'C$')">C$ CAD</button>
-        </div>
-        <div class="input-wrap"><span id="currencySymbol">£</span><input id="budgetInput" type="number" min="0" placeholder="Monthly budget" inputmode="decimal"/></div>
-        <p style="font-size:11px; opacity:0.5; margin-top:6px; margin-bottom:12px;">What's left once your bills are paid</p>
-        <button type="submit" class="btn-set">Get Started</button>
-      </form>
-    </div>
-    <div class="home-top" id="homeMain" style="display:none">
-      <div class="date-row">
-        <button class="day-arrow" id="dayPrev" onclick="shiftDay(-1)">&#8249;</button>
-        <div class="date-label" id="dateLabel">—</div>
-        <button class="day-arrow" id="dayNext" onclick="shiftDay(1)">&#8250;</button>
-      </div>
-      <div class="ring-wrap" id="ringWrap">
-        <div class="ring-glow" id="ringGlow"></div>
-        <svg viewBox="0 0 320 320" style="overflow:visible;">
-          <circle class="ring-track" cx="160" cy="160" r="140"/>
-          <circle class="ring-fill" id="ringFill" cx="160" cy="160" r="140"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-amount" id="ringAmount">—</div>
-          <div class="ring-label" id="ringLabel">left to spend today</div>
-          <div class="ring-status" id="ringStatus">—</div>
-          <div id="ringBudget" style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:3px;letter-spacing:0.5px;"></div>
-        </div>
-      </div>
-      <div class="streak" id="streak"></div>
-
-      <!-- Spend pace meter — only shows on today when spending logged -->
-      <!-- pace bar removed -->
-    </div>
-  <div class="spend-area" id="spendArea" style="display:none;">
-  <button id="noSpendBtn" onclick="logNoSpend()" style="visibility:hidden;width:100%;height:38px;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.3);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#21c25a;cursor:pointer;margin-bottom:4px;">Nothing spent today</button>
-  <form onsubmit="event.preventDefault(); addSpend();">
-  <div class="input-row">
-  <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" step="0.01" placeholder="What did you spend?" inputmode="decimal"/></div>
-  <button type="submit" class="btn-add">Add</button>
-  </div>
-  </form>
-  <div id="undoBar" style="display:flex;visibility:hidden;justify-content:space-between;align-items:center;padding:4px 2px;min-height:26px;">
-  <span id="undoLabel" style="font-size:12px;color:rgba(255,255,255,0.8);"></span>
-  <div style="display:flex;align-items:center;gap:12px;">
-  <button onclick="undoLastEntry()" style="background:none;border:none;font-size:12px;font-weight:600;color:var(--green);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;">Undo</button>
-  <button type="button" id="btnClear" onclick="clearSelectedDay()" style="background:none;border:none;font-size:12px;font-weight:500;color:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;visibility:hidden;">Clear all</button>
-  </div>
-  </div>
-  <div class="toast" id="spendToast"></div>
-  </div>
-
-  </div><!-- end homeScreen -->
-
-  <!-- CALENDAR -->
-  <div class="screen" id="calScreen" style="padding-bottom:80px;">
-    <div class="cal-header">
-      <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
-      <h2 id="calMonthLabel">—</h2>
-      <button class="cal-nav-btn" onclick="nextMonth()">&#8250;</button>
-    </div>
-    <p style="text-align:center; font-size:12px; color:var(--muted); padding:0 0 8px;">Your month at a glance</p>
-    <div class="cal-day-labels">
-      <div class="cal-day-label">Mo</div><div class="cal-day-label">Tu</div><div class="cal-day-label">We</div>
-      <div class="cal-day-label">Th</div><div class="cal-day-label">Fr</div><div class="cal-day-label">Sa</div><div class="cal-day-label">Su</div>
-    </div>
-    <div class="cal-grid" id="calGrid"></div>
-
-    <!-- Legend -->
-    <div style="display:flex;justify-content:center;gap:16px;padding:12px 0 4px;">
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div style="width:10px;height:10px;border-radius:3px;background:var(--green-deep);"></div>
-        <span style="font-size:10px;color:var(--muted);">On track</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div style="width:10px;height:10px;border-radius:3px;background:var(--red);"></div>
-        <span style="font-size:10px;color:var(--muted);">Over budget</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div style="width:10px;height:10px;border-radius:3px;border:1.5px solid rgba(255,255,255,0.2);"></div>
-        <span style="font-size:10px;color:var(--muted);">Not logged</span>
-      </div>
-    </div>
-    
-  </div>
-
-  <!-- OVERVIEW -->
-  <div class="screen" id="logScreen" style="overflow-y:auto;padding-bottom:80px;">
-    <div style="padding:10px 20px 4px;">
-      <div id="overviewTitle" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:-0.5px;"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
-        <h2 style="font-size:14px;font-weight:600;" id="overviewMonthLabel">—</h2>
-        <button class="cal-nav-btn" id="overviewNextBtn" onclick="nextMonth()">&#8250;</button>
-      </div>
-      <p id="logDateLabel" style="display:none;">—</p>
-    </div>
-
-    <div class="projection" data-themed="true" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
-
-    <!-- Get back on track / savings — directly below banner -->
-    <div id="onTrackCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(239,154,154,0.7);margin-bottom:4px;">How to get back on track</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="onTrackText">—</div>
-      </div>
-    </div>
-    <div id="savingsCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Savings projection</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="savingsText">—</div>
-      </div>
-    </div>
-
-    <!-- Option D: Days left ring + remaining budget -->
-    <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;color:var(--text);">
-        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
-          <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
-            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
-            <circle id="daysRingFill" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="50"/>
-          </svg>
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
-            <span id="daysLeftNum" style="font-size:20px;font-weight:700;color:var(--text);line-height:1;font-family:'Inter',sans-serif;">—</span>
-            <span style="font-size:7px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.3px;">days left</span>
+          <!-- SCREEN: OVERVIEW -->
+          <div class="ss" id="ss2">
+            <div class="ah"><div class="ah-wm">On<span>Track</span></div></div>
+            <div class="s3-body">
+              <div class="s3-hi">Good evening, Rob</div>
+              <div class="s3-sub">June 2026</div>
+              <div class="s3-proj">
+                <div class="s3-pa">£45.20 ahead</div>
+                <div class="s3-pl">of budget this month</div>
+              </div>
+              <div class="s3-grid">
+                <div class="s3-stat"><div class="s3-sv" style="color:#21c25a;">£9.20</div><div class="s3-sl">avg daily spend</div></div>
+                <div class="s3-stat"><div class="s3-sv">18/21</div><div class="s3-sl">days on track</div></div>
+                <div class="s3-stat"><div class="s3-sv">7 days</div><div class="s3-sl">best streak</div></div>
+                <div class="s3-stat"><div class="s3-sv" style="color:#21c25a;">£193</div><div class="s3-sl">saved so far</div></div>
+              </div>
+            </div>
+            <div class="app-nav">
+              <div class="nt"><div class="nt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="nt-lbl">Calendar</div></div>
+              <div class="nt"><div class="nt-home-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="nt-lbl">Home</div></div>
+              <div class="nt act"><div class="nt-icon" style="color:#21c25a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="nt-lbl" style="color:#21c25a;">Overview</div></div>
+            </div>
           </div>
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;font-family:'Inter',sans-serif;">—</div>
-          <div style="font-size:11px;color:var(--muted);">remaining to spend</div>
-          <div id="budgetBaseLabel" style="font-size:10px;color:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;">Based on a £500 budget</div>
-          <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-top:2px;">
-            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
-          </div>
+
         </div>
       </div>
     </div>
-
-    <!-- Most expensive day -->
-    <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);" id="biggestDayCard">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Biggest spend this month</div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);" id="biggestDayText">—</div>
-      </div>
-    </div>
-
-    <div class="divider" style="margin:6px 20px;"></div>
-    <button id="viewSummaryBtn" style="display:none;width:calc(100% - 32px);margin:0 16px 6px;height:44px;background:var(--glass);border:1px solid var(--border);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;" onclick="viewMonthlySummary()">View summary</button>
-    <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
   </div>
+</section>
 
-  <!-- SETTINGS -->
-  <div class="overlay" id="settingsOverlay" style="align-items:flex-end;padding:0;background:rgba(0,0,0,0.5);">
-    <div style="background:var(--bg);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:0 0 40px;max-height:92vh;overflow-y:auto;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;">
-        <span style="font-size:20px;font-weight:700;color:var(--text);">Settings</span>
-        <button onclick="closeSettings()" style="background:var(--glass);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
-      </div>
+<!-- HOW IT WORKS -->
+<section class="hiw">
+  <div class="s-eye">Simple by design</div>
+  <h2 class="s-title">Up and running<br>in two minutes.</h2>
+  <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-t">Set your budget</div><div class="step-d">Enter your monthly disposable income — or use our built-in calculator to work it out from your pay and bills.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Log what you spend</div><div class="step-d">No categories. No tags. No faff. Just type the amount and tap add. Takes two seconds.</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">Watch the ring</div><div class="step-d">Green means you're on track. Red means slow down. You always know exactly where you stand today.</div></div>
+  </div>
+</section>
 
-      <!-- Profile -->
-      <div style="padding:0 24px 16px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Profile</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:14px;color:var(--muted);width:90px;flex-shrink:0;">Name</label>
-            <input id="settingsName" type="text" placeholder="Your first name" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
-          </div>
-          <button onclick="saveProfile()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Save name</button>
-          <div id="profileMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
-
-      <!-- Budget & Currency -->
-      <div style="padding:0 24px 16px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Budget & Currency</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <label style="font-size:14px;color:var(--muted);width:90px;flex-shrink:0;">Budget</label>
-            <input id="settingsBudget" type="number" min="1" step="1" placeholder="Monthly budget" style="flex:1;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"/>
-          </div>
-          <p style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">Only affects today onwards — past days stay as they are.</p>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'£')" id="cur_gbp">🇬🇧 £</button>
-            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'$')" id="cur_usd">🇺🇸 $</button>
-            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'€')" id="cur_eur">🇪🇺 €</button>
-            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'A$')" id="cur_aud">🇦🇺 A$</button>
-            <button class="currency-btn" style="font-size:13px;padding:8px 12px;" onclick="setCurrency(this,'C$')" id="cur_cad">🇨🇦 C$</button>
-          </div>
-          <button onclick="saveBudgetSettings()" class="btn-set" style="margin-top:4px;height:42px;font-size:13px;">Update budget</button>
-          <div id="budgetMsg" style="font-size:12px;text-align:center;min-height:16px;"></div>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
-
-      <!-- Budget Review -->
-      <div style="padding:0 24px 16px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Monthly Budget</div>
-        <div id="budgetBreakdownCard" style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:none;">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px;">Your breakdown</div>
-          <div id="breakdownLines" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
-        <button onclick="openBudgetReview()" class="btn-set" style="height:46px;font-size:14px;">Review my budget</button>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.5;">Update your income, bills and savings to recalculate your monthly budget.</p>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:0 24px 16px;"></div>
-
-      <!-- Danger zone -->
-      <div style="padding:0 24px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Danger Zone</div>
-        <button onclick="clearAllData()" style="width:100%;padding:13px;border:1px solid rgba(239,154,154,0.2);border-radius:50px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;background:transparent;color:#ef9a9a;cursor:pointer;">Clear all my data</button>
-      </div>
+<div class="cta-wrap">
+  <div class="cta-band">
+    <div><h2 class="cta-h">Start spending<br>with confidence.</h2><p class="cta-p">Free forever. No download needed. Works on any phone — just open it in your browser and go.</p></div>
+    <div style="text-align:center;flex-shrink:0;">
+      <a href="/?app=1" class="btn-big">Try OnTrack free →</a>
+      <div class="cta-sub">ontrackapp.co.uk</div>
     </div>
   </div>
-
-  <!-- OVERLAYS -->
-  <div class="overlay" id="nameOverlay">
-    <div class="overlay-card" style="background:var(--bg);" style="width:100%;">
-      <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">One quick thing 👋</p>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">What should we call you?</p>
-      <input class="auth-input" id="nameInput" type="text" placeholder="First name" autocomplete="given-name" style="border-bottom:2px solid var(--border);margin-bottom:16px;"/>
-      <button class="btn-set" onclick="saveName()">Let's go</button>
-    </div>
-  </div>
-
-  <div class="overlay" id="onboardOverlay">
-    <div class="overlay-card" style="background:var(--bg);">
-      <p class="overlay-text" id="onboardText"></p>
-      <button class="btn-set" onclick="dismissOnboard()" style="margin-top:16px;">Got it</button>
-    </div>
-  </div>
-
-  <!-- END OF MONTH SUMMARY -->
-  <div class="overlay" id="eomOverlay" style="align-items:flex-end;padding:0;background:rgba(0,0,0,0.5);">
-    <div style="background:var(--bg);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:480px;padding:28px 24px 40px;max-height:92vh;overflow-y:auto;color:var(--text);">
-      <div id="eomContent"></div>
-    </div>
-  </div>
-
-  <!-- NEW MONTH PROMPT -->
-  <div class="overlay" id="newMonthOverlay" style="background:rgba(0,0,0,0.5);">
-    <div class="overlay-card" style="background:var(--bg);" style="width:100%;">
-      <div style="font-size:32px;margin-bottom:8px;">🗓️</div>
-      <p style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;">New month!</p>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.6;">Keep the same budget as last month?</p>
-      <p id="newMonthAmt" style="font-size:28px;font-weight:700;color:var(--green);margin-bottom:20px;letter-spacing:-1px;">£500</p>
-      <button class="btn-set" onclick="keepMonthBudget()" style="margin-bottom:10px;">Keep this budget</button>
-      <button onclick="changeMonthBudget()" style="width:100%;height:48px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.6);cursor:pointer;margin-bottom:8px;">Change it</button>
-      <button onclick="$('newMonthOverlay').classList.remove('show');openBudgetReview();" style="width:100%;height:44px;background:transparent;border:none;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;color:rgba(255,255,255,0.35);cursor:pointer;">Review my full budget breakdown</button>
-    </div>
-  </div>
-
-  <!-- SPEND AREA — outside all screens, always visible -->
-
-
-
-    <nav class="nav" id="mainNav" style="display:none">
-    <button class="nav-btn" id="navCal" onclick="goTab('cal')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
-    </button>
-    <button class="nav-btn nav-home active" id="navHome" onclick="goHome()">
-      <div class="nav-home-inner">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      </div>
-    </button>
-    <button class="nav-btn" id="navLog" onclick="goTab('log')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Overview
-    </button>
-  </nav>
 </div>
 
+<footer>
+  <div class="f-brand">On<span>Track</span></div>
+  <div class="f-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="mailto:hello@ontrackapp.co.uk">Contact</a>
+    <a href="/?app=1">Open App</a>
+  </div>
+</footer>
+
 <script>
-/* ══ THEME ══ */
-function applyTheme(light){
-  const app=document.querySelector('.app');
-  if(light && currentUser) app.setAttribute('data-theme','light');
-  else app.removeAttribute('data-theme');
-  localStorage.setItem('ot_theme', light?'light':'dark');
+let cur=0,timer;
+function goSlide(n){
+  document.querySelectorAll('.ft,.dot,.ss').forEach(e=>e.classList.remove('active'));
+  document.getElementById('ft'+n).classList.add('active');
+  document.getElementById('ss'+n).classList.add('active');
+  document.querySelectorAll('.dot')[n].classList.add('active');
+  cur=n;reset();
 }
-function toggleTheme(light){
-  applyTheme(light);
-  const track=$('themeTrack'), thumb=$('themeThumb');
-  if(track) track.style.background=light?'var(--green)':'rgba(255,255,255,0.15)';
-  if(thumb) thumb.style.transform=light?'translateX(18px)':'translateX(0)';
-}
-// Never apply theme on load - only after login via showApp()
-function setAppHeight(){
-  document.documentElement.style.setProperty('--app-height', window.innerHeight+'px');
-}
-setAppHeight();
-window.addEventListener('resize', setAppHeight);
-window.addEventListener('orientationchange', ()=>setTimeout(setAppHeight, 100));
-
-/* ══ SUPABASE ══ */
-const SUPABASE_URL = 'https://zkdgnhojdednasrosebv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGduaG9qZGVkbmFzcm9zZWJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MTIyNDUsImV4cCI6MjA5NjI4ODI0NX0.FFV0hvChJ01KfQwLC-0AlZqEUN39midvKY6no9saDQQ';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let currentUser = null;
-let isSignUp = false;
-
-/* ══ CURRENCY ══ */
-function getCurrency(){ return localStorage.getItem('ot_currency')||'£'; }
-function getName(){ return localStorage.getItem('ot_name')||''; }
-
-/* ══ OUTRO ANIMATION ══ */
-function playOutro(){
-  const outro=$('outroScreen');
-  const wm=$('outroWordmark');
-  const ring=$('outroRing');
-
-  // Mirror the home screen layout so ring sits in exact same position
-  // Measure the actual header and nav heights
-  const appHeader=document.querySelector('.app-header');
-  const nav=document.querySelector('.nav');
-  const spendArea=$('spendArea');
-  if(appHeader) $('outroHeaderSpacer').style.height=appHeader.getBoundingClientRect().height+'px';
-  const bottomH=(nav?nav.getBoundingClientRect().height:0)+(spendArea?spendArea.getBoundingClientRect().height:0);
-  $('outroBottomSpacer').style.height=bottomH+'px';
-
-  // Reset
-  outro.style.display='flex';
-  outro.style.opacity='1';
-  wm.style.opacity='0';
-  wm.style.animation='';
-  wm.style.transform='';
-  ring.style.opacity='0';
-  ring.style.animation='';
-  void outro.offsetWidth;
-
-  setTimeout(()=>{ wm.style.animation='outroWmIn 0.7s ease forwards'; },100);
-  setTimeout(()=>{ wm.style.animation='outroWmOut 0.5s ease forwards'; },1100);
-  setTimeout(()=>{ ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards'; },1500);
-  setTimeout(()=>{ outro.style.transition='opacity 0.6s ease'; outro.style.opacity='0'; },2600);
-  setTimeout(()=>{
-    outro.style.display='none';
-    outro.style.opacity='1';
-    outro.style.transition='';
-  },3200);
-}
-function playIntro(){
-  const intro=$('introScreen');
-  intro.style.display='flex';
-  intro.style.opacity='1';
-  const ring=$('introRing');
-  const wm=$('introWordmark');
-
-  // Reset state
-  ring.style.animation='';
-  ring.style.display='block';
-  ring.style.opacity='1';
-  wm.style.display='none';
-  wm.style.animation='';
-  void ring.offsetWidth; // force reflow
-
-  // Step 1: Ring fades in (CSS animation handles this)
-  // Step 2: Ring spins and fades out
-  setTimeout(()=>{
-    ring.style.animation='ringSpinFade 1.4s cubic-bezier(0.4,0,0.2,1) forwards';
-  },1200);
-
-  // Step 3: OnTrack glows in as ring fades
-  setTimeout(()=>{
-    wm.style.display='block';
-    wm.style.animation='wordmarkGlow 1.2s ease forwards';
-  },2000);
-
-  // Step 4: Fade whole screen out
-  setTimeout(()=>{
-    intro.style.transition='opacity 0.7s ease';
-    intro.style.opacity='0';
-  },3600);
-
-  setTimeout(()=>{
-    intro.style.display='none';
-    intro.style.opacity='1';
-    showWelcome();
-  },4300);
-}
-
-function showWelcome(){
-  if(!localStorage.getItem('ot_welcomed')){
-    const ws=$('welcomeScreen');
-    ws.style.opacity='0';
-    ws.style.display='flex';
-    ws.style.flexDirection='column';
-    requestAnimationFrame(()=>{
-      ws.style.transition='opacity 0.8s ease';
-      ws.style.opacity='1';
-      setTimeout(()=>ws.style.transition='',900);
-    });
-  } else {
-    showAuth();
-  }
-}
-function startWelcome(isLogin){
-  localStorage.setItem('ot_welcomed','1');
-  $('welcomeScreen').style.display='none';
-  isSignUp=!isLogin;
-  $('authBtn').textContent=isLogin?'Log In':'Sign Up';
-  $('authToggle').textContent=isLogin?'Need an account? Sign up':'Already have an account? Log in';
-  $('authName').style.display=isLogin?'none':'block';
-  $('forgotBtn').style.display=isLogin?'block':'none';
-  $('privacyCheck').style.display=isLogin?'none':'flex';
-  if($('authWelcomeTitle')) $('authWelcomeTitle').textContent=isLogin?'Welcome back':'Create account';
-  if($('authWelcomeSub')) $('authWelcomeSub').textContent=isLogin?'Sign in to your account':'Start tracking your spending today';
-  showAuth();
-}
-function saveName(){
-  const n=$('nameInput').value.trim().split(' ')[0];
-  if(n){ localStorage.setItem('ot_name',n); }
-  $('nameOverlay').classList.remove('show');
-  render();
-}
-function checkName(){ if(!getName()) $('nameOverlay').classList.add('show'); }
-function setCurrency(btn, symbol){
-  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  localStorage.setItem('ot_currency', symbol);
-  if($('currencySymbol')) $('currencySymbol').textContent = symbol;
-  if($('spendCurrencySymbol')) $('spendCurrencySymbol').textContent = symbol;
-  render();
-}
-
-/* ══ END OF MONTH & NEW MONTH ══ */
-function checkMonthPrompts(){
-  const now=new Date();
-  const y=now.getFullYear(),m=now.getMonth();
-  const today=now.getDate();
-  const lastDay=daysInMonth(y,m);
-  const cur=getCurrency();
-
-  // Last day of month — show summary (once)
-  const eomKey=`ot_eom_${y}_${m}`;
-  if(today===lastDay&&!localStorage.getItem(eomKey)){
-    const d=getData(y,m);
-    if(d.budget>0){
-      localStorage.setItem(eomKey,'1');
-      showEOM(d,y,m);
-      return;
-    }
-  }
-
-  // First day of month — ask about budget (once)
-  const newKey=`ot_newmonth_${y}_${m}`;
-  if(today===1&&!localStorage.getItem(newKey)){
-    // Get last month's budget
-    const lm=m===0?11:m-1, ly=m===0?y-1:y;
-    const prev=getData(ly,lm);
-    const curBudget=getData(y,m);
-    if(prev.budget>0&&!curBudget.budget){
-      localStorage.setItem(newKey,'1');
-      $('newMonthAmt').textContent=`${cur}${prev.budget.toFixed(0)}`;
-      $('newMonthOverlay').classList.add('show');
-      $('newMonthOverlay').dataset.prevBudget=prev.budget;
-    }
-  }
-}
-
-function keepMonthBudget(){
-  const budget=parseFloat($('newMonthOverlay').dataset.prevBudget);
-  if(budget>0){
-    const now=new Date();
-    const d=getData(now.getFullYear(),now.getMonth());
-    d.budget=budget;
-    saveData(d,now.getFullYear(),now.getMonth());
-    syncToCloud(now.getFullYear(),now.getMonth());
-  }
-  $('newMonthOverlay').classList.remove('show');
-  render();
-}
-
-function changeMonthBudget(){
-  $('newMonthOverlay').classList.remove('show');
-  // Budget setup will show naturally since no budget set
-}
-
-function showEOM(d,y,m){
-  const history=d.history||[], budget=d.budget, cur=getCurrency();
-  const days=daysInMonth(y,m);
-  const monthName=new Date(y,m,1).toLocaleString('default',{month:'long'});
-
-  // Calculate insights
-  const totalSpent=history.reduce((s,h)=>s+(h.amount||0),0);
-  const saved=budget-totalSpent;
-  const savingsTarget=parseFloat(localStorage.getItem('ot_savings_target'))||0;
-  const avgDaily=days>0?totalSpent/days:0;
-
-  // Days on track
-  let onTrack=0,bestStreak=0,curStreak=0;
-  for(let i=1;i<=days;i++){
-    const spent=history.filter(h=>h&&h.day===i).reduce((s,h)=>s+(h.amount||0),0);
-    const allow=dailyAllowance(i,days,y,m);
-    if(spent<=allow){onTrack++;curStreak++;bestStreak=Math.max(bestStreak,curStreak);}
-    else curStreak=0;
-  }
-
-  // Day totals
-  const dayTotals={};
-  history.forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
-  const sortedDays=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1]);
-  const biggestDay=sortedDays[0];
-  const bestDay=sortedDays[sortedDays.length-1];
-
-  // Day of week analysis
-  const dowTotals={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
-  const dowCounts={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
-  history.forEach(h=>{
-    if(h&&h.day){
-      const dow=new Date(y,m,h.day).getDay();
-      dowTotals[dow]+=h.amount||0;dowCounts[dow]++;
-    }
-  });
-  const dowNames=['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'];
-  const dowAvgs=Object.keys(dowTotals).map(d=>({day:parseInt(d),avg:dowCounts[d]>0?dowTotals[d]/dowCounts[d]:0}));
-  const priciest=dowAvgs.sort((a,b)=>b.avg-a.avg)[0];
-
-  // First half vs second half
-  const firstHalf=history.filter(h=>h&&h.day<=15).reduce((s,h)=>s+(h.amount||0),0);
-  const secondHalf=history.filter(h=>h&&h.day>15).reduce((s,h)=>s+(h.amount||0),0);
-  const halfNote=firstHalf>secondHalf?'You tend to spend more in the first half of the month':'You tend to spend more towards the end of the month';
-
-  const html=`
-    <div style="text-align:center;margin-bottom:20px;">
-      <div style="font-size:36px;margin-bottom:8px;">${saved>=0?'🎉':'📊'}</div>
-      <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;">${monthName} wrapped up</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Here's how your month looked</div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
-        <div style="font-size:18px;font-weight:700;color:${saved>=0?'var(--green)':'#ef9a9a'};letter-spacing:-0.5px;">${saved>=0?cur+Math.abs(saved).toFixed(0):'-'+cur+Math.abs(saved).toFixed(0)}</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">${saved>=0?'Unspent':'Over'}${savingsTarget>0?`<br><span style="font-size:8px;">target ${cur}${savingsTarget.toFixed(0)}</span>`:''}</div>
-      </div>
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
-        <div style="font-size:18px;font-weight:700;color:var(--text);">${onTrack}<span style="font-size:11px;color:var(--muted);">/${days}</span></div>
-        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">On track</div>
-      </div>
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;">
-        <div style="font-size:18px;font-weight:700;color:var(--green);">${bestStreak}</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;">Best streak</div>
-      </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:13px;color:var(--text);">📅 ${dowNames[priciest.day]} were your most expensive days on average</div>
-      </div>
-      ${biggestDay?`<div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:13px;color:var(--text);">💸 Biggest day was the ${biggestDay[0]}${ordinal(parseInt(biggestDay[0]))} — ${cur}${parseFloat(biggestDay[1]).toFixed(2)} spent</div>
-      </div>`:''}
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:13px;color:var(--text);">📊 ${halfNote}</div>
-      </div>
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:13px;color:var(--text);">📈 Average daily spend was ${cur}${avgDaily.toFixed(2)}</div>
-      </div>
-      ${bestDay&&parseFloat(bestDay[1])>0?`<div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
-        <div style="font-size:13px;color:var(--text);">💚 Best day was the ${bestDay[0]}${ordinal(parseInt(bestDay[0]))} — only ${cur}${parseFloat(bestDay[1]).toFixed(2)} spent</div>
-      </div>`:''}
-    </div>
-
-    <button class="btn-set" onclick="$('eomOverlay').classList.remove('show')">On to ${new Date(y,m+1,1).toLocaleString('default',{month:'long'})} →</button>
-    ${getEOMSuggestion(saved,budget)?`<div style="margin-top:12px;background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.5;">${getEOMSuggestion(saved,budget)}</div>`:''}
-  `;
-  $('eomContent').innerHTML=html;
-  $('eomOverlay').classList.add('show');
-}
-
-function viewMonthlySummary(){
-  const d=getData(viewYear,viewMonth);
-  if(d.budget>0) showEOM(d,viewYear,viewMonth);
-}
-function ordinal(n){const s=['th','st','nd','rd'],v=n%100;return s[(v-20)%10]||s[v]||s[0];}
-
-function showIncomeOverlay(){
-  if(!localStorage.getItem('ot_income_asked')){
-    $('incomeOverlay').classList.add('show');
-    // Update currency symbols in calculator
-    const sym=getCurrency();
-    document.querySelectorAll('.calc-sym').forEach(el=>el.textContent=sym);
-    if($('calcSym1')) $('calcSym1').textContent=sym;
-  }
-}
-function incomeYes(){
-  localStorage.setItem('ot_income_asked','1');
-  $('incomeOverlay').classList.remove('show');
-}
-function incomeNo(){
-  $('incomeQuestion').style.display='none';
-  $('incomeCalc').style.display='block';
-}
-function calcDisposable(){
-  const v=id=>parseFloat($(id).value)||0;
-  const income=v('ci_income');
-  const out=v('ci_rent')+v('ci_food')+v('ci_bills')+v('ci_transport')+v('ci_other');
-  const savings=v('ci_savings');
-  const result=income-out-savings;
-  const sym=getCurrency();
-  $('calcResult').textContent=`${sym}${Math.max(0,result).toFixed(2)}`;
-  $('calcResult').style.color=result>0?'var(--green)':'#ef9a9a';
-  $('calcNote').textContent=result>0?`after bills & £${savings.toFixed(0)} savings`:result<0?'⚠ outgoings exceed income':'enter your income above';
-  $('useCalcBtn').disabled=result<=0;
-}
-function useCalculatedBudget(){
-  const v=id=>parseFloat($(id).value)||0;
-  const income=v('ci_income');
-  const out=v('ci_rent')+v('ci_food')+v('ci_bills')+v('ci_transport')+v('ci_other');
-  const savings=v('ci_savings');
-  const result=income-out-savings;
-  if(result>0){
-    $('budgetInput').value=result.toFixed(2);
-    if(savings>0) localStorage.setItem('ot_savings_target', savings.toFixed(2));
-    saveBudgetBreakdown();
-    incomeYes();
-  }
-}
-function showForgot(){ $('loginForm').style.display='none'; $('forgotForm').style.display='block'; $('authError').textContent=''; }
-function hideForgot(){ $('forgotForm').style.display='none'; $('loginForm').style.display='block'; }
-async function sendReset(){
-  const email=$('resetEmail').value.trim(), msg=$('resetMsg');
-  if(!email){msg.textContent='Please enter your email';return;}
-  msg.textContent='Sending...';msg.style.color='var(--muted)';
-  try{
-    const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://ontrackapp.co.uk'});
-    if(error)throw error;
-    msg.textContent='Check your email for a reset link';
-    msg.style.color='var(--green)';
-  }catch(e){
-    msg.textContent=e.message||'Something went wrong';
-    msg.style.color='#ef9a9a';
-  }
-}
-
-/* ══ ONESIGNAL ══ */
-const OS_APP_ID = 'fd4e9adb-17df-4096-b7f8-0832c2f321c1';
-let _OS = null;
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-OneSignalDeferred.push(async function(OneSignal) {
-  try {
-    await OneSignal.init({ appId: OS_APP_ID });
-    _OS = OneSignal;
-  } catch(e) {
-    console.error('OneSignal init failed:', e);
-    // Store error for display
-    window._OSError = e.message || String(e);
-  }
-});
-async function waitForOS(ms=15000){
-  const start=Date.now();
-  while(Date.now()-start<ms){
-    if(_OS) return;
-    if(window._OSError) throw new Error('OneSignal error: ' + window._OSError);
-    await new Promise(r=>setTimeout(r,500));
-  }
-  throw new Error('OneSignal did not load after 15s. The SDK script may be blocked.');
-}
-async function osSubscribe(){
-  await waitForOS();
-  await _OS.Notifications.requestPermission();
-  await new Promise(r=>setTimeout(r,1500));
-  return _OS.User.PushSubscription.id;
-}
-async function osUnsubscribe(){
-  try{ if(_OS) await _OS.User.PushSubscription.optOut(); }catch(e){}
-}
-
-function openBudgetReview(){
-  // Reset calculator fields with saved values
-  const saved=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
-  ['income','rent','food','bills','transport','other','savings'].forEach(k=>{
-    if($('ci_'+k)) $('ci_'+k).value=saved[k]||'';
-  });
-  // Show the income calculator directly
-  $('incomeQuestion').style.display='none';
-  $('incomeCalc').style.display='block';
-  $('incomeOverlay').classList.add('show');
-  closeSettings();
-  calcDisposable();
-}
-
-function saveBudgetBreakdown(){
-  const v=id=>parseFloat($(id).value)||0;
-  const breakdown={
-    income:v('ci_income'), rent:v('ci_rent'), food:v('ci_food'),
-    bills:v('ci_bills'), transport:v('ci_transport'), other:v('ci_other'),
-    savings:v('ci_savings')
-  };
-  localStorage.setItem('ot_budget_breakdown', JSON.stringify(breakdown));
-}
-
-function showBreakdownInSettings(){
-  const b=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
-  const cur=getCurrency();
-  const card=$('budgetBreakdownCard');
-  const lines=$('breakdownLines');
-  if(!card||!lines) return;
-  if(!b.income){ card.style.display='none'; return; }
-  const items=[
-    ['Take-home pay', b.income],
-    ['Rent / mortgage', b.rent],
-    ['Food & groceries', b.food],
-    ['Bills & subscriptions', b.bills],
-    ['Transport', b.transport],
-    ['Other', b.other],
-    ['Savings target', b.savings],
-  ].filter(([,v])=>v>0);
-  lines.innerHTML=items.map(([label,val],i)=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;${i>0&&label!=='Savings target'?'':''}padding:2px 0;border-bottom:${i<items.length-1?'1px solid var(--border)':'none'};">
-      <span style="font-size:13px;color:var(--muted);">${label}</span>
-      <span style="font-size:13px;font-weight:600;color:${label==='Take-home pay'?'var(--green)':label==='Savings target'?'var(--green)':'var(--text)'};">${label==='Take-home pay'?'':'-'}${cur}${val.toFixed(0)}</span>
-    </div>
-  `).join('');
-  card.style.display='block';
-}
-
-function getEOMSuggestion(saved, budget){
-  const b=JSON.parse(localStorage.getItem('ot_budget_breakdown')||'{}');
-  const cur=getCurrency();
-  const savingsTarget=parseFloat(localStorage.getItem('ot_savings_target'))||b.savings||0;
-  if(saved<=0) return '';
-  const pct=Math.round((saved/budget)*100);
-  if(savingsTarget>0 && saved>0){
-    const newSavings=savingsTarget+saved;
-    return `💡 You had ${cur}${saved.toFixed(0)} left over (${pct}% of your budget). Consider increasing your savings target to ${cur}${newSavings.toFixed(0)} next month.`;
-  }
-  if(saved>=50){
-    return `💡 You had ${cur}${saved.toFixed(0)} left unspent this month. Consider putting this into savings next month.`;
-  }
-  return `💡 You had ${cur}${saved.toFixed(0)} left this month — great discipline.`;
-}
-function openSettings(){
-  $('settingsName').value=getName()||'';
-  showBreakdownInSettings();
-  const d=getData(viewYear,viewMonth);
-  $('settingsBudget').value=d.budget>0?d.budget:'';
-  const cur=getCurrency();
-  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.remove('active'));
-  ['gbp','usd','eur','aud','cad'].forEach(c=>{
-    const sym={gbp:'£',usd:'$',eur:'€',aud:'A$',cad:'C$'}[c];
-    const el=$(`cur_${c}`);
-    if(el) el.classList.toggle('active',sym===cur);
-  });
-  $('profileMsg').textContent='';
-  $('budgetMsg').textContent='';
-  $('settingsOverlay').classList.add('show');
-}
-function closeSettings(){ $('settingsOverlay').classList.remove('show'); }
-
-async function saveProfile(){
-  const name=$('settingsName').value.trim();
-  const msg=$('profileMsg');
-  if(!name){ msg.textContent='Please enter a name'; msg.style.color='#ef9a9a'; return; }
-  localStorage.setItem('ot_name',name.split(' ')[0]);
-  render();
-  msg.textContent='Saved ✓'; msg.style.color='var(--green)';
-  setTimeout(()=>msg.textContent='',2000);
-}
-
-function saveBudgetSettings(){
-  const v=parseFloat($('settingsBudget').value);
-  const msg=$('budgetMsg');
-  if(isNaN(v)||v<=0){ msg.textContent='Please enter a valid budget'; msg.style.color='#ef9a9a'; return; }
-  const d=getData(viewYear,viewMonth);
-  d.budget=v; saveData(d,viewYear,viewMonth);
-  render();
-  msg.textContent='Budget updated ✓'; msg.style.color='var(--green)';
-  setTimeout(()=>msg.textContent='',2000);
-}
-
-function updateNotifToggleUI(on){
-  $('notifTrack').style.background=on?'var(--green)':'rgba(255,255,255,0.15)';
-  $('notifThumb').style.transform=on?'translateX(18px)':'translateX(0)';
-}
-async function toggleNotifications(on){
-  updateNotifToggleUI(on);
-  $('notifTimeRow').style.display=on?'flex':'none';
-  const msg=$('notifMsg');
-
-  if(on){
-    // Check basic notification support
-    if(!('Notification' in window)){
-      msg.textContent='Notifications not supported on this browser'; msg.style.color='#ef9a9a';
-      $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
-      return;
-    }
-    // iOS Safari browser — only works when installed as PWA
-    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-    const isPWA=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
-    if(isIOS&&!isPWA){
-      msg.textContent='Add OnTrack to your home screen first to enable notifications'; msg.style.color='#f0a500';
-      $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
-      return;
-    }
-    msg.textContent=''; msg.style.color='var(--muted)';
-    try{
-      const subId=await Promise.race([
-        osSubscribe(),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timed out — try again')),10000))
-      ]);
-      if(subId){
-        localStorage.setItem('ot_notif','1');
-        await saveNotifPrefs();
-        msg.textContent='Notifications on ✓'; msg.style.color='var(--green)';
-        setTimeout(()=>msg.textContent='',3000);
-      } else {
-        localStorage.removeItem('ot_notif');
-        $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
-        msg.textContent='Permission denied in browser settings'; msg.style.color='#ef9a9a';
-      }
-    }catch(e){
-      localStorage.removeItem('ot_notif');
-      $('notifToggle').checked=false; updateNotifToggleUI(false); $('notifTimeRow').style.display='none';
-      msg.textContent=e.message||'Could not enable notifications';
-      msg.style.color='#ef9a9a';
-      msg.style.fontSize='10px';
-    }
-  } else {
-    localStorage.removeItem('ot_notif');
-    try{ await osUnsubscribe(); }catch(e){}
-    await saveNotifPrefs();
-    msg.textContent='Notifications off'; msg.style.color='var(--muted)';
-    setTimeout(()=>msg.textContent='',2000);
-  }
-}
-async function saveNotifPrefs(){
-  if(!currentUser) return;
-  try{
-    await sb.from('user_budgets').upsert({
-      user_id:currentUser.id,
-      month_key:'settings',
-      budget:0,
-      history:[{notif:localStorage.getItem('ot_notif')==='1',time:localStorage.getItem('ot_notif_time')||'20:00'}]
-    },{onConflict:'user_id,month_key'});
-  }catch(e){}
-}
-
-function clearAllData(){
-  if(!confirm('This will delete all your spending data. This cannot be undone. Are you sure?'))return;
-  const keys=Object.keys(localStorage).filter(k=>k.startsWith('gt_')||k.startsWith('ot_'));
-  keys.forEach(k=>localStorage.removeItem(k));
-  closeSettings();
-  render();
-}
-function toggleAuth() {
-  isSignUp = !isSignUp;
-  $('authBtn').textContent = isSignUp ? 'Sign Up' : 'Log In';
-  $('authToggle').textContent = isSignUp ? 'Already have an account? Log in' : 'Need an account? Sign up';
-  $('authPass').autocomplete = isSignUp ? 'new-password' : 'current-password';
-  $('authName').style.display = isSignUp ? 'block' : 'none';
-  $('forgotBtn').style.display = isSignUp ? 'none' : 'block';
-  $('privacyCheck').style.display = isSignUp ? 'flex' : 'none';
-  $('authError').textContent = '';
-  if($('authWelcomeTitle')) $('authWelcomeTitle').textContent = isSignUp ? 'Create account' : 'Welcome back';
-  if($('authWelcomeSub')) $('authWelcomeSub').textContent = isSignUp ? 'Start tracking your spending today' : 'Sign in to your account';
-}
-
-async function handleAuth() {
-  const email = $('authEmail').value.trim();
-  const pass  = $('authPass').value;
-  const errEl = $('authError');
-  const btn   = $('authBtn');
-  if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
-  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
-  if (isSignUp && !$('privacyBox').checked) { errEl.textContent = 'Please agree to the Privacy Policy to continue'; return; }
-  errEl.textContent = '';
-  btn.disabled = true;
-  btn.textContent = isSignUp ? 'Creating account...' : 'Logging in...';
-  try {
-    const { data, error } = isSignUp
-      ? await sb.auth.signUp({ email, password: pass })
-      : await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) throw error;
-    if (isSignUp && data.user && !data.session) {
-      errEl.textContent = 'Check your email to confirm your account';
-      errEl.style.color = 'var(--green)';
-    } else {
-      currentUser = data.user;
-      if (isSignUp && $('authName').value.trim()) {
-        localStorage.setItem('ot_name', $('authName').value.trim().split(' ')[0]);
-      }
-      await loadFromCloud(viewYear, viewMonth);
-      showApp(); render();
-      if (!isSignUp) checkName();
-      if (!isSignUp) checkMonthPrompts();
-      playOutro();
-    }
-  } catch(e) {
-    errEl.textContent = e.message || 'Something went wrong';
-    errEl.style.color = '#ef9a9a';
-  }
-  btn.disabled = false;
-  btn.textContent = isSignUp ? 'Sign Up' : 'Log In';
-}
-
-async function logout() {
-  await sb.auth.signOut();
-  currentUser = null;
-  $('homeScreen').classList.remove('active');
-  $('calScreen').classList.remove('active');
-  $('logScreen').classList.remove('active');
-  $('mainNav').style.display='none';
-  $('logoutBtn').style.display='none';
-  $('settingsBtn').style.display='none';
-  const h=document.getElementById('appHeader'); if(h) h.style.opacity='0';
-  document.querySelector('.app').removeAttribute('data-theme');
-  showAuth();
-}
-
-function showAuth() {
-  $('authScreen').style.display='flex';
-  $('authScreen').style.flexDirection='column';
-  $('authScreen').style.alignItems='center';
-  $('homeScreen').classList.remove('active');
-  $('calScreen').classList.remove('active');
-  $('logScreen').classList.remove('active');
-  $('mainNav').style.display='none';
-  $('logoutBtn').style.display='none';
-}
-
-function showApp() {
-  $('authScreen').style.display = 'none';
-  $('homeScreen').classList.add('active');
-  $('mainNav').style.display = 'flex';
-  $('logoutBtn').style.display = 'block';
-  $('settingsBtn').style.display = 'flex';
-  const h=document.getElementById('appHeader');
-  if(h){ h.style.transition='opacity 0.4s ease'; h.style.opacity='1'; }
-  applyTheme(localStorage.getItem('ot_theme')==='light');
-}
-
-/* ══ DATA — localStorage + Supabase cloud sync ══ */
-function storageKey(y,m) { return `gt_${y}-${String(m+1).padStart(2,'0')}`; }
-function getData(y,m) { try { return JSON.parse(localStorage.getItem(storageKey(y,m)))||{budget:0,history:[]}; } catch(e) { return {budget:0,history:[]}; } }
-function saveData(d,y,m) {
-  try { localStorage.setItem(storageKey(y,m),JSON.stringify(d)); } catch(e) { alert('Could not save.'); }
-  syncToCloud(y,m); // background sync — non-blocking
-}
-
-async function syncToCloud(y,m) {
-  if (!currentUser) return;
-  const d = getData(y,m);
-  const key = `${y}-${String(m+1).padStart(2,'0')}`;
-  try {
-    await sb.from('user_budgets').upsert({
-      user_id: currentUser.id, month_key: key, budget: d.budget, history: d.history
-    }, { onConflict: 'user_id,month_key' });
-  } catch(e) { /* silent — local data is safe */ }
-}
-
-async function loadFromCloud(y,m) {
-  if (!currentUser) return;
-  const key = `${y}-${String(m+1).padStart(2,'0')}`;
-  try {
-    const { data } = await sb.from('user_budgets').select('*')
-      .eq('user_id', currentUser.id).eq('month_key', key).maybeSingle();
-    if (data) {
-      localStorage.setItem(storageKey(y,m), JSON.stringify({
-        budget: Number(data.budget)||0, history: data.history||[]
-      }));
-    }
-  } catch(e) { /* silent — use local data */ }
-}
-
-/* ══ KEYBOARD HANDLING (browser mode) ══ */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const inp = $('spendInput');
-  if(inp){
-    inp.addEventListener('focus', ()=>{
-      setTimeout(()=>inp.scrollIntoView({behavior:'smooth', block:'center'}), 300);
-    });
-  }
-});
-let viewYear=new Date().getFullYear(), viewMonth=new Date().getMonth();
-let selectedDay=new Date().getDate(), activeTab='home';
-
-const $=id=>document.getElementById(id);
-const fmt=n=>getCurrency()+Math.abs(n).toFixed(2);
-function todayDate(){return new Date().getDate();}
-function todayYear(){return new Date().getFullYear();}
-function todayMonth(){return new Date().getMonth();}
-function isCurrentMonth(){return viewYear===todayYear()&&viewMonth===todayMonth();}
-function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
-function monthStartOffset(y,m){return(new Date(y,m,1).getDay()+6)%7;}
-function formatMonth(y,m){return new Date(y,m,1).toLocaleString('default',{month:'long',year:'numeric'});}
-function formatDay(day,y,m){if(day===todayDate()&&y===todayYear()&&m===todayMonth())return'Today';return new Date(y,m,day).toLocaleDateString('default',{weekday:'short',day:'numeric',month:'short'});}
-function spentOnDay(day,h){return h.filter(x=>x&&x.day===day).reduce((s,x)=>s+(x.amount||0),0);}
-function spentUpToDay(day,h){let t=0;for(let i=1;i<=day;i++)t+=spentOnDay(i,h);return t;}
-function remainingAfter(day,y,m){const d=getData(y,m);return(d.budget||0)-spentUpToDay(day,d.history||[]);}
-function todayDateFor(y,m){return(y===todayYear()&&m===todayMonth())?todayDate():null;}
-function dailyAllowance(day,totalDays,y,m){const td=todayDateFor(y,m);if(td&&day>=td){const r=remainingAfter(td-1,y,m);return r/Math.max(1,totalDays-td+1);}else{const r=remainingAfter(day-1,y,m);return r/Math.max(1,totalDays-day+1);}}
-function ringColor(r){if(r<=0)return'#b71c1c';if(r<.2)return'#2e7d32';if(r<.5)return'#388e3c';return'#21c25a';}
-
-/* ══ ACTIONS ══ */
-function setBudget(){
-  const v=parseFloat($('budgetInput').value);if(isNaN(v)||v<=0){alert('Please enter a valid budget.');return;}
-  const d=getData(viewYear,viewMonth);d.budget=v;saveData(d,viewYear,viewMonth);render();
-  if(todayDate()>1){$('onboardText').innerHTML=`You're on day <span style="color:var(--green);font-size:22px;font-weight:700">${todayDate()}</span> of the month.<br><br>Swipe or use the <strong>‹ ›</strong> arrows to go day to day and log what you've spent.`;$('onboardOverlay').classList.add('show');}
-}
-function dismissOnboard(){$('onboardOverlay').classList.remove('show');}
-function shiftDay(dir){
-  const n=selectedDay+dir;
-  if(n<1||n>todayDate())return;
-  $('undoBar').style.visibility='hidden';
-  const ring=$('ringWrap');
-  const slideOut=dir>0?'slide-left':'slide-right', slideIn=dir>0?'slide-right':'slide-left';
-  ring.classList.add(slideOut);
-  setTimeout(()=>{selectedDay=n;render();ring.style.transition='none';ring.classList.remove(slideOut);ring.classList.add(slideIn);requestAnimationFrame(()=>{requestAnimationFrame(()=>{ring.style.transition='';ring.classList.remove(slideIn);});});},250);
-}
-function addSpend(){
-  const raw=parseFloat($('spendInput').value);if(isNaN(raw)||raw<0){alert('Please enter a valid amount.');return;}
-  const d=getData(viewYear,viewMonth);if(!d.history)d.history=[];
-  const entry={day:selectedDay,amount:raw,id:Date.now()};
-  d.history.push(entry);saveData(d,viewYear,viewMonth);
-  $('spendInput').value='';
-  const t=$('spendToast');t.textContent=`${getCurrency()}${raw.toFixed(2)} added ✓`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
-  $('undoLabel').textContent=`Last entry: ${getCurrency()}${raw.toFixed(2)}`;
-  $('undoBar').style.visibility='visible';
-  render();
-}
-function logNoSpend(){
-  if(navigator.vibrate) navigator.vibrate(40);
-  const d=getData(viewYear,viewMonth);if(!d.history)d.history=[];
-  d.history.push({day:selectedDay,amount:0,id:Date.now()});
-  saveData(d,viewYear,viewMonth);
-  const t=$('spendToast');t.textContent='Marked as no spend ✓';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);
-  render();syncToCloud(viewYear,viewMonth);
-}
-function undoLastEntry(){
-  const d=getData(viewYear,viewMonth);if(!d.history||!d.history.length)return;
-  const dayEntries=d.history.filter(h=>h&&h.day===selectedDay);
-  if(!dayEntries.length)return;
-  const last=dayEntries[dayEntries.length-1];
-  d.history=d.history.filter(h=>h.id!==last.id);
-  saveData(d,viewYear,viewMonth);
-  $('undoBar').style.visibility='hidden';
-  render();
-}
-function clearSelectedDay(){
-  if(!confirm(`Clear all entries for ${formatDay(selectedDay,viewYear,viewMonth)}?`))return;
-  const d=getData(viewYear,viewMonth);d.history=(d.history||[]).filter(h=>h&&h.day!==selectedDay);saveData(d,viewYear,viewMonth);render();
-}
-function resetMonth(){
-  if(!confirm('Reset the whole month? All data will be lost.'))return;
-  localStorage.removeItem(storageKey(viewYear,viewMonth));
-  viewYear=todayYear();viewMonth=todayMonth();selectedDay=todayDate();goTab('home');
-}
-function goHome(){
-  viewYear=todayYear(); viewMonth=todayMonth(); selectedDay=todayDate();
-  goTab('home');
-}
-function goTab(tab){
-  activeTab=tab;
-  ['home','cal','log'].forEach(t=>{$(`${t}Screen`).classList.toggle('active',t===tab);$(`nav${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.toggle('active',t===tab);});
-
-  render();
-}
-function prevMonth(){if(viewMonth===0){viewMonth=11;viewYear--;}else viewMonth--;selectedDay=1;loadFromCloud(viewYear,viewMonth).then(()=>render());}
-function nextMonth(){if(viewMonth===11){viewMonth=0;viewYear++;}else viewMonth++;selectedDay=1;loadFromCloud(viewYear,viewMonth).then(()=>render());}
-
-/* ══ RENDER ══ */
-function render(){
-  const d=getData(viewYear,viewMonth),history=d.history||[],budget=d.budget||0;
-  const days=daysInMonth(viewYear,viewMonth),td=todayDateFor(viewYear,viewMonth);
-  {
-    const has=budget>0;
-    $('budgetSetup').style.display=has?'none':'flex';
-    $('homeMain').style.display=has?'flex':'none';
-    $('spendArea').style.display=has?'flex':'none';
-    if(!has) showIncomeOverlay();
-    if(has){
-      const isToday=selectedDay===todayDate()&&isCurrentMonth();
-      const dl=$('dateLabel');
-      dl.textContent=formatDay(selectedDay,viewYear,viewMonth);
-      dl.classList.toggle('is-today',isToday);
-      $('dayPrev').disabled=selectedDay<=1;
-      $('dayNext').disabled=isToday;
-
-      const a=dailyAllowance(selectedDay,days,viewYear,viewMonth);
-      const s=spentOnDay(selectedDay,history);
-      const amount=a-s;
-
-      const circ=2*Math.PI*140,ratio=a>0?Math.max(0,amount)/a:0,off=circ*(1-Math.min(1,ratio)),col=ringColor(ratio);
-      const fill=$('ringFill');fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=off;fill.style.stroke=col;
-      fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
-      fill.style.removeProperty('filter');
-      const ringWrapEl=$('ringWrap');
-      const glowDiv=$('ringGlow');
-      if(glowDiv) glowDiv.style.background='';
-      if(ringWrapEl){
-        ringWrapEl.classList.remove('glowing','glowing-red');
-        if(amount<0) ringWrapEl.classList.add('glowing-red');
-        else if(amount>=0&&ratio>=0.5) ringWrapEl.classList.add('glowing');
-      }
-      $('ringWrap').classList.toggle('over',amount<0);
-      $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
-      $('ringAmount').style.color=col;
-      $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
-      $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
-      $('ringLabel').textContent=amount<0?(isToday?'overspent today':'overspent'):(isToday?'left to spend today':'left to spend');
-
-      const rb=$('ringBudget');
-      rb.textContent=(a>0&&s>0)?`Daily budget: ${getCurrency()}${a.toFixed(2)}`:'';
-
-      // Spend pace meter (removed)
-      const paceEl=null;
-      if(isToday&&s>0&&a>0){
-        const hr=new Date().getHours()+new Date().getMinutes()/60;
-        const dayPct=Math.max(0.01,hr/24);
-        const spentPct=s/a;
-        const ratio=spentPct/dayPct;
-        const fillPct=Math.min(100,Math.max(0,spentPct*100));
-        const markerPct=Math.min(98,Math.max(2,dayPct*100));
-        if($('paceFill')) $('paceFill').style.width=fillPct+'%';
-        if($('paceMarker')) $('paceMarker').style.left=markerPct+'%';
-        let paceColor,paceText;
-        if(ratio<0.7){paceColor='var(--green)';paceText='Under pace ↓';}
-        else if(ratio<1.25){paceColor='var(--green)';paceText='On pace';}
-        else if(ratio<1.75){paceColor='#f0a500';paceText='Slightly ahead';}
-        else{paceColor='#ef9a9a';paceText='Spending fast';}
-        if($('paceFill')) $('paceFill').style.background=paceColor;
-        if($('paceLabel')) $('paceLabel').style.color=paceColor;
-        if($('paceLabel')) $('paceLabel').textContent=paceText;
-        if(paceEl) paceEl.style.visibility='visible';
-      } else { if(paceEl) paceEl.style.visibility='hidden'; }
-      const dayHasEntries=history.filter(h=>h&&h.day===selectedDay).length>0;
-      $('btnClear').style.visibility=dayHasEntries?'visible':'hidden';
-      if($('noSpendBtn')){
-        const canMarkNoSpend=!dayHasEntries&&(isToday||(selectedDay<todayDate()));
-        $('noSpendBtn').style.visibility=canMarkNoSpend?'visible':'hidden';
-      }
-
-      const streakEl=$('streak');let streak=0;
-      for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
-      if(streak>=2&&isToday){streakEl.textContent=`${streak} day streak`;streakEl.style.visibility='visible';}
-      else{streakEl.textContent=`0 day streak`;streakEl.style.visibility='hidden';}
-    }
-  }
-  {
-    $('calMonthLabel').textContent=formatMonth(viewYear,viewMonth);
-    const grid=$('calGrid');grid.innerHTML='';
-    const off=monthStartOffset(viewYear,viewMonth);
-    for(let i=0;i<off;i++)grid.appendChild(document.createElement('div'));
-    for(let i=1;i<=days;i++){
-      const fut=td?i>td:false,isT=td?i===td:false;
-      const allow=dailyAllowance(i,days,viewYear,viewMonth),spent=spentOnDay(i,history);
-      const hasEntries=history.filter(h=>h&&h.day===i).length>0;
-      let cls='cal-cell';
-      if(fut) cls+=' future';
-      else if(!hasEntries) cls+=' empty';
-      else cls+=spent<=allow?' green':' red';
-      if(isT) cls+=' today';
-      const cell=document.createElement('div');cell.className=cls;
-      cell.style.animationDelay=`${(i-1)*0.02}s`;
-      const margin=allow-spent,sign=margin>=0?getCurrency():'-'+getCurrency();
-      const spentStr=!hasEntries?'':spent===0?'no spend':`${getCurrency()}${spent.toFixed(0)}`;
-      cell.innerHTML=fut
-        ?`<span class="cal-num">${i}</span><span class="cal-val">${getCurrency()}${Math.floor(Math.max(0,allow))}</span>`
-        :`<span class="cal-num">${i}</span><span class="cal-val">${spentStr}</span>`;
-      if(!fut){const day=i;cell.onclick=()=>{selectedDay=day;goTab('home');};}
-      grid.appendChild(cell);
-    }
-  }
-  {
-    // Personalised title
-    const name = getName();
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    $('overviewTitle').innerHTML = name ? `${greeting}, ${name}` : greeting;
-    // Show "View summary" button for past months with data
-    const summaryBtn=$('viewSummaryBtn');
-    const isPast=!isCurrentMonth();
-    const hasBudget=budget>0;
-    const monthLabel=new Date(viewYear,viewMonth,1).toLocaleString('default',{month:'long'});
-    if(summaryBtn){
-      summaryBtn.style.display=(isPast&&hasBudget)?'block':'none';
-      summaryBtn.textContent=`View ${monthLabel} summary`;
-    }
-    $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
-    $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
-    const elapsed=td?td:days;
-    const flat=days>0?budget/days:0,expected=flat*elapsed,actual=spentUpToDay(elapsed,history);
-    const saved=expected-actual;
-    const cur=getCurrency();
-    const banner=$('projectionBanner');
-    if(actual>0||elapsed>1){
-      banner.style.display='block';banner.classList.remove('ahead','behind');
-      if(saved>=0.005){banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">${cur}${saved.toFixed(2)} ahead this month</strong>`;}
-      else if(saved<=-0.005){banner.classList.add('behind');banner.innerHTML=`You're <strong style="color:#ef9a9a">${cur}${Math.abs(saved).toFixed(2)} behind this month</strong>`;}
-      else{banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`;}
-    }else{banner.style.display='none';}
-
-    const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0;
-
-    // Option D graphic
-    const daysLeft=dFwd;
-    const pct=Math.max(0,Math.min(100,daysLeft/days*100));
-    const circ=188.5;
-    $('daysRingFill').style.strokeDashoffset=circ*(1-(pct/100));
-    $('daysLeftNum').textContent=daysLeft>0?daysLeft:'0';
-    const remaining=Math.max(0,mLeft);
-    $('budgetRemainingAmt').textContent=`${cur}${remaining.toFixed(2)}`;
-    $('budgetBaseLabel').textContent=`Based on a ${cur}${budget.toFixed(0)} budget`;
-    const usedPct=budget>0?Math.min(100,Math.max(0,((budget-remaining)/budget)*100)):0;
-    $('budgetUsedBar').style.width=usedPct+'%';
-    $('budgetUsedBar').style.background=remaining>=0?'var(--green)':'#ef9a9a';
-
-    // Get back on track card — when behind
-    const otCard=$('onTrackCard');
-    if(saved<=-0.005&&dFwd>0&&budget>0){
-      // Use same formula as calendar future cells so numbers match
-      const daysLeft=Math.max(1,days-(td||days)+1);
-      const remaining=td?remainingAfter(td-1,viewYear,viewMonth):mLeft;
-      const newDaily=remaining/daysLeft;
-      if(newDaily>0){
-        $('onTrackText').textContent=`Spend no more than ${cur}${Math.floor(newDaily)} per day for the next ${daysLeft} day${daysLeft!==1?'s':''} to finish the month on budget.`;
-      } else {
-        $('onTrackText').textContent=`You've exceeded your budget for this month. Try to minimise spending for the remaining ${dFwd} day${dFwd!==1?'s':''}.`;
-      }
-      otCard.style.display='block';
-    } else { otCard.style.display='none'; }
-
-    // Savings projection card — when ahead
-    const savCard=$('savingsCard');
-    if(saved>=0.005&&elapsed>1&&dFwd>0&&budget>0){
-      const avgDaily=actual/elapsed;
-      const projectedTotal=actual+(avgDaily*dFwd);
-      const projectedSaving=budget-projectedTotal;
-      if(projectedSaving>0.5){
-        $('savingsText').textContent=`Keep this up and you'll have ${cur}${projectedSaving.toFixed(2)} to put into savings this month. 🎉`;
-        savCard.style.display='block';
-      } else { savCard.style.display='none'; }
-    } else { savCard.style.display='none'; }
-
-
-    const dayTotals={};
-    (history||[]).forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
-    const bigDay=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1])[0];
-    if(bigDay){
-      const d=new Date(viewYear,viewMonth,parseInt(bigDay[0]));
-      const dayName=d.toLocaleDateString('default',{weekday:'long',day:'numeric',month:'long'});
-      $('biggestDayText').innerHTML=`${dayName}<br><span style="color:var(--text);font-size:20px;font-weight:700;letter-spacing:-0.5px;">${cur}${bigDay[1].toFixed(2)}</span>`;
-      $('biggestDayCard').style.display='block';
-    } else {
-      $('biggestDayCard').style.display='none';
-    }
-  }
-}
-
-/* ══ INIT ══ */
-(async()=>{
-  try {
-    const { data:{ session } } = await sb.auth.getSession();
-    if(session){
-      currentUser=session.user;
-      await loadFromCloud(viewYear,viewMonth);
-      showApp(); render();
-      checkName();
-      checkMonthPrompts();
-      playOutro();
-    } else {
-      if(!localStorage.getItem('ot_welcomed')){
-        playIntro();
-      } else {
-        showAuth();
-      }
-    }
-  } catch(e) { showAuth(); }
-})();
-
-// Handle email confirmation redirect and auth state changes
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'PASSWORD_RECOVERY') {
-    const newPass = prompt('Enter your new password (min 6 characters):');
-    if (newPass && newPass.length >= 6) {
-      const { error } = await sb.auth.updateUser({ password: newPass });
-      if (error) { alert('Error: ' + error.message); }
-      else { alert('Password updated! You can now log in.'); window.history.replaceState(null,'',window.location.pathname); }
-    }
-    return;
-  }
-  if (event === 'SIGNED_IN' && session && !currentUser) {
-    currentUser = session.user;
-    if (event === 'SIGNED_IN' && window.location.hash.includes('access_token')) {
-      // Coming from email confirmation link
-      window.history.replaceState(null, '', window.location.pathname);
-      await loadFromCloud(viewYear, viewMonth);
-      showApp();
-      render();
-      // Show confirmation toast
-      const toast = document.createElement('div');
-      toast.textContent = '✓ Email confirmed — welcome to OnTrack!';
-      toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#21c25a;color:#06220f;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;font-family:Inter,sans-serif;z-index:999;white-space:nowrap;';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
-    }
-  }
-});
-let deferredPrompt = null;
-function dismissInstall() {
-  $('installBanner').style.display = 'none';
-  localStorage.setItem('installDismissed', '1');
-}
-function nativeInstall() {
-  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; dismissInstall(); }
-}
-function showInstallBanner() {
-  if (localStorage.getItem('installDismissed')) return;
-  if (window.matchMedia('(display-mode: standalone)').matches) return; // already installed
-  $('installBanner').style.display = 'block';
-}
-
-// Android — catch native install prompt
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  $('installMsg').textContent = 'Install OnTrack as an app on your device';
-  $('installBtn').style.display = 'block';
-  setTimeout(showInstallBanner, 3000);
-});
-
-// iOS — show manual instructions
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isInStandalone = window.matchMedia('(display-mode: standalone)').matches;
-if (isIOS && !isInStandalone) setTimeout(showInstallBanner, 3000);
-
-// Register service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
-}
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(document.activeElement===$('budgetInput')){e.preventDefault();setBudget();}
-    if(document.activeElement===$('spendInput')){e.preventDefault();addSpend();}
-  }
-});
-
-let touchStartX=0,touchStartY=0;
-document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
-document.addEventListener('touchend',e=>{
-  if(activeTab!=='home')return;
-  const dx=e.changedTouches[0].clientX-touchStartX,dy=e.changedTouches[0].clientY-touchStartY;
-  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){if(dx>0)shiftDay(-1);else shiftDay(1);}
-},{passive:true});
+function next(){goSlide((cur+1)%3);}
+function reset(){clearInterval(timer);timer=setInterval(next,4500);}
+reset();
 </script>
 </body>
 </html>
