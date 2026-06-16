@@ -551,24 +551,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="streak" id="streak"></div>
 
       <!-- Spend pace meter — only shows on today when spending logged -->
-      <div id="spendPace" style="display:none!important;" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
-        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:8px 14px;color:var(--text);">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
-            <span id="paceLabel" style="font-size:11px;font-weight:600;color:var(--green);">On pace</span>
-          </div>
-          <!-- Meter bar -->
-          <div style="position:relative;height:6px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:visible;">
-            <div id="paceFill" style="height:100%;border-radius:50px;transition:width 0.6s ease,background 0.4s ease;width:50%;background:var(--green);"></div>
-            <!-- Time of day marker -->
-            <div id="paceMarker" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:2px;height:12px;background:rgba(255,255,255,0.7);border-radius:2px;transition:left 0.6s ease;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:5px;">
-            <span style="font-size:9px;color:rgba(255,255,255,0.7);">Under</span>
-            <span style="font-size:9px;color:rgba(255,255,255,0.7);">Over</span>
-          </div>
-        </div>
-      </div>
+      <!-- pace bar removed -->
     </div>
   <div class="spend-area" id="spendArea" style="display:none;">
   <button id="noSpendBtn" onclick="logNoSpend()" style="visibility:hidden;width:100%;height:38px;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.3);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#21c25a;cursor:pointer;margin-bottom:4px;">Nothing spent today</button>
@@ -1642,8 +1625,8 @@ function render(){
       const rb=$('ringBudget');
       rb.textContent=(a>0&&s>0)?`Daily budget: ${getCurrency()}${a.toFixed(2)}`:'';
 
-      // Spend pace meter
-      const paceEl=$('spendPace');
+      // Spend pace meter (removed)
+      const paceEl=null;
       if(isToday&&s>0&&a>0){
         const hr=new Date().getHours()+new Date().getMinutes()/60;
         const dayPct=Math.max(0.01,hr/24);
@@ -1651,18 +1634,18 @@ function render(){
         const ratio=spentPct/dayPct;
         const fillPct=Math.min(100,Math.max(0,spentPct*100));
         const markerPct=Math.min(98,Math.max(2,dayPct*100));
-        $('paceFill').style.width=fillPct+'%';
-        $('paceMarker').style.left=markerPct+'%';
+        if($('paceFill')) $('paceFill').style.width=fillPct+'%';
+        if($('paceMarker')) $('paceMarker').style.left=markerPct+'%';
         let paceColor,paceText;
         if(ratio<0.7){paceColor='var(--green)';paceText='Under pace ↓';}
         else if(ratio<1.25){paceColor='var(--green)';paceText='On pace';}
         else if(ratio<1.75){paceColor='#f0a500';paceText='Slightly ahead';}
         else{paceColor='#ef9a9a';paceText='Spending fast';}
-        $('paceFill').style.background=paceColor;
-        $('paceLabel').style.color=paceColor;
-        $('paceLabel').textContent=paceText;
-        paceEl.style.visibility='visible';
-      } else { paceEl.style.visibility='hidden'; }
+        if($('paceFill')) $('paceFill').style.background=paceColor;
+        if($('paceLabel')) $('paceLabel').style.color=paceColor;
+        if($('paceLabel')) $('paceLabel').textContent=paceText;
+        if(paceEl) paceEl.style.visibility='visible';
+      } else { if(paceEl) paceEl.style.visibility='hidden'; }
       const dayHasEntries=history.filter(h=>h&&h.day===selectedDay).length>0;
       $('btnClear').style.visibility=dayHasEntries?'visible':'hidden';
       if($('noSpendBtn')){
