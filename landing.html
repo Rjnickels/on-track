@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnTrack — Know exactly what you can spend today</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:#080808;color:#f0f0f0;font-family:'Inter',sans-serif;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);}
+.nav-brand{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+.nav-brand span{color:#21c25a;}
+.nav-cta{background:#21c25a;color:#000;font-size:14px;font-weight:700;padding:10px 24px;border-radius:50px;text-decoration:none;transition:background 0.2s;}
+.nav-cta:hover{background:#27d966;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 48px 60px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(33,194,90,0.07) 0%,transparent 70%);}
+
+.hero-inner{display:flex;align-items:center;justify-content:space-between;gap:80px;max-width:1200px;width:100%;}
+
+/* LEFT: text + slides */
+.hero-left{flex:1;max-width:520px;}
+.hero-eyebrow{font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:20px;}
+.hero-headline{font-size:clamp(42px,5vw,64px);font-weight:900;letter-spacing:-2.5px;line-height:1.0;color:#fff;margin-bottom:24px;}
+.hero-headline span{color:#21c25a;}
+
+/* Slide feature text */
+.slide-features{min-height:160px;margin-bottom:40px;}
+.feature{display:none;animation:fadeUp 0.5s ease forwards;}
+.feature.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.feature-tag{display:inline-block;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.25);border-radius:50px;padding:4px 14px;font-size:11px;font-weight:600;color:#21c25a;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.feature-title{font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.5px;}
+.feature-desc{font-size:16px;color:rgba(255,255,255,0.55);line-height:1.7;}
+
+/* Slide dots */
+.dots{display:flex;gap:8px;margin-bottom:40px;}
+.dot{width:28px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);cursor:pointer;transition:background 0.3s,width 0.3s;}
+.dot.active{background:#21c25a;width:48px;}
+
+.hero-cta{display:inline-flex;align-items:center;gap:10px;background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:16px 32px;border-radius:50px;text-decoration:none;transition:all 0.2s;}
+.hero-cta:hover{background:#27d966;transform:translateY(-1px);}
+.hero-cta-sub{margin-top:12px;font-size:13px;color:rgba(255,255,255,0.35);}
+
+/* RIGHT: iPhone mockup */
+.hero-right{flex-shrink:0;position:relative;}
+.phone-scene{width:300px;height:580px;position:relative;}
+
+/* 3D tilt */
+.phone-tilt{transform:perspective(1200px) rotateY(-18deg) rotateX(4deg);transform-style:preserve-3d;transition:transform 0.6s ease;}
+.phone-tilt:hover{transform:perspective(1200px) rotateY(-10deg) rotateX(2deg);}
+
+/* Glow behind phone */
+.phone-glow{position:absolute;top:10%;left:10%;right:10%;bottom:10%;border-radius:50%;background:radial-gradient(circle,rgba(33,194,90,0.2) 0%,transparent 70%);filter:blur(40px);pointer-events:none;}
+
+/* Phone shell */
+.phone{width:260px;position:relative;background:#0f0f0f;border-radius:44px;border:2px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);}
+.phone-island{height:32px;background:#0f0f0f;display:flex;align-items:center;justify-content:center;}
+.island{width:88px;height:20px;background:#000;border-radius:20px;}
+.phone-screen{padding:12px 16px 18px;}
+
+/* Screen slides */
+.screen-slide{display:none;}
+.screen-slide.active{display:block;animation:fadeUp 0.5s ease forwards;}
+
+/* App header mini */
+.mini-header{display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative;}
+.mini-wm{font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.mini-wm span{color:#21c25a;}
+.mini-logout{position:absolute;right:0;font-size:7px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;}
+
+/* Ring screen */
+.mini-date{text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+.mini-ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 8px;}
+.mini-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+.mini-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.mini-amt{font-size:26px;font-weight:700;color:#21c25a;letter-spacing:-1px;line-height:1;}
+.mini-lbl{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.45);}
+.mini-status{font-size:8px;font-weight:700;color:#21c25a;}
+.mini-streak{text-align:center;font-size:8px;font-weight:700;color:#21c25a;letter-spacing:0.5px;margin-bottom:8px;}
+.mini-input{background:rgba(255,255,255,0.05);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.mini-sym{font-size:11px;color:rgba(255,255,255,0.3);}
+.mini-ph{font-size:9px;color:rgba(255,255,255,0.2);flex:1;}
+.mini-add{background:#21c25a;border-radius:16px;padding:5px 10px;font-size:8px;font-weight:700;color:#000;}
+
+/* Calendar screen */
+.mini-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mini-cal-title{font-size:13px;font-weight:700;color:#fff;}
+.mini-cal-arrow{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,0.4);}
+.mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;}
+.mini-day-label{font-size:7px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center;padding:2px 0;}
+.mini-cal-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;}
+.mc-g{background:rgba(33,194,90,0.7);color:#fff;}
+.mc-r{background:rgba(183,28,28,0.6);color:#fff;}
+.mc-e{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);}
+.mc-f{background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2);}
+.cal-legend{display:flex;justify-content:center;gap:12px;}
+.cal-leg-item{display:flex;align-items:center;gap:4px;font-size:7px;color:rgba(255,255,255,0.4);}
+.cal-leg-dot{width:6px;height:6px;border-radius:2px;}
+
+/* Overview screen */
+.mini-ov-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;}
+.mini-ov-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:10px;}
+.mini-proj{background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:center;}
+.mini-proj-amt{font-size:18px;font-weight:700;color:#21c25a;letter-spacing:-0.5px;}
+.mini-proj-lbl{font-size:8px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.mini-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px;}
+.mini-stat-val{font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.mini-stat-lbl{font-size:7px;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+/* Mini nav */
+.mini-nav{display:flex;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:6px;}
+.mini-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.mini-tab-icon{font-size:13px;}
+.mini-tab-lbl{font-size:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+.mini-tab.act .mini-tab-lbl{color:#21c25a;}
+
+/* ── HOW IT WORKS ── */
+.hiw{padding:120px 48px;max-width:1200px;margin:0 auto;}
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#21c25a;margin-bottom:16px;}
+.section-title{font-size:clamp(32px,4vw,48px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:64px;max-width:500px;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+.step{padding:36px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:20px;transition:border-color 0.3s;}
+.step:hover{border-color:rgba(33,194,90,0.3);}
+.step-num{width:44px;height:44px;border-radius:50%;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.25);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#21c25a;margin-bottom:20px;}
+.step-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-0.3px;}
+.step-desc{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;}
+
+/* ── CTA BAND ── */
+.cta-band{margin:0 48px 120px;padding:80px 80px;background:linear-gradient(135deg,rgba(33,194,90,0.08) 0%,rgba(33,194,90,0.03) 100%);border:1px solid rgba(33,194,90,0.15);border-radius:32px;display:flex;align-items:center;justify-content:space-between;gap:48px;}
+.cta-band-left h2{font-size:clamp(28px,3.5vw,42px);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;}
+.cta-band-left p{font-size:16px;color:rgba(255,255,255,0.5);max-width:420px;line-height:1.6;}
+.cta-band-right{flex-shrink:0;text-align:center;}
+.cta-big{display:inline-block;background:#21c25a;color:#000;font-size:16px;font-weight:700;padding:18px 40px;border-radius:50px;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.cta-big:hover{background:#27d966;transform:translateY(-2px);}
+.cta-band-sub{font-size:12px;color:rgba(255,255,255,0.3);margin-top:10px;}
+
+/* ── FOOTER ── */
+footer{padding:32px 48px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
+.footer-brand{font-size:16px;font-weight:800;color:#fff;}
+.footer-brand span{color:#21c25a;}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s;}
+.footer-links a:hover{color:#21c25a;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">On<span>Track</span></div>
+  <a href="/index.html" class="nav-cta">Try it free →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <div class="hero-eyebrow">Daily budget tracker</div>
+      <h1 class="hero-headline">Know exactly<br>what you can<br><span>spend today.</span></h1>
+
+      <div class="slide-features">
+        <div class="feature active" id="feat0">
+          <div class="feature-tag">Home</div>
+          <div class="feature-title">Your daily allowance at a glance</div>
+          <div class="feature-desc">Set your monthly budget once. OnTrack divides it across the month and tells you exactly what you can spend today — updated every time you log something.</div>
+        </div>
+        <div class="feature" id="feat1">
+          <div class="feature-tag">Calendar</div>
+          <div class="feature-title">See your whole month in seconds</div>
+          <div class="feature-desc">Green days mean you stayed on track. Red days mean you overspent. At a glance you can see patterns, streaks, and where things went wrong.</div>
+        </div>
+        <div class="feature" id="feat2">
+          <div class="feature-tag">Overview</div>
+          <div class="feature-title">Monthly insights that actually mean something</div>
+          <div class="feature-desc">See how much you've saved, your average daily spend, your most expensive days, and whether you're ahead or behind your budget this month.</div>
+        </div>
+      </div>
+
+      <div class="dots">
+        <div class="dot active" onclick="goSlide(0)"></div>
+        <div class="dot" onclick="goSlide(1)"></div>
+        <div class="dot" onclick="goSlide(2)"></div>
+      </div>
+
+      <a href="/index.html" class="hero-cta">Try it free →</a>
+      <div class="hero-cta-sub">No download needed. Works on any phone.</div>
+    </div>
+
+    <!-- RIGHT: Angled iPhone -->
+    <div class="hero-right">
+      <div class="phone-scene">
+        <div class="phone-glow"></div>
+        <div class="phone-tilt">
+          <div class="phone">
+            <div class="phone-island"><div class="island"></div></div>
+            <div class="phone-screen">
+
+              <!-- Screen 0: Home -->
+              <div class="screen-slide active" id="screen0">
+                <div class="mini-header">
+                  <div class="mini-wm">On<span>Track</span></div>
+                  <div class="mini-logout">LOG OUT</div>
+                </div>
+                <div class="mini-date">Today</div>
+                <div class="mini-ring-wrap">
+                  <svg viewBox="0 0 140 140">
+                    <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(33,194,90,0.08)" stroke-width="8"/>
+                    <circle cx="70" cy="70" r="60" fill="none" stroke="#21c25a" stroke-width="8" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="94"/>
+                  </svg>
+                  <div class="mini-ring-text">
+                    <div class="mini-amt">£8.40</div>
+                    <div class="mini-lbl">left today</div>
+                    <div class="mini-status">✓ ON TRACK</div>
+                  </div>
+                </div>
+                <div class="mini-streak">3 DAY STREAK</div>
+                <div class="mini-input">
+                  <div class="mini-sym">£</div>
+                  <div class="mini-ph">What did you spend?</div>
+                  <div class="mini-add">Add</div>
+                </div>
+                <div class="mini-nav">
+                  <div class="mini-tab act"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl" style="color:#21c25a;">Home</div></div>
+                  <div class="mini-tab"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl">Calendar</div></div>
+                  <div class="mini-tab"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl">Overview</div></div>
+                </div>
+              </div>
+
+              <!-- Screen 1: Calendar -->
+              <div class="screen-slide" id="screen1">
+                <div class="mini-header">
+                  <div class="mini-wm">On<span>Track</span></div>
+                </div>
+                <div class="mini-cal-header">
+                  <div class="mini-cal-arrow">‹</div>
+                  <div class="mini-cal-title">June 2026</div>
+                  <div class="mini-cal-arrow">›</div>
+                </div>
+                <div class="mini-cal-days">
+                  <div class="mini-day-label">M</div><div class="mini-day-label">T</div><div class="mini-day-label">W</div><div class="mini-day-label">T</div><div class="mini-day-label">F</div><div class="mini-day-label">S</div><div class="mini-day-label">S</div>
+                  <div class="mini-cal-cell mc-g">2</div><div class="mini-cal-cell mc-g">3</div><div class="mini-cal-cell mc-r">4</div><div class="mini-cal-cell mc-g">5</div><div class="mini-cal-cell mc-g">6</div><div class="mini-cal-cell mc-g">7</div><div class="mini-cal-cell mc-r">8</div>
+                  <div class="mini-cal-cell mc-g">9</div><div class="mini-cal-cell mc-g">10</div><div class="mini-cal-cell mc-g">11</div><div class="mini-cal-cell mc-r">12</div><div class="mini-cal-cell mc-g">13</div><div class="mini-cal-cell mc-g">14</div><div class="mini-cal-cell mc-g">15</div>
+                  <div class="mini-cal-cell mc-g">16</div><div class="mini-cal-cell mc-g">17</div><div class="mini-cal-cell mc-g">18</div><div class="mini-cal-cell mc-g">19</div><div class="mini-cal-cell mc-r">20</div><div class="mini-cal-cell mc-e">21</div><div class="mini-cal-cell mc-f">22</div>
+                  <div class="mini-cal-cell mc-f">23</div><div class="mini-cal-cell mc-f">24</div><div class="mini-cal-cell mc-f">25</div><div class="mini-cal-cell mc-f">26</div><div class="mini-cal-cell mc-f">27</div><div class="mini-cal-cell mc-f">28</div><div class="mini-cal-cell mc-f">29</div>
+                </div>
+                <div class="cal-legend">
+                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(33,194,90,0.7);"></div>On track</div>
+                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(183,28,28,0.6);"></div>Over</div>
+                  <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);"></div>Not logged</div>
+                </div>
+                <div class="mini-nav" style="margin-top:8px;">
+                  <div class="mini-tab"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl">Home</div></div>
+                  <div class="mini-tab act"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl" style="color:#21c25a;">Calendar</div></div>
+                  <div class="mini-tab"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl">Overview</div></div>
+                </div>
+              </div>
+
+              <!-- Screen 2: Overview -->
+              <div class="screen-slide" id="screen2">
+                <div class="mini-header">
+                  <div class="mini-wm">On<span>Track</span></div>
+                </div>
+                <div class="mini-ov-title">Good evening, Rob</div>
+                <div class="mini-ov-sub">June 2026</div>
+                <div class="mini-proj">
+                  <div class="mini-proj-amt">£45.20 ahead</div>
+                  <div class="mini-proj-lbl">of budget this month</div>
+                </div>
+                <div class="mini-stats">
+                  <div class="mini-stat"><div class="mini-stat-val" style="color:#21c25a;">£9.20</div><div class="mini-stat-lbl">avg daily spend</div></div>
+                  <div class="mini-stat"><div class="mini-stat-val">18/21</div><div class="mini-stat-lbl">days on track</div></div>
+                  <div class="mini-stat"><div class="mini-stat-val">7 🔥</div><div class="mini-stat-lbl">best streak</div></div>
+                  <div class="mini-stat"><div class="mini-stat-val" style="color:#21c25a;">£193</div><div class="mini-stat-lbl">saved so far</div></div>
+                </div>
+                <div class="mini-nav" style="margin-top:8px;">
+                  <div class="mini-tab"><div class="mini-tab-icon">🏠</div><div class="mini-tab-lbl">Home</div></div>
+                  <div class="mini-tab"><div class="mini-tab-icon">📅</div><div class="mini-tab-lbl">Calendar</div></div>
+                  <div class="mini-tab act"><div class="mini-tab-icon">≡</div><div class="mini-tab-lbl" style="color:#21c25a;">Overview</div></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw">
+  <div class="section-eyebrow">Simple by design</div>
+  <h2 class="section-title">Up and running in two minutes.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Set your budget</div>
+      <div class="step-desc">Enter your monthly disposable income — or use our calculator to work it out from your pay and bills.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Log what you spend</div>
+      <div class="step-desc">No categories, no tags, no faff. Just type the amount and tap add. Takes two seconds.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Watch the ring</div>
+      <div class="step-desc">Green means you're on track. Red means slow down. You always know exactly where you stand.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div style="max-width:1200px;margin:0 auto;">
+  <div class="cta-band">
+    <div class="cta-band-left">
+      <h2>Start spending with confidence.</h2>
+      <p>Free forever. No download needed. Works on any phone — just open it in your browser and go.</p>
+    </div>
+    <div class="cta-band-right">
+      <a href="/index.html" class="cta-big">Try OnTrack free →</a>
+      <div class="cta-band-sub">ontrackapp.co.uk</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">On<span>Track</span></div>
+  <div class="footer-links">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="mailto:hello@ontrackapp.co.uk">Contact</a>
+    <a href="/index.html">Open App</a>
+  </div>
+</footer>
+
+<script>
+let current = 0;
+let timer;
+
+function goSlide(n){
+  document.querySelectorAll('.feature,.dot,.screen-slide').forEach(el=>el.classList.remove('active'));
+  document.getElementById('feat'+n).classList.add('active');
+  document.getElementById('screen'+n).classList.add('active');
+  document.querySelectorAll('.dot')[n].classList.add('active');
+  current = n;
+  resetTimer();
+}
+
+function nextSlide(){
+  goSlide((current+1)%3);
+}
+
+function resetTimer(){
+  clearInterval(timer);
+  timer = setInterval(nextSlide, 4000);
+}
+
+resetTimer();
+</script>
+</body>
+</html>
