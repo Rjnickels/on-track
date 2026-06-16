@@ -10,7 +10,7 @@
 <script>
 // Redirect desktop visitors to landing page
 if(window.innerWidth > 768 && !window.location.search.includes('app')) {
-  window.location.href = '/landing.html';
+  window.location.replace('/landing.html');
 }
 </script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -85,7 +85,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-auth:hover { background: var(--green-bright); }
 .btn-auth:disabled { opacity: 0.5; cursor: default; }
 
-.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 24px 8px; gap: 10px; overflow: hidden; }
+.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 24px 8px; gap: 10px; overflow: hidden; }
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
 .day-arrow:hover { background: rgba(255,255,255,0.14); }
@@ -188,10 +188,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .reset-btn { margin: 8px 24px 0; width: calc(100% - 48px); padding: 11px; border: 1px solid rgba(239,154,154,0.2); border-radius: 50px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; background: transparent; color: #ef9a9a; cursor: pointer; transition: background 0.2s; }
 .reset-btn:hover { background: rgba(239,154,154,0.08); }
 
-@media (max-height: 680px) {
-  #spendPace { visibility: hidden !important; height: 0 !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; }
-  .streak { font-size: 10px !important; margin: 0 !important; }
-}
+
 .calc-row label { font-size:13px; color:var(--muted); flex:1; }
 .calc-input-wrap { display:flex; align-items:center; gap:4px; background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:6px 10px; width:110px; flex-shrink:0; }
 .calc-input-wrap span { font-size:13px; font-weight:600; color:var(--muted); }
@@ -554,7 +551,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <div class="streak" id="streak"></div>
 
       <!-- Spend pace meter — only shows on today when spending logged -->
-      <div id="spendPace" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
+      <div id="spendPace" style="display:none!important;" style="visibility:hidden;width:100%;padding:0 24px;margin-top:4px;">
         <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:8px 14px;color:var(--text);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Spend pace</span>
@@ -958,9 +955,11 @@ function saveName(){
 function checkName(){ if(!getName()) $('nameOverlay').classList.add('show'); }
 function setCurrency(btn, symbol){
   document.querySelectorAll('.currency-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   localStorage.setItem('ot_currency', symbol);
-  $('currencySymbol').textContent = symbol;
+  if($('currencySymbol')) $('currencySymbol').textContent = symbol;
+  if($('spendCurrencySymbol')) $('spendCurrencySymbol').textContent = symbol;
+  render();
 }
 
 /* ══ END OF MONTH & NEW MONTH ══ */
@@ -1276,9 +1275,11 @@ function openSettings(){
   const d=getData(viewYear,viewMonth);
   $('settingsBudget').value=d.budget>0?d.budget:'';
   const cur=getCurrency();
+  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.remove('active'));
   ['gbp','usd','eur','aud','cad'].forEach(c=>{
     const sym={gbp:'£',usd:'$',eur:'€',aud:'A$',cad:'C$'}[c];
-    $(`cur_${c}`).classList.toggle('active',sym===cur);
+    const el=$(`cur_${c}`);
+    if(el) el.classList.toggle('active',sym===cur);
   });
   $('profileMsg').textContent='';
   $('budgetMsg').textContent='';
