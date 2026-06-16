@@ -89,10 +89,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
-.ring-wrap { position: relative; width: min(320px, calc(var(--app-height, 100dvh) - 430px)); height: min(320px, calc(var(--app-height, 100dvh) - 430px)); min-width: 160px; min-height: 160px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
+.ring-wrap { position: relative; width: min(320px, calc(var(--app-height, 100dvh) - 430px)); aspect-ratio: 1 / 1; min-width: 160px; margin: 4px 0; transition: transform 0.25s ease, opacity 0.25s ease; }
 .ring-glow { display:none; }
 .ring-wrap::after {
-  content:''; position:absolute; inset:6%; border-radius:50%;
+  content:''; position:absolute; width:88%; height:88%; top:6%; left:6%; border-radius:50%;
   pointer-events:none; opacity:0; transition:opacity 1.5s ease;
   box-shadow: 0 0 0 12px rgba(33,194,90,0.08), 0 0 30px 8px rgba(33,194,90,0.2), 0 0 60px 16px rgba(33,194,90,0.08);
 }
@@ -114,8 +114,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .streak { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--green); height: 20px; min-height: 20px; text-align: center; visibility: visible; }
 
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-@keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.5} }
-.ring-wrap.over { animation: shake 0.5s ease, pulse-ring 1.4s ease infinite 0.5s; }
+@keyframes pulse-ring { 0%,100%{opacity:1} 50%{opacity:0.7} }
+.ring-wrap.over { animation: none; }
 
 .spend-area { padding: 6px 24px 8px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; border-top: 1px solid var(--border); }
 .input-row { display: flex; gap: 8px; }
@@ -1266,29 +1266,17 @@ function getEOMSuggestion(saved, budget){
   return `💡 You had ${cur}${saved.toFixed(0)} left this month — great discipline.`;
 }
 function openSettings(){
-  // Populate fields
   $('settingsName').value=getName()||'';
   showBreakdownInSettings();
-  const isLight=localStorage.getItem('ot_theme')==='light';
-  if($('themeToggle')) $('themeToggle').checked=isLight;
-  if($('themeTrack')) $('themeTrack').style.background=isLight?'var(--green)':'rgba(255,255,255,0.15)';
-  if($('themeThumb')) $('themeThumb').style.transform=isLight?'translateX(18px)':'translateX(0)';
   const d=getData(viewYear,viewMonth);
   $('settingsBudget').value=d.budget>0?d.budget:'';
-  // Currency buttons
   const cur=getCurrency();
   ['gbp','usd','eur','aud','cad'].forEach(c=>{
     const sym={gbp:'£',usd:'$',eur:'€',aud:'A$',cad:'C$'}[c];
     $(`cur_${c}`).classList.toggle('active',sym===cur);
   });
-  // Notifications
-  const notifOn=localStorage.getItem('ot_notif')==='1';
-  $('notifToggle').checked=notifOn;
-  updateNotifToggleUI(notifOn);
-  $('notifTimeRow').style.display=notifOn?'flex':'none';
   $('profileMsg').textContent='';
   $('budgetMsg').textContent='';
-  $('notifMsg').textContent='';
   $('settingsOverlay').classList.add('show');
 }
 function closeSettings(){ $('settingsOverlay').classList.remove('show'); }
