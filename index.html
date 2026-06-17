@@ -86,7 +86,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-auth:hover { background: var(--green-bright); }
 .btn-auth:disabled { opacity: 0.5; cursor: default; }
 
-.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 24px 8px; gap: 10px; overflow: hidden; }
+.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px 12px; gap: 16px; overflow: hidden; }
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
 .day-arrow:hover { background: rgba(255,255,255,0.14); }
@@ -545,17 +545,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         <div class="ring-center">
           <div class="ring-amount" id="ringAmount">—</div>
           <div class="ring-label" id="ringLabel">left to spend today</div>
-          <div class="ring-status" id="ringStatus">—</div>
-          <div id="ringBudget" style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:3px;letter-spacing:0.5px;"></div>
+          
+          
         </div>
       </div>
-      <div class="streak" id="streak"></div>
+      
 
       <!-- Spend pace meter — only shows on today when spending logged -->
       <!-- pace bar removed -->
     </div>
   <div class="spend-area" id="spendArea" style="display:none;">
-  <button id="noSpendBtn" onclick="logNoSpend()" style="visibility:hidden;width:100%;height:38px;background:rgba(33,194,90,0.12);border:1px solid rgba(33,194,90,0.3);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:#21c25a;cursor:pointer;margin-bottom:4px;">Nothing spent today</button>
+  
   <form onsubmit="event.preventDefault(); addSpend();">
   <div class="input-row">
   <div class="input-wrap"><span id="spendCurrencySymbol">£</span><input id="spendInput" type="number" min="0" step="0.01" placeholder="What did you spend?" inputmode="decimal"/></div>
@@ -608,67 +608,55 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
   <!-- OVERVIEW -->
   <div class="screen" id="logScreen" style="overflow-y:auto;padding-bottom:80px;">
-    <div style="padding:10px 20px 4px;">
-      <div id="overviewTitle" style="font-size:26px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:-0.5px;"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="padding:16px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <button class="cal-nav-btn" onclick="prevMonth()">&#8249;</button>
-        <h2 style="font-size:14px;font-weight:600;" id="overviewMonthLabel">—</h2>
+        <h2 style="font-size:15px;font-weight:600;color:var(--text);" id="overviewMonthLabel">—</h2>
         <button class="cal-nav-btn" id="overviewNextBtn" onclick="nextMonth()">&#8250;</button>
       </div>
-      <p id="logDateLabel" style="display:none;">—</p>
-    </div>
-
-    <div class="projection" data-themed="true" id="projectionBanner" style="margin:6px 16px 4px;padding:18px 16px;">—</div>
-
-    <!-- Get back on track / savings — directly below banner -->
-    <div id="onTrackCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(183,28,28,0.08);border:1px solid rgba(183,28,28,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(239,154,154,0.7);margin-bottom:4px;">How to get back on track</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="onTrackText">—</div>
+      <!-- Month progress bar -->
+      <div style="height:3px;background:var(--glass);border-radius:3px;overflow:hidden;margin-bottom:20px;">
+        <div id="monthProgressBar" style="height:100%;background:var(--green);border-radius:3px;transition:width 0.6s ease;width:0%;"></div>
       </div>
-    </div>
-    <div id="savingsCard" style="display:none;margin:4px 16px;">
-      <div style="background:rgba(33,194,90,0.08);border:1px solid rgba(33,194,90,0.2);border-radius:12px;padding:10px 14px;color:var(--text);">
-        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:rgba(123,224,154,0.7);margin-bottom:4px;">Savings projection</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;" id="savingsText">—</div>
+      <!-- Hero number -->
+      <div style="text-align:center;margin-bottom:24px;">
+        <div id="heroAmount" style="font-size:42px;font-weight:700;letter-spacing:-2px;line-height:1;color:var(--green);">—</div>
+        <div id="heroLabel" style="font-size:13px;color:var(--muted);margin-top:6px;">—</div>
       </div>
-    </div>
-
-    <!-- Option D: Days left ring + remaining budget -->
-    <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;color:var(--text);">
-        <div style="position:relative;width:72px;height:72px;flex-shrink:0;">
-          <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
-            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
-            <circle id="daysRingFill" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="50"/>
+      <!-- 2x2 stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;">
+          <div id="statAvg" style="font-size:22px;font-weight:700;color:var(--green);letter-spacing:-0.5px;">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">daily average</div>
+        </div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;">
+          <div id="statDaysOn" style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">days on track</div>
+        </div>
+      </div>
+      <!-- Days left ring card -->
+      <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:16px;margin-bottom:10px;">
+        <div style="position:relative;width:64px;height:64px;flex-shrink:0;">
+          <svg viewBox="0 0 64 64" width="64" height="64" style="transform:rotate(-90deg);">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="7"/>
+            <circle id="daysRingFill" cx="32" cy="32" r="26" fill="none" stroke="var(--green)" stroke-width="7" stroke-linecap="round" stroke-dasharray="163" stroke-dashoffset="50"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
-            <span id="daysLeftNum" style="font-size:20px;font-weight:700;color:var(--text);line-height:1;font-family:'Inter',sans-serif;">—</span>
-            <span style="font-size:7px;color:var(--muted);font-family:'Inter',sans-serif;letter-spacing:0.3px;">days left</span>
+            <span id="daysLeftNum" style="font-size:18px;font-weight:700;color:var(--text);line-height:1;">—</span>
+            <span style="font-size:7px;color:var(--muted);">left</span>
           </div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;font-family:'Inter',sans-serif;">—</div>
-          <div style="font-size:11px;color:var(--muted);">remaining to spend</div>
-          <div id="budgetBaseLabel" style="font-size:10px;color:rgba(255,255,255,0.7);font-family:'Inter',sans-serif;">Based on a £500 budget</div>
-          <div style="height:4px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-top:2px;">
-            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:50px;transition:width 0.6s ease;width:0%;"></div>
+        <div style="flex:1;">
+          <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">remaining budget</div>
+          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-top:8px;">
+            <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:3px;transition:width 0.6s ease;width:0%;"></div>
           </div>
         </div>
       </div>
+      <button id="viewSummaryBtn" style="display:none;width:100%;height:44px;background:var(--glass);border:1px solid var(--border);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;margin-bottom:6px;" onclick="viewMonthlySummary()">View summary</button>
+      <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     </div>
-
-    <!-- Most expensive day -->
-    <div style="margin:4px 16px;">
-      <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);" id="biggestDayCard">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;">Biggest spend this month</div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);" id="biggestDayText">—</div>
-      </div>
-    </div>
-
-    <div class="divider" style="margin:6px 20px;"></div>
-    <button id="viewSummaryBtn" style="display:none;width:calc(100% - 32px);margin:0 16px 6px;height:44px;background:var(--glass);border:1px solid var(--border);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;" onclick="viewMonthlySummary()">View summary</button>
-    <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
   </div>
 
   <!-- SETTINGS -->
@@ -1619,7 +1607,7 @@ function render(){
       $('ringWrap').classList.toggle('over',amount<0);
       $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
       $('ringAmount').style.color=col;
-      $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
+      if($('ringStatus')) $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
       $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
       $('ringLabel').textContent=amount<0?(isToday?'overspent today':'overspent'):(isToday?'left to spend today':'left to spend');
 
@@ -1651,7 +1639,7 @@ function render(){
       $('btnClear').style.visibility=dayHasEntries?'visible':'hidden';
       if($('noSpendBtn')){
         const canMarkNoSpend=!dayHasEntries&&(isToday||(selectedDay<todayDate()));
-        $('noSpendBtn').style.visibility=canMarkNoSpend?'visible':'hidden';
+        if($('noSpendBtn')) $('noSpendBtn').style.visibility=canMarkNoSpend?'visible':'hidden';
       }
 
       const streakEl=$('streak');let streak=0;
@@ -1688,85 +1676,78 @@ function render(){
   {
     // Personalised title
     const name = getName();
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    $('overviewTitle').innerHTML = name ? `${greeting}, ${name}` : greeting;
-    // Show "View summary" button for past months with data
-    const summaryBtn=$('viewSummaryBtn');
-    const isPast=!isCurrentMonth();
-    const hasBudget=budget>0;
-    const monthLabel=new Date(viewYear,viewMonth,1).toLocaleString('default',{month:'long'});
-    if(summaryBtn){
-      summaryBtn.style.display=(isPast&&hasBudget)?'block':'none';
-      summaryBtn.textContent=`View ${monthLabel} summary`;
-    }
-    $('overviewMonthLabel').textContent = formatMonth(viewYear, viewMonth);
-    $('logDateLabel').textContent = formatMonth(viewYear,viewMonth);
+    const monthLabel=new Date(viewYear,viewMonth,1).toLocaleString('default',{month:'long',year:'numeric'});
+    $('overviewMonthLabel').textContent = monthLabel;
+
     const elapsed=td?td:days;
-    const flat=days>0?budget/days:0,expected=flat*elapsed,actual=spentUpToDay(elapsed,history);
-    const saved=expected-actual;
+    const totalSpent=spentUpToDay(elapsed,history);
     const cur=getCurrency();
-    const banner=$('projectionBanner');
-    if(actual>0||elapsed>1){
-      banner.style.display='block';banner.classList.remove('ahead','behind');
-      if(saved>=0.005){banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">${cur}${saved.toFixed(2)} ahead this month</strong>`;}
-      else if(saved<=-0.005){banner.classList.add('behind');banner.innerHTML=`You're <strong style="color:#ef9a9a">${cur}${Math.abs(saved).toFixed(2)} behind this month</strong>`;}
-      else{banner.classList.add('ahead');banner.innerHTML=`You're <span class="on">On</span><span class="track">Track</span><strong style="color:var(--green)">Right on budget</strong>`;}
-    }else{banner.style.display='none';}
 
-    const mLeft=remainingAfter(days,viewYear,viewMonth),dFwd=td?Math.max(0,days-td):0;
+    // Month progress bar
+    const monthPct=Math.round((elapsed/days)*100);
+    if($('monthProgressBar')) $('monthProgressBar').style.width=monthPct+'%';
 
-    // Option D graphic
-    const daysLeft=dFwd;
-    const pct=Math.max(0,Math.min(100,daysLeft/days*100));
-    const circ=188.5;
-    $('daysRingFill').style.strokeDashoffset=circ*(1-(pct/100));
-    $('daysLeftNum').textContent=daysLeft>0?daysLeft:'0';
-    const remaining=Math.max(0,mLeft);
-    $('budgetRemainingAmt').textContent=`${cur}${remaining.toFixed(2)}`;
-    $('budgetBaseLabel').textContent=`Based on a ${cur}${budget.toFixed(0)} budget`;
-    const usedPct=budget>0?Math.min(100,Math.max(0,((budget-remaining)/budget)*100)):0;
-    $('budgetUsedBar').style.width=usedPct+'%';
-    $('budgetUsedBar').style.background=remaining>=0?'var(--green)':'#ef9a9a';
-
-    // Get back on track card — when behind
-    const otCard=$('onTrackCard');
-    if(saved<=-0.005&&dFwd>0&&budget>0){
-      // Use same formula as calendar future cells so numbers match
-      const daysLeft=Math.max(1,days-(td||days)+1);
-      const remaining=td?remainingAfter(td-1,viewYear,viewMonth):mLeft;
-      const newDaily=remaining/daysLeft;
-      if(newDaily>0){
-        $('onTrackText').textContent=`Spend no more than ${cur}${Math.floor(newDaily)} per day for the next ${daysLeft} day${daysLeft!==1?'s':''} to finish the month on budget.`;
+    // Hero: how much saved or over vs flat budget expectation
+    const flat=days>0?budget/days:0;
+    const expected=flat*elapsed;
+    const saved=expected-totalSpent;
+    if($('heroAmount')&&$('heroLabel')){
+      if(elapsed>0&&budget>0){
+        if(saved>=0.01){
+          $('heroAmount').textContent=`${cur}${saved.toFixed(2)} saved`;
+          $('heroAmount').style.color='var(--green)';
+          $('heroLabel').textContent='ahead of budget this month';
+        } else if(saved<=-0.01){
+          $('heroAmount').textContent=`${cur}${Math.abs(saved).toFixed(2)} over`;
+          $('heroAmount').style.color='#ef9a9a';
+          $('heroLabel').textContent='over budget this month';
+        } else {
+          $('heroAmount').textContent='Right on budget';
+          $('heroAmount').style.color='var(--green)';
+          $('heroLabel').textContent='exactly on track';
+        }
       } else {
-        $('onTrackText').textContent=`You've exceeded your budget for this month. Try to minimise spending for the remaining ${dFwd} day${dFwd!==1?'s':''}.`;
+        $('heroAmount').textContent='—';
+        $('heroLabel').textContent='start logging to see your progress';
       }
-      otCard.style.display='block';
-    } else { otCard.style.display='none'; }
+    }
 
-    // Savings projection card — when ahead
-    const savCard=$('savingsCard');
-    if(saved>=0.005&&elapsed>1&&dFwd>0&&budget>0){
-      const avgDaily=actual/elapsed;
-      const projectedTotal=actual+(avgDaily*dFwd);
-      const projectedSaving=budget-projectedTotal;
-      if(projectedSaving>0.5){
-        $('savingsText').textContent=`Keep this up and you'll have ${cur}${projectedSaving.toFixed(2)} to put into savings this month. 🎉`;
-        savCard.style.display='block';
-      } else { savCard.style.display='none'; }
-    } else { savCard.style.display='none'; }
+    // Daily average
+    const avgDaily=elapsed>0?totalSpent/elapsed:0;
+    if($('statAvg')) $('statAvg').textContent=elapsed>0?`${cur}${avgDaily.toFixed(2)}`:'—';
 
-
+    // Days on track
     const dayTotals={};
     (history||[]).forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
-    const bigDay=Object.entries(dayTotals).sort((a,b)=>b[1]-a[1])[0];
-    if(bigDay){
-      const d=new Date(viewYear,viewMonth,parseInt(bigDay[0]));
-      const dayName=d.toLocaleDateString('default',{weekday:'long',day:'numeric',month:'long'});
-      $('biggestDayText').innerHTML=`${dayName}<br><span style="color:var(--text);font-size:20px;font-weight:700;letter-spacing:-0.5px;">${cur}${bigDay[1].toFixed(2)}</span>`;
-      $('biggestDayCard').style.display='block';
-    } else {
-      $('biggestDayCard').style.display='none';
+    let daysOnTrack=0;
+    for(let i=1;i<=elapsed;i++){
+      const allow=dailyAllowance(i,days,viewYear,viewMonth);
+      if((dayTotals[i]||0)<=allow) daysOnTrack++;
+    }
+    if($('statDaysOn')) $('statDaysOn').textContent=elapsed>0?`${daysOnTrack}/${elapsed}`:'—';
+
+    // Days left ring
+    const dFwd=td?Math.max(0,days-td):0;
+    const daysLeft=dFwd;
+    const circ=163;
+    const pct=Math.max(0,Math.min(100,daysLeft/days*100));
+    if($('daysRingFill')) $('daysRingFill').style.strokeDashoffset=circ*(1-(pct/100));
+    if($('daysLeftNum')) $('daysLeftNum').textContent=daysLeft>0?daysLeft:'0';
+    const mLeft=remainingAfter(days,viewYear,viewMonth);
+    const remaining=Math.max(0,mLeft);
+    if($('budgetRemainingAmt')) $('budgetRemainingAmt').textContent=`${cur}${remaining.toFixed(2)}`;
+    const usedPct=budget>0?Math.min(100,Math.max(0,((budget-remaining)/budget)*100)):0;
+    if($('budgetUsedBar')){
+      $('budgetUsedBar').style.width=usedPct+'%';
+      $('budgetUsedBar').style.background=remaining>=0?'var(--green)':'#ef9a9a';
+    }
+
+    // View summary button for past months
+    const summaryBtn=$('viewSummaryBtn');
+    const isPast=!isCurrentMonth();
+    if(summaryBtn){
+      summaryBtn.style.display=(isPast&&budget>0)?'block':'none';
+      summaryBtn.textContent=`View ${new Date(viewYear,viewMonth,1).toLocaleString('default',{month:'long'})} summary`;
     }
   }
 }
