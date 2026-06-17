@@ -1607,12 +1607,10 @@ function render(){
       $('ringWrap').classList.toggle('over',amount<0);
       $('ringAmount').textContent=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
       $('ringAmount').style.color=col;
-      if($('ringStatus')) $('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';
-      $('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';
-      $('ringLabel').textContent=amount<0?(isToday?'overspent today':'overspent'):(isToday?'left to spend today':'left to spend');
-
+      if($('ringStatus')){$('ringStatus').textContent=amount>=0?'✓ on track':'⚠ over budget';$('ringStatus').style.color=amount>=0?'var(--green-soft)':'#ef9a9a';}
+      $('ringLabel').textContent=amount<0?(isToday?'overspent today':'overspent'):(isToday?'left today':'left today');
       const rb=$('ringBudget');
-      rb.textContent=(a>0&&s>0)?`Daily budget: ${getCurrency()}${a.toFixed(2)}`:'';
+      if(rb) rb.textContent=(a>0&&s>0)?`Daily budget: ${getCurrency()}${a.toFixed(2)}`:'';
 
       // Spend pace meter (removed)
       const paceEl=null;
@@ -1644,8 +1642,10 @@ function render(){
 
       const streakEl=$('streak');let streak=0;
       for(let i=todayDate()-1;i>=1;i--){if(spentOnDay(i,history)<=dailyAllowance(i,days,viewYear,viewMonth))streak++;else break;}
-      if(streak>=2&&isToday){streakEl.textContent=`${streak} day streak`;streakEl.style.visibility='visible';}
-      else{streakEl.textContent=`0 day streak`;streakEl.style.visibility='hidden';}
+      if(streakEl){
+        if(streak>=2&&isToday){streakEl.textContent=`${streak} day streak`;streakEl.style.visibility='visible';}
+        else{streakEl.textContent=`0 day streak`;streakEl.style.visibility='hidden';}
+      }
     }
   }
   {
