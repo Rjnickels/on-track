@@ -86,7 +86,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .btn-auth:hover { background: var(--green-bright); }
 .btn-auth:disabled { opacity: 0.5; cursor: default; }
 
-.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 24px 12px; gap: 16px; overflow: hidden; }
+.home-top { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 24px 8px; gap: 10px; overflow: hidden; }
 .date-row { display: flex; align-items: center; gap: 14px; margin-bottom: 2px; }
 .day-arrow { background: var(--glass); border: 1px solid var(--border); color: var(--text); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
 .day-arrow:hover { background: rgba(255,255,255,0.14); }
@@ -112,7 +112,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .ring-wrap.slide-right { transform: translateX(60px); opacity: 0; }
 .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track { fill: none; stroke: none; stroke-width: 14; }
-.ring-fill { fill: none; stroke: #21c25a; stroke-width: 14; stroke-linecap: round; stroke-dasharray: 879.6; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; }
+.ring-fill { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.6s ease; }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .ring-amount { font-size: 48px; font-weight: 700; letter-spacing: -2px; line-height: 1; transition: color 0.6s; }
 .ring-label { font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -826,13 +826,21 @@ function playOutro(){
   const ring=$('outroRing');
 
   // Mirror the home screen layout so ring sits in exact same position
-  // Measure the actual header and nav heights
   const appHeader=document.querySelector('.app-header');
   const nav=document.querySelector('.nav');
-  const spendArea=$('spendArea');
   if(appHeader) $('outroHeaderSpacer').style.height=appHeader.getBoundingClientRect().height+'px';
-  const bottomH=(nav?nav.getBoundingClientRect().height:0)+(spendArea?spendArea.getBoundingClientRect().height:0);
-  $('outroBottomSpacer').style.height=bottomH+'px';
+  const navH=nav?nav.getBoundingClientRect().height:60;
+  $('outroBottomSpacer').style.height=navH+'px';
+  // Match outro ring size to actual home ring size
+  const homeRing=$('ringWrap');
+  if(homeRing){
+    const rw=homeRing.getBoundingClientRect().width;
+    const outroRingEl=ring.querySelector('svg');
+    if(outroRingEl&&rw>0){
+      outroRingEl.setAttribute('width',rw);
+      outroRingEl.setAttribute('height',rw);
+    }
+  }
 
   // Reset
   outro.style.display='flex';
@@ -1589,11 +1597,10 @@ function render(){
   const days=daysInMonth(viewYear,viewMonth),td=todayDateFor(viewYear,viewMonth);
   {
     const has=budget>0;
-    // DEBUG
-    $('ringAmount').textContent=`b=${budget} y=${viewYear} m=${viewMonth} d=${selectedDay}`;
-    $('homeMain').style.display='flex';
-    $('spendArea').style.display='none';
-    $('budgetSetup').style.display='none';
+    $('budgetSetup').style.display=has?'none':'flex';
+    $('homeMain').style.display=has?'flex':'none';
+    $('spendArea').style.display=has?'flex':'none';
+    if(!has) showIncomeOverlay();
     if(has){
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
@@ -1605,14 +1612,15 @@ function render(){
       const a=dailyAllowance(selectedDay,days,viewYear,viewMonth);
       const s=spentOnDay(selectedDay,history);
       const amount=a-s;
-      // DEBUG - remove after fixing
-      $('ringLabel').textContent=`a=${a.toFixed(2)} s=${s.toFixed(2)} b=${budget}`;
 
       const circ=2*Math.PI*140,ratio=a>0?Math.max(0,amount)/a:0,off=circ*(1-Math.min(1,ratio)),col=ringColor(ratio);
       const fill=$('ringFill');
-      fill.setAttribute('stroke-dasharray', circ);
-      fill.setAttribute('stroke-dashoffset', off);
-      fill.setAttribute('stroke', col);
+      fill.setAttribute('stroke',col);
+      fill.setAttribute('stroke-dasharray',circ);
+      fill.setAttribute('stroke-dashoffset',off);
+      fill.style.stroke=col;
+      fill.style.strokeDasharray=circ;
+      fill.style.strokeDashoffset=off;
       fill.classList.toggle('glow',amount>=0&&ratio>=0.5);
       const ringWrapEl=$('ringWrap');
       const glowDiv=$('ringGlow');
