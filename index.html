@@ -655,6 +655,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
         </div>
       </div>
       <button id="viewSummaryBtn" style="display:none;width:100%;height:44px;background:var(--glass);border:1px solid var(--border);border-radius:50px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;margin-bottom:6px;" onclick="viewMonthlySummary()">View summary</button>
+      <div id="nextMonthTip" style="display:none;background:rgba(33,194,90,0.06);border:1px solid rgba(33,194,90,0.15);border-radius:14px;padding:14px 16px;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:6px;">💡 Next month</div>
+        <div id="nextMonthTipText" style="font-size:13px;color:var(--text);line-height:1.6;"></div>
+      </div>
       <button class="reset-btn" onclick="resetMonth()">Start the month over</button>
     </div>
   </div>
@@ -1714,7 +1718,6 @@ function render(){
         } else if(saved<=-0.01){
           $('heroAmount').textContent=`${cur}${Math.abs(saved).toFixed(2)} over`;
           $('heroAmount').style.color='#ef9a9a';
-          // Check if recovery is possible
           const daysLeft=td?Math.max(0,days-td):0;
           const remaining=remainingAfter(td?td-1:days,viewYear,viewMonth);
           const deficit=Math.abs(saved);
@@ -1732,9 +1735,14 @@ function render(){
           $('heroAmount').style.color='var(--green)';
           $('heroLabel').textContent='exactly on track';
         }
+      } else if(budget>0&&elapsed>0&&totalSpent===0){
+        // Budget set but nothing logged yet
+        $('heroAmount').textContent='Nothing logged yet';
+        $('heroAmount').style.color='var(--muted)';
+        $('heroLabel').textContent='start logging your spending on the home screen';
       } else {
         $('heroAmount').textContent='—';
-        $('heroLabel').textContent='start logging to see your progress';
+        $('heroLabel').textContent='set a budget to get started';
       }
     }
 
@@ -1777,8 +1785,26 @@ function render(){
       $('budgetUsedBar').style.background=remaining>=0?'var(--green)':'#ef9a9a';
     }
 
-    // View summary button for past months
-    const summaryBtn=$('viewSummaryBtn');
+    // Smart next month suggestion
+    const tipEl=$('nextMonthTip');
+    const tipText=$('nextMonthTipText');
+    if(tipEl&&tipText&&elapsed>=7&&budget>0&&avgDaily>0){
+      const projectedMonthly=avgDaily*days;
+      const diff=projectedMonthly-budget;
+      if(Math.abs(diff)>5){
+        const suggestedBudget=Math.round(avgDaily*days);
+        if(diff>0){
+          tipText.textContent=`Based on your ${cur}${avgDaily.toFixed(2)}/day average, you're on track to spend ${cur}${projectedMonthly.toFixed(0)} this month. Consider increasing your budget to ${cur}${suggestedBudget} or cutting back.`;
+        } else {
+          tipText.textContent=`You're only spending ${cur}${avgDaily.toFixed(2)}/day on average. You could reduce your budget to ${cur}${suggestedBudget} next month and put the rest into savings.`;
+        }
+        tipEl.style.display='block';
+      } else {
+        tipEl.style.display='none';
+      }
+    } else if(tipEl){
+      tipEl.style.display='none';
+    }
     const isPast=!isCurrentMonth();
     if(summaryBtn){
       summaryBtn.style.display=(isPast&&budget>0)?'block':'none';
