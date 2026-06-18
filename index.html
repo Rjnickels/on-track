@@ -1507,13 +1507,8 @@ function todayDateFor(y,m){return(y===todayYear()&&m===todayMonth())?todayDate()
 function dailyAllowance(day,totalDays,y,m){
   const td=todayDateFor(y,m);
   if(td&&day>=td){
-    // Remaining budget minus deficit to break even
-    const remaining=remainingAfter(td-1,y,m);
-    const daysLeft=Math.max(1,totalDays-td+1);
-    const flatExpected=(getData(y,m).budget||0)/totalDays*(td-1);
-    const actualSpent=spentUpToDay(td-1,getData(y,m).history||[]);
-    const deficit=Math.max(0,actualSpent-flatExpected);
-    return Math.max(0,(remaining-deficit)/daysLeft);
+    const r=remainingAfter(td-1,y,m);
+    return r/Math.max(1,totalDays-td+1);
   }else{
     const r=remainingAfter(day-1,y,m);
     return r/Math.max(1,totalDays-day+1);
