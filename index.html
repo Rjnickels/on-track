@@ -1500,7 +1500,21 @@ function spentOnDay(day,h){return h.filter(x=>x&&x.day===day).reduce((s,x)=>s+(x
 function spentUpToDay(day,h){let t=0;for(let i=1;i<=day;i++)t+=spentOnDay(i,h);return t;}
 function remainingAfter(day,y,m){const d=getData(y,m);return(d.budget||0)-spentUpToDay(day,d.history||[]);}
 function todayDateFor(y,m){return(y===todayYear()&&m===todayMonth())?todayDate():null;}
-function dailyAllowance(day,totalDays,y,m){const td=todayDateFor(y,m);if(td&&day>=td){const r=remainingAfter(td-1,y,m);return r/Math.max(1,totalDays-td+1);}else{const r=remainingAfter(day-1,y,m);return r/Math.max(1,totalDays-day+1);}}
+function dailyAllowance(day,totalDays,y,m){
+  const td=todayDateFor(y,m);
+  if(td&&day>=td){
+    // Remaining budget minus deficit to break even
+    const remaining=remainingAfter(td-1,y,m);
+    const daysLeft=Math.max(1,totalDays-td+1);
+    const flatExpected=(getData(y,m).budget||0)/totalDays*(td-1);
+    const actualSpent=spentUpToDay(td-1,getData(y,m).history||[]);
+    const deficit=Math.max(0,actualSpent-flatExpected);
+    return Math.max(0,(remaining-deficit)/daysLeft);
+  }else{
+    const r=remainingAfter(day-1,y,m);
+    return r/Math.max(1,totalDays-day+1);
+  }
+}
 function ringColor(r){if(r<=0)return'#b71c1c';if(r<.2)return'#2e7d32';if(r<.5)return'#388e3c';return'#21c25a';}
 
 /* ══ ACTIONS ══ */
@@ -1700,7 +1714,19 @@ function render(){
         } else if(saved<=-0.01){
           $('heroAmount').textContent=`${cur}${Math.abs(saved).toFixed(2)} over`;
           $('heroAmount').style.color='#ef9a9a';
-          $('heroLabel').textContent='over budget this month';
+          // Check if recovery is possible
+          const daysLeft=td?Math.max(0,days-td):0;
+          const remaining=remainingAfter(td?td-1:days,viewYear,viewMonth);
+          const deficit=Math.abs(saved);
+          const canRecover=remaining>deficit&&daysLeft>0;
+          if(canRecover){
+            const targetDaily=(remaining-deficit)/daysLeft;
+            $('heroLabel').textContent=`spend ${cur}${targetDaily.toFixed(2)}/day to recover`;
+          } else if(daysLeft>0){
+            $('heroLabel').textContent=`can't recover this month — spend as little as possible`;
+          } else {
+            $('heroLabel').textContent='over budget this month';
+          }
         } else {
           $('heroAmount').textContent='Right on budget';
           $('heroAmount').style.color='var(--green)';
@@ -1712,11 +1738,16 @@ function render(){
       }
     }
 
-    // Daily average
+    // Daily average — colour based on vs daily budget
     const avgDaily=elapsed>0?totalSpent/elapsed:0;
-    if($('statAvg')) $('statAvg').textContent=elapsed>0?`${cur}${avgDaily.toFixed(2)}`:'—';
+    const flatDaily=days>0?budget/days:0;
+    if($('statAvg')){
+      $('statAvg').textContent=elapsed>0?`${cur}${avgDaily.toFixed(2)}`:'—';
+      // Green if under daily budget, red if over
+      $('statAvg').style.color=elapsed>0?(avgDaily<=flatDaily?'var(--green)':'#ef9a9a'):'var(--text)';
+    }
 
-    // Days on track
+    // Days on track — neutral colour, just a number
     const dayTotals={};
     (history||[]).forEach(h=>{if(h&&h.day)dayTotals[h.day]=(dayTotals[h.day]||0)+(h.amount||0);});
     let daysOnTrack=0;
@@ -1724,7 +1755,11 @@ function render(){
       const allow=dailyAllowance(i,days,viewYear,viewMonth);
       if((dayTotals[i]||0)<=allow) daysOnTrack++;
     }
-    if($('statDaysOn')) $('statDaysOn').textContent=elapsed>0?`${daysOnTrack}/${elapsed}`:'—';
+    if($('statDaysOn')){
+      $('statDaysOn').textContent=elapsed>0?`${daysOnTrack}/${elapsed}`:'—';
+      // Green if majority on track, red if not
+      $('statDaysOn').style.color=elapsed>0?(daysOnTrack/elapsed>=0.5?'var(--green)':'#ef9a9a'):'var(--text)';
+    }
 
     // Days left ring
     const dFwd=td?Math.max(0,days-td):0;
