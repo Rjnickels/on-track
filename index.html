@@ -822,45 +822,16 @@ function getName(){ return localStorage.getItem('ot_name')||''; }
 /* ══ OUTRO ANIMATION ══ */
 function playOutro(){
   const outro=$('outroScreen');
-  const wm=$('outroWordmark');
-  const ring=$('outroRing');
-
-  // Mirror the home screen layout so ring sits in exact same position
-  const appHeader=document.querySelector('.app-header');
-  const nav=document.querySelector('.nav');
-  if(appHeader) $('outroHeaderSpacer').style.height=appHeader.getBoundingClientRect().height+'px';
-  const navH=nav?nav.getBoundingClientRect().height:60;
-  $('outroBottomSpacer').style.height=navH+'px';
-  // Match outro ring size to actual home ring size
-  const homeRing=$('ringWrap');
-  if(homeRing){
-    const rw=homeRing.getBoundingClientRect().width;
-    const outroRingEl=ring.querySelector('svg');
-    if(outroRingEl&&rw>0){
-      outroRingEl.setAttribute('width',rw);
-      outroRingEl.setAttribute('height',rw);
-    }
-  }
-
-  // Reset
+  if(!outro) return;
   outro.style.display='flex';
   outro.style.opacity='1';
-  wm.style.opacity='0';
-  wm.style.animation='';
-  wm.style.transform='';
-  ring.style.opacity='0';
-  ring.style.animation='';
+  outro.style.transition='';
   void outro.offsetWidth;
-
-  setTimeout(()=>{ wm.style.animation='outroWmIn 0.7s ease forwards'; },100);
-  setTimeout(()=>{ wm.style.animation='outroWmOut 0.5s ease forwards'; },1100);
-  setTimeout(()=>{ ring.style.animation='outroRingIn 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards'; },1500);
-  setTimeout(()=>{ outro.style.transition='opacity 0.6s ease'; outro.style.opacity='0'; },2600);
   setTimeout(()=>{
-    outro.style.display='none';
-    outro.style.opacity='1';
-    outro.style.transition='';
-  },3200);
+    outro.style.transition='opacity 0.5s ease';
+    outro.style.opacity='0';
+    setTimeout(()=>{ outro.style.display='none'; outro.style.opacity='1'; outro.style.transition=''; },550);
+  },400);
 }
 function playIntro(){
   const intro=$('introScreen');
