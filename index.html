@@ -1589,10 +1589,11 @@ function render(){
   const days=daysInMonth(viewYear,viewMonth),td=todayDateFor(viewYear,viewMonth);
   {
     const has=budget>0;
-    $('budgetSetup').style.display=has?'none':'flex';
-    $('homeMain').style.display=has?'flex':'none';
-    $('spendArea').style.display=has?'flex':'none';
-    if(!has) showIncomeOverlay();
+    // DEBUG
+    $('ringAmount').textContent=`b=${budget} y=${viewYear} m=${viewMonth} d=${selectedDay}`;
+    $('homeMain').style.display='flex';
+    $('spendArea').style.display='none';
+    $('budgetSetup').style.display='none';
     if(has){
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
