@@ -1,4 +1,4 @@
-const CACHE = 'ontrack-v8';
+const CACHE = 'ontrack-v9';
 const ASSETS = [
   '/',
   '/index.html',
