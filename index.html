@@ -643,12 +643,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
             <span id="daysLeftNum" style="font-size:18px;font-weight:700;color:var(--text);line-height:1;">—</span>
-            <span style="font-size:7px;color:var(--muted);">left</span>
+            <span style="font-size:7px;color:var(--muted);">days left</span>
           </div>
         </div>
         <div style="flex:1;">
           <div id="budgetRemainingAmt" style="font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px;">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px;">remaining budget</div>
+          <div id="budgetRemainingLabel" style="font-size:11px;color:var(--muted);margin-top:3px;">left in your budget</div>
           <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-top:8px;">
             <div id="budgetUsedBar" style="height:100%;background:var(--green);border-radius:3px;transition:width 0.6s ease;width:0%;"></div>
           </div>
@@ -1714,7 +1714,7 @@ function render(){
         if(saved>=0.01){
           $('heroAmount').textContent=`${cur}${saved.toFixed(2)} saved`;
           $('heroAmount').style.color='var(--green)';
-          $('heroLabel').textContent='ahead of budget this month';
+          $('heroLabel').textContent='ahead of pace this month';
         } else if(saved<=-0.01){
           $('heroAmount').textContent=`${cur}${Math.abs(saved).toFixed(2)} over`;
           $('heroAmount').style.color='#ef9a9a';
@@ -1779,6 +1779,11 @@ function render(){
     const mLeft=remainingAfter(days,viewYear,viewMonth);
     const remaining=Math.max(0,mLeft);
     if($('budgetRemainingAmt')) $('budgetRemainingAmt').textContent=`${cur}${remaining.toFixed(2)}`;
+    if($('budgetRemainingLabel')){
+      if(saved<-0.01) $('budgetRemainingLabel').textContent=`left — but you\'re ${cur}${Math.abs(saved).toFixed(2)} behind pace`;
+      else if(saved>0.01) $('budgetRemainingLabel').textContent=`left — ${cur}${saved.toFixed(2)} ahead of pace`;
+      else $('budgetRemainingLabel').textContent='left in your budget';
+    }
     const usedPct=budget>0?Math.min(100,Math.max(0,((budget-remaining)/budget)*100)):0;
     if($('budgetUsedBar')){
       $('budgetUsedBar').style.width=usedPct+'%';
