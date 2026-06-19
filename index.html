@@ -1565,6 +1565,13 @@ function nextMonth(){if(viewMonth===11){viewMonth=0;viewYear++;}else viewMonth++
 /* ══ RENDER ══ */
 function render(){
   const d=getData(viewYear,viewMonth),history=d.history||[],budget=d.budget||0;
+  // If budget is 0 but user is logged in, data may not have loaded yet — retry
+  if(budget===0&&currentUser){
+    loadFromCloud(viewYear,viewMonth).then(()=>{
+      const d2=getData(viewYear,viewMonth);
+      if(d2.budget>0) render();
+    });
+  }
   const days=daysInMonth(viewYear,viewMonth),td=todayDateFor(viewYear,viewMonth);
   {
     const has=budget>0;
