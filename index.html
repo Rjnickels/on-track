@@ -1507,9 +1507,22 @@ function shiftDay(dir){
   if(n<1||n>todayDate())return;
   $('undoBar').style.visibility='hidden';
   const ring=$('ringWrap');
-  const slideOut=dir>0?'slide-left':'slide-right', slideIn=dir>0?'slide-right':'slide-left';
+  // Clear any stuck slide classes first
+  ring.classList.remove('slide-left','slide-right');
+  const slideOut=dir>0?'slide-left':'slide-right';
+  const slideIn=dir>0?'slide-right':'slide-left';
   ring.classList.add(slideOut);
-  setTimeout(()=>{selectedDay=n;render();ring.style.transition='none';ring.classList.remove(slideOut);ring.classList.add(slideIn);requestAnimationFrame(()=>{requestAnimationFrame(()=>{ring.style.transition='';ring.classList.remove(slideIn);});});},250);
+  setTimeout(()=>{
+    selectedDay=n;
+    render();
+    ring.style.transition='none';
+    ring.classList.remove('slide-left','slide-right');
+    ring.classList.add(slideIn);
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+      ring.style.transition='';
+      ring.classList.remove('slide-left','slide-right');
+    });});
+  },250);
 }
 function addSpend(){
   const raw=parseFloat($('spendInput').value);if(isNaN(raw)||raw<0){alert('Please enter a valid amount.');return;}
@@ -1580,6 +1593,9 @@ function render(){
     $('spendArea').style.display=has?'flex':'none';
     if(!has) showIncomeOverlay();
     if(has){
+      // Safety: clear any stuck slide classes
+      const rw=$('ringWrap');
+      if(rw){ rw.style.opacity=''; rw.style.transform=''; }
       const isToday=selectedDay===todayDate()&&isCurrentMonth();
       const dl=$('dateLabel');
       dl.textContent=formatDay(selectedDay,viewYear,viewMonth);
