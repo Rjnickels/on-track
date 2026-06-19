@@ -95,6 +95,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .date-label { font-size: 16px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: center; min-width: 170px; }
 .date-label.is-today { color: var(--text); }
 
+@keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
+@keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
+@keyframes outroRingIn { from{opacity:0;transform:rotate(-180deg) scale(0.4)} to{opacity:1;transform:rotate(0deg) scale(1)} }
 .ring-wrap { position: relative; width: min(320px, calc(var(--app-height, 100dvh) - 430px)); aspect-ratio: 1 / 1; min-width: 160px; margin: 4px 0; }
 .ring-glow { display:none; }
 .ring-wrap::after {
@@ -227,11 +230,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   </div>
   <!-- OUTRO ANIMATION (post-login) -->
   <div id="outroScreen" style="display:none;position:fixed;inset:0;z-index:250;background:var(--bg);flex-direction:column;pointer-events:none;">
-    <style>
-      @keyframes outroWmIn  { from{opacity:0;filter:blur(8px)} to{opacity:1;filter:blur(0px)} }
-      @keyframes outroWmOut { from{opacity:1} to{opacity:0;transform:scale(0.9)} }
-      @keyframes outroRingIn { from{opacity:0;transform:rotate(-180deg) scale(0.4)} to{opacity:1;transform:rotate(0deg) scale(1)} }
-    </style>
     <div id="outroWordmark" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;">
       <span style="font-family:'Inter',sans-serif;font-size:52px;font-weight:800;letter-spacing:-2px;"><span style="color:#ffffff;">On</span><span style="color:#21c25a;">Track</span></span>
     </div>
@@ -1650,7 +1648,7 @@ function render(){
       const newAmtText=amount>=0?`${getCurrency()}${amount.toFixed(2)}`:`-${getCurrency()}${Math.abs(amount).toFixed(2)}`;
       const amtEl=$('ringAmount');
       if(amtEl.textContent&&amtEl.textContent!==newAmtText&&amtEl.textContent!=='—'){
-        animateNumber(amtEl,amtEl.textContent,newAmtText,400);
+        animateNumber(amtEl,amtEl.textContent,newAmtText,700);
       } else {
         amtEl.textContent=newAmtText;
       }
